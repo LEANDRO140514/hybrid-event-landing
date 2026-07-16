@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid Event 2026 - Guías de Participantes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, #ff3d00 0%, #ffd600 100%);
+        }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(255, 61, 0, 0.3); }
+        .role-icon { font-size: 3rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-hero text-white py-12">
+        <div class="max-w-4xl mx-auto px-4">
+            <a href="/" class="text-white opacity-80 hover:opacity-100 mb-6 inline-flex items-center gap-2 text-sm font-semibold">
+                ← Volver a Hybrid Event
+            </a>
+            <div class="text-center">
+                <h1 class="text-5xl font-black mb-4">Hybrid Event 2026</h1>
+                <p class="text-xl opacity-90">Guías para Participantes</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-16">
+        <!-- Intro -->
+        <section class="mb-16 text-center">
+            <h2 class="text-3xl font-black mb-4 text-gray-900">¿Necesitas ayuda?</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto mb-8">
+                Selecciona tu rol para acceder a instrucciones detalladas, customer journey y FAQ. 
+                Todo lo que necesitas saber para participar exitosamente en Hybrid Event 2026.
+            </p>
+        </section>
+
+        <!-- Role Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <!-- Atleta -->
+            <a href="athlete.html" class="card-hover bg-white rounded-lg shadow-lg p-8 border-l-4 border-orange-500 hover:shadow-2xl">
+                <div class="role-icon text-center">🏃</div>
+                <h3 class="text-2xl font-black text-gray-900 mb-3 text-center">Atleta</h3>
+                <p class="text-gray-600 text-center mb-4">
+                    Desde tu inscripción hasta el día del evento. Incluye paso-a-paso, FAQ y qué esperar.
+                </p>
+                <div class="text-center text-orange-600 font-semibold hover:text-orange-700">
+                    Leer guía →
+                </div>
+            </a>
+
+            <!-- Capitán -->
+            <a href="captain.html" class="card-hover bg-white rounded-lg shadow-lg p-8 border-l-4 border-yellow-500 hover:shadow-2xl">
+                <div class="role-icon text-center">👥</div>
+                <h3 class="text-2xl font-black text-gray-900 mb-3 text-center">Capitán de Equipo</h3>
+                <p class="text-gray-600 text-center mb-4">
+                    Responsabilidades, timeline y checklist para capitanes. Coordina tu equipo con confianza.
+                </p>
+                <div class="text-center text-yellow-600 font-semibold hover:text-yellow-700">
+                    Leer guía →
+                </div>
+            </a>
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-gray-200 pt-8 mt-12 text-center text-gray-600">
+            <p class="text-sm">
+                ¿Problemas técnicos? Contacta a <strong>soporte@enforma.mx</strong>
+            </p>
+            <p class="text-xs mt-2 text-gray-500">
+                Última actualización: Julio 2026
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

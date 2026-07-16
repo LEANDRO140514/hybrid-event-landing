@@ -1,0 +1,24 @@
+# WORKSPACE_STATUS
+
+- **Product:** The Hybrid Event
+- **Workspace:** `hybrid-event-web`
+- **Origin:** `C:\Users\vonde\Proyectos\orchids-hype-pwa-design`
+- **Creation phase:** ENFORMA-EXTRACT-1A
+- **Status:** ACTIVE_BUILD
+- **Creation date:** 2026-07-15
+- **Agent:** Claude Code
+- **Source branch:** main
+- **Source HEAD:** `a595e463ed671da8ee935de5109f654b067146f1`
+- **Source HEAD short:** `a595e46`
+- **Source working tree state:** Clean (project-level). Parent repo contains unrelated untracked files.
+- **Extraction method:** COPY_FULL_THEN_PRUNE
+- **Current scope:** Full source copy. No pruning performed. All pages, stores, components, and assets from source are present.
+- **Prohibited scope:** No product separation. No file removal. No route changes. No naming changes.
+- **Next phase:** ENFORMA-EXTRACT-1B — Hybrid Event Pruning
+- **Future monorepo destination:** PENDING
+- **Decisions applied:** D-01 (The Hybrid Event), D-02 (per-product themes), D-03 (public spectator tickets), D-04 (Shop independent layout)
+- **Files copied:** 109
+- **Files excluded:** node_modules/, dist/, .git/
+- **Validation:** All 109 files verified identical (MD5 hash comparison)
+- **Build:** NOT_RUN — dependencies not installed in Phase 1A
+- **Git:** Initialized. No remote configured.
