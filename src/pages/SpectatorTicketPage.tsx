@@ -118,7 +118,7 @@ export default function SpectatorTicketPage() {
                 fullWidth
                 required
                 sx={textFieldSx}
-                FormHelperTextProps={{ sx: { fontFamily: "'Space Grotesk', sans-serif" } }}
+                slotProps={{ formHelperText: { sx: { fontFamily: "'Space Grotesk', sans-serif" } } }}
               />
               <TextField
                 label="Email"
@@ -128,7 +128,7 @@ export default function SpectatorTicketPage() {
                 fullWidth
                 required
                 sx={textFieldSx}
-                FormHelperTextProps={{ sx: { fontFamily: "'Space Grotesk', sans-serif" } }}
+                slotProps={{ formHelperText: { sx: { fontFamily: "'Space Grotesk', sans-serif" } } }}
               />
               <TextField
                 label="Teléfono"
@@ -138,7 +138,7 @@ export default function SpectatorTicketPage() {
                 fullWidth
                 required
                 sx={textFieldSx}
-                FormHelperTextProps={{ sx: { fontFamily: "'Space Grotesk', sans-serif" } }}
+                slotProps={{ formHelperText: { sx: { fontFamily: "'Space Grotesk', sans-serif" } } }}
               />
             </Stack>
           </CardContent>

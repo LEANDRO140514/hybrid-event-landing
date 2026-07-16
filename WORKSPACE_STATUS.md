@@ -4,21 +4,28 @@
 - **Workspace:** `hybrid-event-web`
 - **Origin:** `C:\Users\vonde\Proyectos\orchids-hype-pwa-design`
 - **Creation phase:** ENFORMA-EXTRACT-1A
-- **Status:** ACTIVE_BUILD
+- **Pruning phase:** ENFORMA-EXTRACT-1B
+- **Status:** READY_FOR_VALIDATION
 - **Creation date:** 2026-07-15
+- **Pruning date:** 2026-07-15
 - **Agent:** Claude Code
 - **Source branch:** main
 - **Source HEAD:** `a595e463ed671da8ee935de5109f654b067146f1`
 - **Source HEAD short:** `a595e46`
-- **Source working tree state:** Clean (project-level). Parent repo contains unrelated untracked files.
 - **Extraction method:** COPY_FULL_THEN_PRUNE
-- **Current scope:** Full source copy. No pruning performed. All pages, stores, components, and assets from source are present.
-- **Prohibited scope:** No product separation. No file removal. No route changes. No naming changes.
-- **Next phase:** ENFORMA-EXTRACT-1B — Hybrid Event Pruning
+- **Current scope:** The Hybrid Event only — 7 public routes. No App, Shop, or Admin.
+- **Pages preserved (7):** LandingPage, RegistroPage, PagoPage, ConfirmacionPage, SpectatorTicketPage, SpectatorConfirmPage, CorporateLandingPage
+- **Pages removed (11):** DashboardPage, ProfilePage, TrainingPage, CommunityPage, EventPage, ShopPage, ProductDetailPage, CartPage, MerchCheckoutPage, MerchConfirmacionPage, AdminPage
+- **Modules removed (4):** AppLayout, BottomTabNav, cartStore, productStore
+- **Routes:** 7 public routes (`/`, `/registro`, `/pago`, `/confirmacion`, `/tickets`, `/tickets/confirmacion`, `/corporate`)
+- **No `/app/*` routes:** ✅ Confirmed
+- **Build:** PASSED (Vite 8.1.2, 838 modules, PWA generated)
+- **Typecheck:** PASSED (TypeScript 6.0.2)
+- **Lint:** PASSED (oxlint)
+- **Dependencies:** npm install (3s, 464 packages, 0 vulnerabilities)
+- **MUI v9 fixes applied:** Removed `containedPrimary`/`filledPrimary`/`outlinedPrimary` style overrides (MUI v9 type incompatibility). Replaced `FormHelperTextProps` with `slotProps.formHelperText`. Added `DOMAINS` export to config.ts.
+- **Deferred to Phase 1C:** eventConfig.ts, centralized naming, full theme restore, LandingPage decomposition, PWA icon recovery
+- **Git:** No remote. Commit pending.
+- **Next phase:** ENFORMA-EXTRACT-1C — Hybrid Event Configuration
 - **Future monorepo destination:** PENDING
-- **Decisions applied:** D-01 (The Hybrid Event), D-02 (per-product themes), D-03 (public spectator tickets), D-04 (Shop independent layout)
-- **Files copied:** 109
-- **Files excluded:** node_modules/, dist/, .git/
-- **Validation:** All 109 files verified identical (MD5 hash comparison)
-- **Build:** NOT_RUN — dependencies not installed in Phase 1A
-- **Git:** Initialized. No remote configured.
+- **Decisions applied:** D-01 (The Hybrid Event), D-02 (per-product themes), D-03 (public spectator tickets → /tickets), D-04 (Shop independent — removed from this workspace)

@@ -122,7 +122,7 @@ export default function SpectatorConfirmPage() {
             <Button
               variant="contained"
               size="large"
-              onClick={() => navigate({ to: '/app' })}
+              onClick={() => navigate({ to: '/' })}
               sx={{
                 borderRadius: 0,
                 fontWeight: 700,
@@ -172,7 +172,7 @@ export default function SpectatorConfirmPage() {
             <Button
               variant="contained"
               size="large"
-              onClick={() => navigate({ to: '/app' })}
+              onClick={() => navigate({ to: '/' })}
               sx={{
                 borderRadius: 0,
                 fontWeight: 700,

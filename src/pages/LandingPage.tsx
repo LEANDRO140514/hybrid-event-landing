@@ -23,7 +23,7 @@ import InstagramIcon from '@mui/icons-material/Instagram'
 import WhatsAppIcon from '@mui/icons-material/WhatsApp'
 import EmailIcon from '@mui/icons-material/Email'
 import { useCountdown } from '../hooks/useCountdown'
-import { CATEGORIES, getCategoryColor, getCategoryChipColor, formatPrice } from '../constants/categories'
+import { CATEGORIES, getCategoryChipColor, formatPrice } from '../constants/categories'
 
 const FAQ_DATA = [
   {
@@ -296,33 +296,9 @@ const PRO_DATA = [
   { name: 'Wall Balls', distance: '100 repeticiones', weight: '9kg / 6kg' },
 ]
 
-const EVENT_SCHEDULE = [
-  {
-    type: 'exercise',
-    name: 'Hybrid Total + WOD Sorpresa',
-    duration: '60 min',
-    detail: '2 min de preparación',
-    scoring: 'Peso × Reps',
-  },
-  { type: 'exercise', name: 'Deadlift', duration: '5 min', detail: 'Máximo de repeticiones', scoring: 'Peso × Reps' },
-  { type: 'rest', name: 'Descanso / Preparación', duration: '2 min', detail: 'Ajuste de peso' },
-  { type: 'exercise', name: 'Skierg', duration: '5 min', detail: 'Máximo de calorías', scoring: 'Calorías' },
-  { type: 'rest', name: 'Descanso / Preparación', duration: '2 min', detail: 'Recuperación activa' },
-  { type: 'exercise', name: 'Back Squat', duration: '5 min', detail: 'Máximo de repeticiones', scoring: 'Peso × Reps' },
-  { type: 'rest', name: 'Descanso / Preparación', duration: '2 min', detail: 'Recuperación activa' },
-  { type: 'exercise', name: 'Bikerg', duration: '5 min', detail: 'Máximo de calorías', scoring: 'Calorías' },
-  { type: 'rest', name: 'Descanso / Preparación', duration: '2 min', detail: 'Recuperación activa' },
-  { type: 'exercise', name: 'Shoulder Strict Press', duration: '5 min', detail: 'Máximo de repeticiones', scoring: 'Peso × Reps' },
-  { type: 'rest', name: 'Descanso / Preparación', duration: '2 min', detail: 'Recuperación activa' },
-  { type: 'exercise', name: 'Rowerg', duration: '10 min', detail: '2000m — lo más rápido posible', scoring: 'Tiempo' },
-  { type: 'rest', name: 'Recuperación Total', duration: '13 min', detail: 'Hidratación y preparación' },
-  { type: 'exercise', name: 'WOD Sorpresa', duration: '40 min cap', detail: 'Incluye segmento de carrera', scoring: 'Por tiempo' },
-]
-
 // ── Navbar ───────────────────────────────────────────────────────
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const navigate = useNavigate()
 
   const links = [
     { label: 'INICIO', href: '#hero' },
@@ -386,7 +362,7 @@ function Navbar() {
             </Typography>
           ))}
           <Button
-            onClick={() => navigate({ to: '/app/shop' })}
+            onClick={() => window.open('https://shop.enforma.mx', '_blank')}
             sx={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontSize: '0.7rem',
@@ -441,7 +417,7 @@ function Navbar() {
             </Box>
           ))}
           <Box
-            onClick={() => { setMenuOpen(false); navigate({ to: '/app/shop' }); }}
+            onClick={() => { setMenuOpen(false); window.open('https://shop.enforma.mx', '_blank'); }}
             sx={{
               px: 3,
               py: 1.5,
@@ -1668,7 +1644,7 @@ export default function LandingPage() {
               variant="contained"
               color="secondary"
               size="large"
-              onClick={() => navigate({ to: '/app/evento/aficionado' })}
+              onClick={() => navigate({ to: '/tickets' })}
               sx={{
                 px: 5,
                 py: 1.5,

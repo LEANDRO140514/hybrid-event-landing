@@ -143,40 +143,6 @@ const themeOptions: ThemeOptions = {
           padding: '12px 28px',
           fontSize: '0.9rem',
         },
-        containedPrimary: {
-          backgroundColor: '#E6F2B1',
-          color: '#000000',
-          border: '2px solid #E6F2B1',
-          '&:hover': {
-            backgroundColor: '#F0F7CD',
-            borderColor: '#F0F7CD',
-          },
-        },
-        containedSecondary: {
-          backgroundColor: '#E9C7DF',
-          color: '#000000',
-          border: '2px solid #E9C7DF',
-          '&:hover': {
-            backgroundColor: '#F2DCEB',
-            borderColor: '#F2DCEB',
-          },
-        },
-        outlinedPrimary: {
-          borderColor: '#E6F2B1',
-          color: '#E6F2B1',
-          '&:hover': {
-            borderColor: '#F0F7CD',
-            backgroundColor: 'rgba(230, 242, 177, 0.08)',
-          },
-        },
-        outlinedSecondary: {
-          borderColor: '#E9C7DF',
-          color: '#E9C7DF',
-          '&:hover': {
-            borderColor: '#F2DCEB',
-            backgroundColor: 'rgba(233, 199, 223, 0.08)',
-          },
-        },
       },
     },
     MuiCard: {
@@ -248,14 +214,6 @@ const themeOptions: ThemeOptions = {
       styleOverrides: {
         root: {
           borderRadius: 0,
-        },
-        filledPrimary: {
-          backgroundColor: '#E6F2B1',
-          color: '#000000',
-        },
-        outlinedPrimary: {
-          borderColor: 'rgba(230, 242, 177, 0.4)',
-          color: '#E6F2B1',
         },
       },
     },

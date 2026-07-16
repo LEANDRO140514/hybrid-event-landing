@@ -245,7 +245,7 @@ function ParticipantFields({ index, genderRule, participantCount }: {
           {...register(`participants.${index}.name`)}
           error={!!pErrors?.name}
           helperText={pErrors?.name?.message}
-          FormHelperTextProps={{ sx: { fontFamily: "'Space Grotesk', sans-serif" } }}
+          slotProps={{ formHelperText: { sx: { fontFamily: "'Space Grotesk', sans-serif" } } }}
         />
 
         <TextField
@@ -257,7 +257,7 @@ function ParticipantFields({ index, genderRule, participantCount }: {
           {...register(`participants.${index}.email`)}
           error={!!pErrors?.email}
           helperText={pErrors?.email?.message}
-          FormHelperTextProps={{ sx: { fontFamily: "'Space Grotesk', sans-serif" } }}
+          slotProps={{ formHelperText: { sx: { fontFamily: "'Space Grotesk', sans-serif" } } }}
         />
 
         <TextField
@@ -265,11 +265,10 @@ function ParticipantFields({ index, genderRule, participantCount }: {
           variant="outlined"
           fullWidth
           sx={textFieldSx}
-          slotProps={{ htmlInput: { maxLength: 10, inputMode: 'numeric' } }}
+          slotProps={{ htmlInput: { maxLength: 10, inputMode: 'numeric' }, formHelperText: { sx: { fontFamily: "'Space Grotesk', sans-serif" } } }}
           {...register(`participants.${index}.phone`)}
           error={!!pErrors?.phone}
           helperText={pErrors?.phone?.message}
-          FormHelperTextProps={{ sx: { fontFamily: "'Space Grotesk', sans-serif" } }}
         />
 
         <TextField
@@ -278,11 +277,10 @@ function ParticipantFields({ index, genderRule, participantCount }: {
           fullWidth
           type="date"
           sx={textFieldSx}
-          slotProps={{ inputLabel: { shrink: true } }}
+          slotProps={{ inputLabel: { shrink: true }, formHelperText: { sx: { fontFamily: "'Space Grotesk', sans-serif" } } }}
           {...register(`participants.${index}.birthDate`)}
           error={!!pErrors?.birthDate}
           helperText={pErrors?.birthDate?.message}
-          FormHelperTextProps={{ sx: { fontFamily: "'Space Grotesk', sans-serif" } }}
         />
 
         <Controller
@@ -380,7 +378,7 @@ function StepParticipants({ category }: StepParticipantsProps) {
               {...register('teamName')}
               error={!!errors.teamName}
               helperText={errors.teamName?.message}
-              FormHelperTextProps={{ sx: { fontFamily: "'Space Grotesk', sans-serif" } }}
+              slotProps={{ formHelperText: { sx: { fontFamily: "'Space Grotesk', sans-serif" } } }}
             />
           )}
 
