@@ -5,9 +5,10 @@
 - **Origin:** `C:\Users\vonde\Proyectos\orchids-hype-pwa-design`
 - **Creation phase:** ENFORMA-EXTRACT-1A
 - **Pruning phase:** ENFORMA-EXTRACT-1B
-- **Status:** READY_FOR_VALIDATION
+- **Status:** READY_FOR_ENFORMA_EXTRACT_1D
 - **Creation date:** 2026-07-15
 - **Pruning date:** 2026-07-15
+- **Stabilization date (1C):** 2026-07-17
 - **Agent:** Claude Code
 - **Source branch:** main
 - **Source HEAD:** `a595e463ed671da8ee935de5109f654b067146f1`
@@ -25,6 +26,14 @@
 - **Dependencies:** npm install (3s, 464 packages, 0 vulnerabilities)
 - **MUI v9 fixes applied:** Removed `containedPrimary`/`filledPrimary`/`outlinedPrimary` style overrides (MUI v9 type incompatibility). Replaced `FormHelperTextProps` with `slotProps.formHelperText`. Added `DOMAINS` export to config.ts.
 - **Deferred to Phase 1C:** eventConfig.ts, centralized naming, full theme restore, LandingPage decomposition, PWA icon recovery
+- **Resolved in Phase 1C (2026-07-17):**
+  - **PWA icons:** `PWA_ICONS_NOT_FOUND` — only `icon.svg` exists. Removed non-existent `icon-192.png` / `icon-512.png` references from `includeAssets`. PWA stabilized with SVG-only icon. Manifest valid, service worker generates correctly (12 precache entries). PWA remains installable.
+  - **Centralized naming:** `package.json` name changed from `"the-hype-pwa"` → `"hybrid-event-web"`.
+  - **Unused dependencies removed:** `zustand`, `dexie`, `recharts` (37 packages removed, 427 remain, 0 vulnerabilities).
+  - **Theme:** Validated — MUI v9 compatible, brutalist dark theme intact.
+  - **Routes:** 7 public routes validated — no `/app/*` routes, no residual imports to pruned modules.
+  - **LandingPage decomposition:** Deferred — component is stable and self-contained. No blocking issues.
+- **Next phase:** ENFORMA-EXTRACT-1D
 - **Git:** No remote. Commit pending.
 - **Next phase:** ENFORMA-EXTRACT-1C — Hybrid Event Configuration
 - **Future monorepo destination:** PENDING
