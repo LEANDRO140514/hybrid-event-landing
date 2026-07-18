@@ -16,6 +16,7 @@ import HourglassTop from '@mui/icons-material/HourglassTop'
 import ErrorOutlined from '@mui/icons-material/ErrorOutlined'
 import { getRegistrationStatus, type RegistrationStatus } from '../api/checkout'
 import { formatPrice } from '../constants/categories'
+import { eventConfig } from '../config/eventConfig'
 
 export default function ConfirmacionPage() {
   const navigate = useNavigate()
@@ -95,7 +96,7 @@ export default function ConfirmacionPage() {
         return {
           icon: <CheckCircleOutlined sx={{ fontSize: 80, color: '#E6F2B1' }} />,
           title: 'Inscripción confirmada',
-          subtitle: 'Tu pago fue procesado y ya estás inscrito en Hybrid Event 2026.',
+          subtitle: `Tu pago fue procesado y ya estás inscrito en ${eventConfig.name} 2026.`,
           color: '#E6F2B1',
         }
       case 'paid':

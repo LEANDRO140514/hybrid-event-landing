@@ -5,11 +5,14 @@
 - **Origin:** `C:\Users\vonde\Proyectos\orchids-hype-pwa-design`
 - **Creation phase:** ENFORMA-EXTRACT-1A
 - **Pruning phase:** ENFORMA-EXTRACT-1B
-- **Status:** READY_FOR_ENFORMA_EXTRACT_1D
+- **Stabilization phase:** ENFORMA-EXTRACT-1C (partial) / ENFORMA-EXTRACT-1C-FIX (completion)
+- **Status:** READY_FOR_ENFORMA_EXTRACT_1D_RECHECK
 - **Creation date:** 2026-07-15
 - **Pruning date:** 2026-07-15
 - **Stabilization date (1C):** 2026-07-17
+- **1C-FIX date:** 2026-07-18
 - **Agent:** Claude Code
+- **Initial HEAD (1C-FIX):** `82327df`
 - **Source branch:** main
 - **Source HEAD:** `a595e463ed671da8ee935de5109f654b067146f1`
 - **Source HEAD short:** `a595e46`
@@ -20,10 +23,10 @@
 - **Modules removed (4):** AppLayout, BottomTabNav, cartStore, productStore
 - **Routes:** 7 public routes (`/`, `/registro`, `/pago`, `/confirmacion`, `/tickets`, `/tickets/confirmacion`, `/corporate`)
 - **No `/app/*` routes:** ✅ Confirmed
-- **Build:** PASSED (Vite 8.1.2, 838 modules, PWA generated)
-- **Typecheck:** PASSED (TypeScript 6.0.2)
-- **Lint:** PASSED (oxlint)
-- **Dependencies:** npm install (3s, 464 packages, 0 vulnerabilities)
+- **Build:** PASSED (Vite 8.1.2, 839 modules, PWA generated, 12 precache entries)
+- **Typecheck:** PASSED (TypeScript 6.0.2, 0 errors)
+- **Lint:** PASSED (oxlint, 0 warnings)
+- **Dependencies:** npm ci (427 packages, 0 vulnerabilities, lockfile hash stable)
 - **MUI v9 fixes applied:** Removed `containedPrimary`/`filledPrimary`/`outlinedPrimary` style overrides (MUI v9 type incompatibility). Replaced `FormHelperTextProps` with `slotProps.formHelperText`. Added `DOMAINS` export to config.ts.
 - **Deferred to Phase 1C:** eventConfig.ts, centralized naming, full theme restore, LandingPage decomposition, PWA icon recovery
 - **Resolved in Phase 1C (2026-07-17):**
@@ -33,8 +36,17 @@
   - **Theme:** Validated — MUI v9 compatible, brutalist dark theme intact.
   - **Routes:** 7 public routes validated — no `/app/*` routes, no residual imports to pruned modules.
   - **LandingPage decomposition:** Deferred — component is stable and self-contained. No blocking issues.
-- **Next phase:** ENFORMA-EXTRACT-1D
+- **Resolved in Phase 1C-FIX (2026-07-18):**
+  - **eventConfig.ts:** CREATED — `src/config/eventConfig.ts` with `name`, `shortName`, `slug`, `organizer`.
+  - **Naming authority:** `src/config/eventConfig.ts` is now the single authority for canonical event identity in runtime code.
+  - **Consumers migrated:** LandingPage (section header), CorporateLandingPage (product card title, footer), ConfirmacionPage (confirmation message), index.html (title, description, apple-mobile-web-app-title), vite.config.ts (manifest name, short_name, description, lang).
+  - **PWA naming:** `name: 'The Hybrid Event'`, `short_name: 'Hybrid'`, `lang: 'es-MX'`.
+  - **PWA icons:** SVG-only / `PWA_ICONS_NOT_FOUND` — MINOR, unchanged.
+  - **Date conflict:** REQUIRES_DECISION — two dates detected (9-11 Octubre vs 17 Octubre). Neither selected as canonical.
+  - **Theme color:** REQUIRES_DECISION — `#FF3D00` vs theme primary `#E6F2B1`.
+- **Date conflict:** REQUIRES_DECISION — `9-11 OCTUBRE 2026` (LandingPage hero + CTA section) vs `17 Octubre` (SpectatorConfirmPage ticket). No authoritative source exists. Both preserved as-is in their respective editorial contexts.
+- **Known issues (post-1C-FIX):** See ENFORMA-EXTRACT-1C-FIX-REPORT.md.
+- **Next phase:** ENFORMA-EXTRACT-1D-RECHECK
 - **Git:** No remote. Commit pending.
-- **Next phase:** ENFORMA-EXTRACT-1C — Hybrid Event Configuration
 - **Future monorepo destination:** PENDING
 - **Decisions applied:** D-01 (The Hybrid Event), D-02 (per-product themes), D-03 (public spectator tickets → /tickets), D-04 (Shop independent — removed from this workspace)

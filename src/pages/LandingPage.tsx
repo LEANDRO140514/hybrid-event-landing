@@ -24,6 +24,7 @@ import WhatsAppIcon from '@mui/icons-material/WhatsApp'
 import EmailIcon from '@mui/icons-material/Email'
 import { useCountdown } from '../hooks/useCountdown'
 import { CATEGORIES, getCategoryChipColor, formatPrice } from '../constants/categories'
+import { eventConfig } from '../config/eventConfig'
 
 const FAQ_DATA = [
   {
@@ -712,7 +713,7 @@ export default function LandingPage() {
             variant="h2"
             sx={{ textAlign: 'center', mb: 2, fontFamily: "'Space Grotesk', sans-serif" }}
           >
-            ¿Qué es Hybrid Event?
+            {`¿Qué es ${eventConfig.name}?`}
           </Typography>
           <Typography
             variant="body1"

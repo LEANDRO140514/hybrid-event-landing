@@ -1,5 +1,7 @@
 # MIGRATION MANIFEST — HYBRID-DESIGN Redesign
 
+> **⚠️ Historical migration reference.** This manifest documents the design phase migration from the Orchids sandbox (2026-07-15). It is NOT the current operational authority. Many files referenced here no longer exist in this workspace (removed during ENFORMA-EXTRACT-1B pruning). For current workspace status, see `WORKSPACE_STATUS.md`.
+>
 > **Origin:** `orchids-hype-pwa-design` (design sandbox)
 > **Target:** Monorepo principal (team de desarrollo)
 > **Generated:** 2026-07-15

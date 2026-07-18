@@ -3,10 +3,11 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import SportsScoreIcon from '@mui/icons-material/SportsScore'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import { DOMAINS } from '../config'
+import { eventConfig } from '../config/eventConfig'
 
 const products = [
   {
-    title: 'Hybrid Event',
+    title: eventConfig.name,
     description: 'Competencia de fitness funcional. Inscripciones abiertas para atletas, duplas y relevos.',
     href: `https://${DOMAINS.event}`,
     icon: <FitnessCenterIcon sx={{ fontSize: 38 }} />,
@@ -133,7 +134,7 @@ export default function CorporateLandingPage() {
                     </Stack>
                     <Button
                       href={product.href}
-                      variant={product.title === 'Hybrid Event' ? 'contained' : 'outlined'}
+                      variant={product.title === eventConfig.name ? 'contained' : 'outlined'}
                       color="secondary"
                       fullWidth
                       sx={{ py: 1.2, borderRadius: 999, fontWeight: 900 }}
@@ -147,7 +148,7 @@ export default function CorporateLandingPage() {
           </Box>
 
           <Typography sx={{ color: 'rgba(255,255,255,0.42)', fontSize: '0.9rem' }}>
-            © 2026 EnForma Sports Society · Ready2Race · Hybrid Event
+            {`© 2026 EnForma Sports Society · Ready2Race · ${eventConfig.name}`}
           </Typography>
         </Stack>
       </Container>

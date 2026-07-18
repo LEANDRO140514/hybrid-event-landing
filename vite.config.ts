@@ -9,9 +9,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/icon.svg'],
       manifest: {
-        name: 'Hybrid Event',
-        short_name: 'Hybrid Event',
-        description: 'Entrena, compite y conecta con la comunidad Hybrid Event 2026',
+        name: 'The Hybrid Event',
+        short_name: 'Hybrid',
+        description: 'Entrena, compite y conecta con la comunidad The Hybrid Event 2026',
+        lang: 'es-MX',
         start_url: '/',
         display: 'standalone',
         background_color: '#0A0A0A',

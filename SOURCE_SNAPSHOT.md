@@ -48,3 +48,24 @@ MD5 content hash of all 109 files. All files: IDENTICAL (0 differences).
 ## Known Differences
 
 None. Source and destination are byte-identical for all 109 files.
+
+## Evolution — ENFORMA-EXTRACT-1C-FIX (2026-07-18)
+
+- **Date:** 2026-07-18
+- **Initial HEAD:** `82327df`
+- **Purpose:** Complete the deferred `eventConfig.ts` requirement from ENFORMA-EXTRACT-1C.
+- **Primary files modified:**
+  - `src/config/eventConfig.ts` — CREATED (canonical event identity)
+  - `src/pages/LandingPage.tsx` — imported eventConfig, migrated section header
+  - `src/pages/CorporateLandingPage.tsx` — imported eventConfig, migrated product title + footer
+  - `src/pages/ConfirmacionPage.tsx` — imported eventConfig, migrated confirmation message
+  - `index.html` — updated title, description, apple-mobile-web-app-title to match eventConfig
+  - `vite.config.ts` — aligned manifest name/short_name/lang with eventConfig
+  - `WORKSPACE_STATUS.md` — updated phase, fixed duplicate line, documented date conflict
+  - `MIGRATION_MANIFEST.md` — added historical clarification header
+- **Consumers migrated:** 5 files (LandingPage, CorporateLandingPage, ConfirmacionPage, index.html, vite.config.ts)
+- **Unresolved conflicts:**
+  - Date conflict: `9-11 OCTUBRE 2026` vs `17 Octubre` → REQUIRES_DECISION
+  - Theme color mismatch: `#FF3D00` vs `#E6F2B1` → REQUIRES_DECISION
+- **Source integrity:** Orchids HEAD `a595e46` — unchanged.
+- **Monorepo integrity:** R2R THE HYPE HEAD `baf2901` — unchanged.
