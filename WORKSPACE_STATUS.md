@@ -1,12 +1,12 @@
 # WORKSPACE_STATUS
 
-- **Product:** The Hybrid Event
+- **Product:** The Hybrid Experience (renamed from "The Hybrid Event" in phase HEX-REBRAND-CATALOG, see below)
 - **Workspace:** `hybrid-event-web`
 - **Origin:** `C:\Users\vonde\Proyectos\orchids-hype-pwa-design`
 - **Creation phase:** ENFORMA-EXTRACT-1A
 - **Pruning phase:** ENFORMA-EXTRACT-1B
 - **Stabilization phase:** ENFORMA-EXTRACT-1C (partial) / ENFORMA-EXTRACT-1C-FIX (completion)
-- **Status:** READY_FOR_ENFORMA_EXTRACT_1D_RECHECK
+- **Status:** READY_FOR_NEXT_PHASE (HEX-REBRAND-CATALOG closed — see "Phase HEX-REBRAND-CATALOG" section below for current state; the `ENFORMA-EXTRACT-1D-RECHECK` name below is historical and was superseded)
 - **Creation date:** 2026-07-15
 - **Pruning date:** 2026-07-15
 - **Stabilization date (1C):** 2026-07-17
@@ -60,8 +60,43 @@
 - **Untracked reference material (authorized, not modified this phase):** `docs/guiones-origen/athlete.html` and `docs/guiones-origen/captain.html` — copied by the user on purpose as input for a future "guías públicas" phase. Not part of the build, not linked from the app, left untouched.
 - **.gitignore:** added `.claude/launch.json` (local tooling config, not project-relevant).
 - **Internal registration/payment flow removed:** `src/pages/RegistroPage.tsx`, `PagoPage.tsx`, `ConfirmacionPage.tsx`, `SpectatorTicketPage.tsx`, `SpectatorConfirmPage.tsx`, `src/api/checkout.ts`, and their routes in `routeTree.gen.ts` were deleted, along with `src/constants/categories.ts` (its only consumers were the deleted pages and the old COMPITE cards, both superseded by `src/data/catalogo.ts`). Also removed `public/docs/{index,athlete,captain}.html` — a static guide describing the deleted flow step-by-step (MercadoPago/Stripe instructions, old event name, `17 Octubre` date) — and the landing's "Ver Documentación Completa" CTA that linked to it, since it would otherwise become a dead/misleading link. Reason: this landing is marketing-only now — "sin formularios ni pagos" — every product button routes to `app.enforma.mx/inscribir?cat=CODIGO` (Ready2Hybrid, rebuilt in Next.js + InsForge + Mercado Pago). Code remains recoverable at checkpoint commit `b61846c` ("checkpoint: estado previo a eliminar flujo de registro/pago (se reconstruye en ready2hybrid)").
-- **Known unrelated observation:** `public/r2r/` still contains a full pre-built app bundle (JS/CSS/fonts/workers, already `globIgnores`d from the PWA precache in `vite.config.ts`). Nothing in the app links to `/r2r/` — it isn't a broken link, just unused static weight. Left untouched this phase (no explicit authorization to remove it); flagged for a future cleanup phase.
+- **`public/r2r/` bundle:** resolved (see CLOSE section below) — removed entirely, was unused static weight from the prior stage.
 
 ### Sub-phase: descriptive content (opened same day)
 - **Scope:** "¿Qué es el deporte híbrido?" intro (replaces the old generic About copy) with 3 entry-level links; new "TRES DÍAS" narrative timeline section (between Formatos and COMPITE) deep-linking into per-day/session COMPITE groups (`#compite-vie-pm`, `#compite-sab-am`, `#compite-sab-pm`, `#compite-dom-am`) and into `#experience`; per-format descriptions (`FORMATO_DESCRIPCIONES`) shown under each COMPITE group header and reused verbatim in the EXPERIENCE section's Workout/½ Hybrid copy; FAQ trimmed and replaced with the 6 purchase-decision questions plus 2 kept practical ones (cronometraje, estacionamiento) — dropped items now covered elsewhere (what-is / prior-experience / what-to-bring merged, category-change request dropped as non-decision-relevant).
 - **Validation:** `tsc -b`, `oxlint` (0/0), `vite build` all pass; verified in a real browser (0 console errors) including expanding the new "¿Qué día compito?" table and clicking a TRES DÍAS deep link to confirm it lands on the right COMPITE group.
+
+### CLOSE — Phase HEX-REBRAND-CATALOG (closed 2026-07-20)
+
+- **Commits (in order):**
+  1. `b61846c` — checkpoint: estado previo a eliminar flujo de registro/pago
+  2. `a522bd9` — refactor: elimina flujo interno de registro/pago (se reconstruye en ready2hybrid)
+  3. `06d09be` — feat: rebrand a Hybrid Experience + catalogo 28 productos + secciones COMPITE/EXPERIENCE/ASISTE (incluye la sub-fase de contenido descriptivo)
+  4. `3754592` — chore: elimina dependencias no utilizadas (react-hook-form, @hookform/resolvers, zod)
+  5. `e70e439` — chore: elimina bundle r2r no utilizado
+  6. `5a8e1a7` — chore: limpia globIgnores('r2r/**') obsoleto tras eliminar public/r2r/
+- **Validation at close:** `tsc -b` clean, `oxlint` 0/0, `vite build` clean (647 modules, 9 PWA precache entries), `npm install` after dependency removal reported 0 vulnerabilities. Working tree clean at close except the two authorized untracked reference files below.
+- **Known issues:** (none)
+- **Pending decisions:** (none) — both prior REQUIRES_DECISION items (event date, theme color) resolved above.
+- **Left for a future phase, not authorized this phase:** the two `docs/guiones-origen/*.html` files remain untracked, staged as input for a future "guías públicas" phase.
+- **Next Authorized Phase:** (none yet — awaiting instruction)
+
+```
+=== NEXT_SESSION_BOOTSTRAP ===
+Workspace: C:\vonde\hybrid-event-landing
+Product/System: The Hybrid Experience (hybrid-event-web)
+Workspace Type: standalone-repo / external-development-workspace
+Branch: main
+HEAD: 5a8e1a7
+Last Commits: 5a8e1a7 chore: limpia globIgnores('r2r/**') obsoleto tras eliminar public/r2r/ | e70e439 chore: elimina bundle r2r no utilizado | 3754592 chore: elimina dependencias no utilizadas (react-hook-form, @hookform/resolvers, zod)
+Completed Phase: HEX-REBRAND-CATALOG
+Gate: READY_FOR_INSTRUCTIONS
+Known Issues: (none)
+Pending Decisions: (none)
+Protected Sources: (none)
+Next Authorized Phase: (awaiting instruction)
+Files To Read First: WORKSPACE_STATUS.md, src/data/catalogo.ts, src/pages/LandingPage.tsx
+Forbidden Actions: push, modifying docs/guiones-origen/*.html
+First Command: scripts/workspace-preflight.ps1
+=== END_BOOTSTRAP ===
+```
