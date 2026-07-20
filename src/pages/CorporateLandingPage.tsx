@@ -14,7 +14,7 @@ const products = [
     cta: 'Ir al evento',
   },
   {
-    title: 'Ready2Race',
+    title: 'Ready2Hybrid',
     description: 'Plataforma de gestión de eventos deportivos con inscripciones, QR, cronometraje y resultados.',
     href: `https://${DOMAINS.app}`,
     icon: <SportsScoreIcon sx={{ fontSize: 38 }} />,
@@ -148,7 +148,7 @@ export default function CorporateLandingPage() {
           </Box>
 
           <Typography sx={{ color: 'rgba(255,255,255,0.42)', fontSize: '0.9rem' }}>
-            {`© 2026 EnForma Sports Society · Ready2Race · ${eventConfig.name}`}
+            {`© 2026 EnForma Sports Society · Ready2Hybrid · ${eventConfig.name}`}
           </Typography>
         </Stack>
       </Container>

@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useMemo, useState, type ReactNode } from 'react'
 import {
   Box,
   Button,
@@ -19,43 +18,92 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber'
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
+import BoltIcon from '@mui/icons-material/Bolt'
 import InstagramIcon from '@mui/icons-material/Instagram'
 import WhatsAppIcon from '@mui/icons-material/WhatsApp'
 import EmailIcon from '@mui/icons-material/Email'
 import { useCountdown } from '../hooks/useCountdown'
-import { CATEGORIES, getCategoryChipColor, formatPrice } from '../constants/categories'
-import { eventConfig } from '../config/eventConfig'
+import { CATALOGO, porBloque, getInscribirUrl, formatPrecio } from '../data/catalogo'
+import type { Producto } from '../data/catalogo'
 
-const FAQ_DATA = [
+const DIA_COMPITO_ROWS = [
+  { formato: 'Dobles', cuando: 'Viernes PM · Sábado AM' },
+  { formato: 'Relay', cuando: 'Sábado PM' },
+  { formato: '½ Hybrid', cuando: 'Sábado AM' },
+  { formato: 'Workout Experience', cuando: 'Sábado AM' },
+  { formato: 'Individual (Open / Pro)', cuando: 'Domingo AM' },
+]
+
+function DiaCompitoTable() {
+  return (
+    <Box component="dl" sx={{ m: 0 }}>
+      {DIA_COMPITO_ROWS.map((row) => (
+        <Box
+          key={row.formato}
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 2,
+            py: 0.75,
+            borderBottom: '1px solid rgba(230,242,177,0.08)',
+          }}
+        >
+          <Box component="dt" sx={{ color: '#E6F2B1', fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
+            {row.formato}
+          </Box>
+          <Box component="dd" sx={{ m: 0, color: 'text.secondary', fontFamily: "'Space Grotesk', sans-serif", textAlign: 'right' }}>
+            {row.cuando}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  )
+}
+
+interface FaqItem {
+  question: string
+  answer: ReactNode
+}
+
+const FAQ_DATA: FaqItem[] = [
   {
-    question: '¿Qué es Hybrid Event?',
+    question: '¿Nunca he competido, puedo participar?',
     answer:
-      'Hybrid Event es una competencia de fitness funcional que combina carreras con estaciones de ejercicio. Es una experiencia competitiva y divertida diseñada para atletas de todos los niveles.',
+      'Sí. Empieza con el Workout Experience (para probar) o el ½ Hybrid (para competir con volumen accesible). Ninguno de los dos requiere experiencia previa.',
   },
   {
-    question: '¿Necesito experiencia previa?',
+    question: '¿Qué diferencia hay entre ½ Hybrid y el formato completo?',
     answer:
-      'No necesitas ser un atleta profesional. El evento está diseñado para que cualquier persona con un nivel básico de condición física pueda participar y disfrutar. Recomendamos al menos 3 meses de entrenamiento previo.',
+      'El ½ Hybrid usa las mismas estaciones y el mismo espíritu del formato oficial, con la mitad del volumen y cargas accesibles: es competencia real, con chip y clasificación. El formato completo (Individual, Dobles, Relay) es el reto sin reducir.',
   },
   {
-    question: '¿Qué debo llevar el día del evento?',
+    question: '¿Qué incluye el precio?',
     answer:
-      'Ropa deportiva cómoda, tenis para correr, toalla, botella de agua y mucha energía. Te proporcionaremos tu número de competidor y chip de cronometraje el día del registro.',
+      'Chip de cronometraje y seguro del atleta, incluidos en todas las categorías de competencia y en el ½ Hybrid. Sin cargos adicionales ni desgloses ocultos.',
+  },
+  {
+    question: '¿Qué día compito?',
+    answer: <DiaCompitoTable />,
+  },
+  {
+    question: '¿Puedo ir solo a ver?',
+    answer: `Sí. Pases de público por día (${formatPrecio(250)}) o pase de 3 días (${formatPrecio(600)}). Compra el día en que compite tu atleta.`,
+  },
+  {
+    question: '¿Qué necesito llevar?',
+    answer:
+      'Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Tu número de competidor y chip se entregan el día del registro.',
   },
   {
     question: '¿Cómo funciona el cronometraje?',
     answer:
-      'Utilizamos un sistema de cronometraje con chip electrónico. Tu tiempo se registra automáticamente al pasar por cada estación y al cruzar la meta. Los resultados se publican en tiempo real.',
-  },
-  {
-    question: '¿Puedo cambiar de categoría después de inscribirme?',
-    answer:
-      'Sí, puedes solicitar un cambio de categoría hasta 15 días antes del evento, sujeto a disponibilidad. Contacta a nuestro equipo por WhatsApp o correo electrónico.',
+      'Sistema de chip electrónico. Tu tiempo se registra al pasar por cada estación y al cruzar la meta. Resultados en tiempo real.',
   },
   {
     question: '¿Hay estacionamiento?',
     answer:
-      'Sí, la sede cuenta con estacionamiento amplio. También recomendamos llegar temprano o usar transporte público para evitar contratiempos.',
+      'Sí, la sede cuenta con estacionamiento amplio. Recomendamos llegar con anticipación.',
   },
 ]
 
@@ -90,33 +138,10 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 }
 
 // ── Brutalist SVG Icons ──────────────────────────────────────────
-function StrengthIcon({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-      <line x1="4" y1="24" x2="44" y2="24" strokeWidth="3" />
-      <rect x="10" y="17" width="5" height="14" />
-      <rect x="18" y="13" width="5" height="22" />
-      <rect x="25" y="13" width="5" height="22" />
-      <rect x="33" y="17" width="5" height="14" />
-    </svg>
-  )
-}
-
 function CardioIcon({ size = 48 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
       <polygon points="28,4 10,26 22,26 18,44 38,20 26,20" />
-    </svg>
-  )
-}
-
-function TeamsIcon({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-      <rect x="4" y="10" width="18" height="28" />
-      <rect x="26" y="10" width="18" height="28" />
-      <line x1="13" y1="4" x2="13" y2="44" />
-      <line x1="35" y1="4" x2="35" y2="44" />
     </svg>
   )
 }
@@ -164,92 +189,6 @@ function RelevoIcon({ size = 48 }: { size?: number }) {
   )
 }
 
-function IndividualIconF({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-      <circle cx="24" cy="12" r="6" />
-      <path d="M18 8 Q24 3 30 8" />
-      <line x1="24" y1="18" x2="24" y2="34" />
-      <line x1="10" y1="24" x2="38" y2="24" />
-      <polygon points="15,34 33,34 24,44" />
-      <line x1="24" y1="44" x2="14" y2="46" />
-      <line x1="24" y1="44" x2="34" y2="46" />
-    </svg>
-  )
-}
-
-function DuplaIconF({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-      <circle cx="12" cy="10" r="5" />
-      <path d="M8 7 Q12 3 16 7" />
-      <line x1="12" y1="15" x2="12" y2="28" />
-      <line x1="4" y1="20" x2="20" y2="20" />
-      <polygon points="6,28 18,28 12,36" />
-      <line x1="12" y1="36" x2="6" y2="38" />
-      <line x1="12" y1="36" x2="18" y2="38" />
-      <circle cx="36" cy="10" r="5" />
-      <path d="M32 7 Q36 3 40 7" />
-      <line x1="36" y1="15" x2="36" y2="28" />
-      <line x1="28" y1="20" x2="44" y2="20" />
-      <polygon points="30,28 42,28 36,36" />
-      <line x1="36" y1="36" x2="30" y2="38" />
-      <line x1="36" y1="36" x2="42" y2="38" />
-    </svg>
-  )
-}
-
-function RelevoIconF({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-      <rect x="6" y="14" width="10" height="6" />
-      <polygon points="6,20 16,20 11,26" />
-      <rect x="20" y="14" width="10" height="6" />
-      <polygon points="20,20 30,20 25,26" />
-      <rect x="34" y="14" width="10" height="6" />
-      <polygon points="34,20 44,20 39,26" />
-      <line x1="16" y1="17" x2="20" y2="17" />
-      <line x1="30" y1="17" x2="34" y2="17" />
-      <line x1="8" y1="28" x2="40" y2="28" />
-      <polyline points="34,24 40,28 34,32" />
-    </svg>
-  )
-}
-
-function DuplaIconMx({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-      <circle cx="12" cy="10" r="5" />
-      <line x1="12" y1="15" x2="12" y2="28" />
-      <line x1="4" y1="20" x2="20" y2="20" />
-      <line x1="12" y1="28" x2="6" y2="38" />
-      <line x1="12" y1="28" x2="18" y2="38" />
-      <circle cx="36" cy="10" r="5" />
-      <path d="M32 7 Q36 3 40 7" />
-      <line x1="36" y1="15" x2="36" y2="28" />
-      <line x1="28" y1="20" x2="44" y2="20" />
-      <polygon points="30,28 42,28 36,36" />
-      <line x1="36" y1="36" x2="30" y2="38" />
-      <line x1="36" y1="36" x2="42" y2="38" />
-    </svg>
-  )
-}
-
-function RelevoIconMx({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-      <rect x="6" y="14" width="10" height="6" />
-      <rect x="20" y="14" width="10" height="6" />
-      <polygon points="20,20 30,20 25,26" />
-      <rect x="34" y="14" width="10" height="6" />
-      <line x1="16" y1="17" x2="20" y2="17" />
-      <line x1="30" y1="17" x2="34" y2="17" />
-      <line x1="8" y1="28" x2="40" y2="28" />
-      <polyline points="34,24 40,28 34,32" />
-    </svg>
-  )
-}
-
 // ── Decorative Vector Accents ────────────────────────────────────
 function CornerBrackets({ size = 16, color = 'rgba(230,242,177,0.15)' }: { size?: number; color?: string }) {
   return (
@@ -269,10 +208,311 @@ function ArrowRight({ size = 20, color = '#E6F2B1' }: { size?: number; color?: s
   )
 }
 
-const CATEGORY_IMAGES: Record<string, string> = {
+const PRODUCT_IMAGES: Record<string, string> = {
   Individual: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&q=80',
-  Dupla: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80',
-  Relevo: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80',
+  Dobles: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80',
+  Relay: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80',
+  '½ Hybrid Individual': 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&q=80',
+  '½ Hybrid Dobles': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80',
+}
+
+function getProductIcon(tipo: string, size = 40) {
+  switch (tipo) {
+    case 'Dobles':
+    case '½ Hybrid Dobles':
+      return <DuplaIcon size={size} />
+    case 'Relay':
+      return <RelevoIcon size={size} />
+    case 'Individual':
+    case '½ Hybrid Individual':
+      return <IndividualIcon size={size} />
+    case 'Workout Experience':
+      return <CardioIcon size={size} />
+    case 'Fotógrafo':
+      return <PhotoCameraIcon sx={{ fontSize: size }} />
+    case 'Público':
+    default:
+      return <ConfirmationNumberIcon sx={{ fontSize: size }} />
+  }
+}
+
+const DIA_FECHA: Record<string, string> = {
+  Viernes: 'VIERNES 9',
+  Sábado: 'SÁBADO 10',
+  Domingo: 'DOMINGO 11',
+  'Vie-Dom': 'VIE 9 – DOM 11',
+}
+
+const DIA_SLUG: Record<string, string> = {
+  Viernes: 'vie',
+  Sábado: 'sab',
+  Domingo: 'dom',
+  'Vie-Dom': 'vie-dom',
+}
+
+const FORMATO_DESCRIPCIONES: Record<string, string> = {
+  'Workout Experience':
+    'Una hora, un coach de ENFORMA, las instalaciones y el equipo real del evento. Aprendes la técnica de cada estación y haces un entrenamiento completo en formato híbrido. Sin cronómetro, sin ranking, sin experiencia previa. Sales sabiendo si esto es para ti.',
+  '½ Hybrid Individual':
+    'Formato by ENFORMA. La estructura del formato oficial con la mitad del volumen: mismas estaciones, mismo espíritu, distancia y cargas accesibles. Es competencia de verdad, con chip y clasificación. Para quien ya entrena y quiere su primera competencia.',
+  '½ Hybrid Dobles':
+    'Formato by ENFORMA. La estructura del formato oficial con la mitad del volumen: mismas estaciones, mismo espíritu, distancia y cargas accesibles. Es competencia de verdad, con chip y clasificación. Para quien ya entrena y quiere su primera competencia.',
+  Dobles:
+    'Dos atletas, un solo tiempo. Se dividen el trabajo de las estaciones y se relevan según su estrategia. Formato completo.',
+  Relay:
+    'Cuatro atletas por equipo. Cada quien toma su tramo. El formato más social y el mejor para llegar en grupo.',
+  Individual:
+    'El formato completo, tú solo, de principio a fin. Open para competidores; Pro para quien busca el podio. Mismo recorrido, distinta liga.',
+}
+
+interface TresDiasItem {
+  fecha: string
+  sesion: string
+  titulo: string
+  texto: string
+  links: { label: string; href: string }[]
+}
+
+const TRES_DIAS: TresDiasItem[] = [
+  {
+    fecha: 'VIERNES 9',
+    sesion: 'PM',
+    titulo: 'Arranca la competencia',
+    texto: 'Dobles: dos atletas se reparten el trabajo y se relevan. La energía de apertura.',
+    links: [{ label: 'Ver Dobles', href: '#compite-vie-pm' }],
+  },
+  {
+    fecha: 'SÁBADO 10',
+    sesion: 'AM',
+    titulo: 'El día más abierto',
+    texto:
+      'Vuelven los Dobles, debuta el ½ Hybrid, y quien nunca ha competido puede tomar el Workout. Es el día para entrar al deporte.',
+    links: [
+      { label: 'Ver Dobles', href: '#compite-sab-am' },
+      { label: 'Ver ½ Hybrid y Workout', href: '#experience' },
+    ],
+  },
+  {
+    fecha: 'SÁBADO 10',
+    sesion: 'PM',
+    titulo: 'Relay',
+    texto: 'Cuatro atletas, un solo tiempo. El formato más ruidoso y de mayor ambiente.',
+    links: [{ label: 'Ver Relay', href: '#compite-sab-pm' }],
+  },
+  {
+    fecha: 'DOMINGO 11',
+    sesion: 'AM',
+    titulo: 'Individual',
+    texto:
+      'Sin relevos, sin equipo: tú contra el reloj. Open y Pro. El cierre y los tiempos que definen el podio.',
+    links: [{ label: 'Ver Individual', href: '#compite-dom-am' }],
+  },
+]
+
+interface ProductCardProps {
+  producto: Producto
+  accentColor?: string
+}
+
+function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
+  const imageUrl = PRODUCT_IMAGES[producto.tipo] || PRODUCT_IMAGES.Individual
+  return (
+    <Card
+      sx={{
+        position: 'relative',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: 0,
+        border: `1px solid ${accentColor}26`,
+        backgroundImage: `url(${imageUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        transition: 'transform 0.2s ease, border-color 0.2s ease',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.92) 100%)',
+          zIndex: 1,
+          pointerEvents: 'none',
+        },
+        '&:hover': {
+          transform: 'translateY(-3px)',
+          borderColor: `${accentColor}80`,
+        },
+      }}
+    >
+      <CardContent
+        sx={{
+          position: 'relative',
+          zIndex: 2,
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          p: { xs: 2, sm: 3 },
+          '&:last-child': { pb: { xs: 2, sm: 3 } },
+        }}
+      >
+        <Box sx={{ mb: 0.5, color: accentColor }}>{getProductIcon(producto.tipo)}</Box>
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 900,
+            mb: 0.25,
+            fontSize: { xs: '0.85rem', sm: '1rem' },
+            fontFamily: "'Space Grotesk', sans-serif",
+            color: accentColor,
+            letterSpacing: '0.02em',
+          }}
+        >
+          {producto.nombre}
+        </Typography>
+        <Chip
+          label={producto.tipo}
+          size="small"
+          sx={{
+            mb: 0.5,
+            fontSize: '0.65rem',
+            height: 20,
+            borderRadius: 0,
+            fontWeight: 700,
+            bgcolor: `${accentColor}26`,
+            color: accentColor,
+          }}
+        />
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'rgba(255,255,255,0.6)',
+            mb: 1,
+            fontSize: { xs: '0.7rem', sm: '0.8rem' },
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          {producto.integrantes} {producto.integrantes === 1 ? 'integrante' : 'integrantes'}
+        </Typography>
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 900,
+            fontSize: { xs: '1.1rem', sm: '1.3rem' },
+            fontFamily: "'Space Grotesk', sans-serif",
+            color: accentColor,
+            letterSpacing: '0.02em',
+          }}
+        >
+          {formatPrecio(producto.precio)}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'rgba(255,255,255,0.5)',
+            fontSize: '0.65rem',
+            mb: producto.incluyeChip ? 0.5 : 1.5,
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          {producto.precioUnidad}
+        </Typography>
+        {producto.incluyeChip && (
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'rgba(255,255,255,0.45)',
+              fontSize: '0.6rem',
+              lineHeight: 1.4,
+              mb: 1.5,
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Incluye chip de cronometraje y seguro del atleta
+          </Typography>
+        )}
+        <Button
+          component="a"
+          href={getInscribirUrl(producto.code)}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="outlined"
+          size="small"
+          sx={{
+            mt: 'auto',
+            fontSize: { xs: '0.65rem', sm: '0.75rem' },
+            px: { xs: 1.5, sm: 2 },
+            py: 0.5,
+            borderRadius: 0,
+            fontWeight: 700,
+            borderWidth: 2,
+            borderColor: accentColor,
+            color: accentColor,
+            '&:hover': { borderWidth: 2, borderColor: accentColor, bgcolor: `${accentColor}1A` },
+          }}
+        >
+          Inscribirse
+        </Button>
+      </CardContent>
+    </Card>
+  )
+}
+
+interface ProductoGroup {
+  key: string
+  id: string
+  dia: string
+  sesion: string
+  tipo: string
+  precioUnidad: string
+  productos: Producto[]
+}
+
+function groupProductos(productos: Producto[]): ProductoGroup[] {
+  const groups: ProductoGroup[] = []
+  for (const p of productos) {
+    const key = `${p.dia}|${p.sesion}|${p.tipo}`
+    let group = groups.find((g) => g.key === key)
+    if (!group) {
+      const id = `compite-${DIA_SLUG[p.dia]}-${p.sesion.toLowerCase()}`
+      group = { key, id, dia: p.dia, sesion: p.sesion, tipo: p.tipo, precioUnidad: p.precioUnidad, productos: [] }
+      groups.push(group)
+    }
+    group.productos.push(p)
+  }
+  return groups
+}
+
+const COMPITE_GROUPS = groupProductos(porBloque('COMPITE'))
+const HALF_HYBRID_PRODUCTS = CATALOGO.filter((p) => p.tipo === '½ Hybrid Individual' || p.tipo === '½ Hybrid Dobles')
+const WORKOUT_PRODUCTS = CATALOGO.filter((p) => p.tipo === 'Workout Experience')
+const PUBLICO_PRODUCTS = CATALOGO.filter((p) => p.tipo === 'Público')
+const FOTOGRAFO_PRODUCTS = CATALOGO.filter((p) => p.tipo === 'Fotógrafo')
+
+function SectionHeading({ label, color = '#E6F2B1' }: { label: string; color?: string }) {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, mb: 1 }}>
+      <Box sx={{ color: `${color}33`, fontFamily: "'JetBrains Mono', monospace", fontSize: { xs: '1rem', sm: '1.5rem' }, fontWeight: 700, lineHeight: 1, transform: 'translateY(-2px)' }}>
+        {'[ '}
+      </Box>
+      <Typography
+        variant="h2"
+        sx={{
+          color,
+          fontWeight: 900,
+          fontSize: { xs: '2rem', sm: '3rem', md: '3.5rem' },
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase',
+          fontFamily: "'Space Grotesk', sans-serif",
+        }}
+      >
+        {label}
+      </Typography>
+      <Box sx={{ color: `${color}33`, fontFamily: "'JetBrains Mono', monospace", fontSize: { xs: '1rem', sm: '1.5rem' }, fontWeight: 700, lineHeight: 1, transform: 'translateY(-2px)' }}>
+        {' ]'}
+      </Box>
+    </Box>
+  )
 }
 
 const OPEN_DATA = [
@@ -303,8 +543,10 @@ function Navbar() {
 
   const links = [
     { label: 'INICIO', href: '#hero' },
-    { label: 'COMPITE', href: '#compite' },
+    { label: 'EXPERIENCE', href: '#experience' },
     { label: 'FORMATOS', href: '#formatos' },
+    { label: 'COMPITE', href: '#compite' },
+    { label: 'ASISTE', href: '#asiste' },
     { label: 'PREPARACIÓN', href: '#preparacion' },
     { label: 'UBICACIÓN', href: '#ubicacion' },
     { label: 'FAQ', href: '#faq' },
@@ -333,13 +575,14 @@ function Navbar() {
             fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
             fontStyle: 'italic',
             color: '#E6F2B1',
-            fontSize: '1.3rem',
+            fontSize: { xs: '0.95rem', sm: '1.3rem' },
             lineHeight: 1,
             cursor: 'pointer',
             userSelect: 'none',
+            whiteSpace: 'nowrap',
           }}
         >
-          HYBRID EVENT
+          HYBRID EXPERIENCE
         </Typography>
 
         {/* Desktop links */}
@@ -545,7 +788,6 @@ function SponsorMarquee() {
 }
 
 export default function LandingPage() {
-  const navigate = useNavigate()
   const targetDate = useMemo(() => new Date('2026-10-09T17:00:00'), [])
   const timeLeft = useCountdown(targetDate)
   const [desafioTab, setDesafioTab] = useState(0)
@@ -606,7 +848,7 @@ export default function LandingPage() {
             variant="h1"
             component="span"
             sx={{
-              fontSize: { xs: 'calc(3.5rem + 3px)', sm: 'calc(5rem + 3px)', md: 'calc(7rem + 3px)' },
+              fontSize: { xs: 'calc(2.2rem + 3px)', sm: 'calc(3.6rem + 3px)', md: 'calc(5.2rem + 3px)' },
               fontWeight: 900,
               fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
               fontStyle: 'italic',
@@ -615,7 +857,7 @@ export default function LandingPage() {
               color: '#E6F2B1',
             }}
           >
-            EVENT
+            EXPERIENCE
           </Typography>
         </Box>
 
@@ -706,161 +948,285 @@ export default function LandingPage() {
 
       <SponsorMarquee />
 
-      {/* ===== ABOUT SECTION ===== */}
+      {/* ===== QUÉ ES EL DEPORTE HÍBRIDO ===== */}
       <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
         <Container maxWidth="md">
           <Typography
             variant="h2"
-            sx={{ textAlign: 'center', mb: 2, fontFamily: "'Space Grotesk', sans-serif" }}
+            sx={{ textAlign: 'center', mb: 3, fontFamily: "'Space Grotesk', sans-serif" }}
           >
-            {`¿Qué es ${eventConfig.name}?`}
+            ¿Qué es el deporte híbrido?
           </Typography>
+          <Stack spacing={2} sx={{ maxWidth: 640, mx: 'auto', mb: 5 }}>
+            <Typography
+              variant="body1"
+              sx={{
+                textAlign: 'center',
+                color: 'text.secondary',
+                fontSize: { xs: '1rem', sm: '1.1rem' },
+                lineHeight: 1.7,
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              Una competencia continua: corres, entras a una estación de trabajo funcional,
+              y vuelves a correr. Sin pausas entre segmentos.
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                textAlign: 'center',
+                color: 'text.secondary',
+                fontSize: { xs: '1rem', sm: '1.1rem' },
+                lineHeight: 1.7,
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              Se mide en tiempo total. El que termina primero — corriendo y trabajando —
+              gana.
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                textAlign: 'center',
+                color: '#E6F2B1',
+                fontWeight: 700,
+                fontSize: { xs: '1rem', sm: '1.1rem' },
+                lineHeight: 1.7,
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              No es CrossFit. No es una carrera. Es resistencia y fuerza en el mismo reloj.
+            </Typography>
+          </Stack>
+
+          <Typography
+            variant="body2"
+            sx={{
+              textAlign: 'center',
+              color: 'text.secondary',
+              mb: 2.5,
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              fontSize: '0.75rem',
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Elige tu nivel de entrada
+          </Typography>
+          <Grid container spacing={2}>
+            {[
+              { label: 'Workout', desc: 'Probar el deporte, sin cronómetro.', href: '#experience' },
+              { label: '½ Hybrid', desc: 'Competir de verdad, volumen accesible.', href: '#experience' },
+              { label: 'Hybrid completo', desc: 'El reto real. Individual, Dobles o Relay.', href: '#compite' },
+            ].map((nivel) => (
+              <Grid size={{ xs: 12, sm: 4 }} key={nivel.label}>
+                <Box
+                  component="a"
+                  href={nivel.href}
+                  sx={{
+                    display: 'block',
+                    textAlign: 'center',
+                    p: 3,
+                    height: '100%',
+                    border: '1px solid rgba(230, 242, 177, 0.2)',
+                    textDecoration: 'none',
+                    transition: 'border-color 0.15s ease, transform 0.15s ease',
+                    '&:hover': { borderColor: '#E6F2B1', transform: 'translateY(-2px)' },
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 900,
+                      color: '#E6F2B1',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      letterSpacing: '0.02em',
+                      mb: 0.5,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {nivel.label}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'text.secondary', fontFamily: "'Space Grotesk', sans-serif" }}
+                  >
+                    {nivel.desc}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* ===== EXPERIENCE SECTION ===== */}
+      <Box
+        id="experience"
+        sx={{
+          py: { xs: 8, md: 12 },
+          background: 'linear-gradient(180deg, #000000 0%, rgba(230,242,177,0.05) 50%, #000000 100%)',
+        }}
+      >
+        <Container maxWidth="lg">
+          <SectionHeading label="EXPERIENCE" />
           <Typography
             variant="body1"
             sx={{
               textAlign: 'center',
               color: 'text.secondary',
-              maxWidth: 600,
+              mb: { xs: 5, md: 7 },
+              maxWidth: 620,
               mx: 'auto',
-              mb: 6,
-              fontSize: { xs: '1rem', sm: '1.1rem' },
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
-            Hybrid Event es una competencia de fitness funcional que combina segmentos
-            de carrera con estaciones de ejercicio de alta intensidad. Ya sea que compitas solo, en
-            dupla o en equipo de relevos, vivirás una experiencia única llena de
-            adrenalina y comunidad.
+            La puerta de entrada al deporte híbrido. Para quien nunca ha competido — y para
+            quien quiere hacerlo de verdad, en volumen accesible.
           </Typography>
 
-          <Grid container spacing={3}>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Card
-                sx={{
-                  textAlign: 'center',
-                  py: 4,
-                  px: 2,
-                  bgcolor: '#111111',
-                  border: '1px solid rgba(230, 242, 177, 0.15)',
-                  borderRadius: 0,
-                  height: '100%',
-                  position: 'relative',
-                  backgroundImage:
-                    'url(https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%)',
-                    zIndex: 1,
-                    pointerEvents: 'none',
-                  },
-                }}
-              >
-                <Box sx={{ position: 'relative', zIndex: 2 }}>
-                  <StrengthIcon />
-                  <Typography variant="h5" sx={{ mb: 1, fontFamily: "'Space Grotesk', sans-serif" }}>
-                    8 Estaciones
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                  >
-                    Ejercicios funcionales que pondrán a prueba tu fuerza, resistencia y
-                    determinación.
-                  </Typography>
-                </Box>
-              </Card>
+          {/* B) Workout Experience — conversion product, most prominent treatment */}
+          <Box
+            sx={{
+              mb: { xs: 6, md: 8 },
+              p: { xs: 3, sm: 4, md: 5 },
+              border: '2px solid #E6F2B1',
+              position: 'relative',
+              background:
+                'linear-gradient(135deg, rgba(230,242,177,0.1) 0%, rgba(0,0,0,0.5) 100%)',
+              boxShadow: '0 0 40px rgba(230,242,177,0.08)',
+            }}
+          >
+            <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+              <CornerBrackets size={16} />
+            </Box>
+            <Chip
+              icon={<BoltIcon sx={{ fontSize: '1rem !important', color: '#000000 !important' }} />}
+              label="EMPIEZA AQUÍ"
+              sx={{
+                mb: 2,
+                bgcolor: '#E6F2B1',
+                color: '#000000',
+                fontWeight: 900,
+                fontSize: '0.7rem',
+                letterSpacing: '0.1em',
+                borderRadius: 0,
+              }}
+            />
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                gap: { xs: 4, md: 6 },
+                alignItems: { md: 'center' },
+              }}
+            >
+              <Box sx={{ flex: 1.2 }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 900,
+                    color: '#E6F2B1',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    letterSpacing: '0.01em',
+                    fontSize: { xs: '1.5rem', sm: '2rem', md: '2.3rem' },
+                    mb: 1,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Conoce el deporte híbrido: haz el workout
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#E6F2B1',
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    fontSize: '0.8rem',
+                    mb: 2,
+                    fontFamily: "'Space Grotesk', sans-serif",
+                  }}
+                >
+                  Sábado 10 · AM · {formatPrecio(300)}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'text.secondary',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    lineHeight: 1.8,
+                    fontSize: { xs: '0.9rem', sm: '1rem' },
+                  }}
+                >
+                  {FORMATO_DESCRIPCIONES['Workout Experience']}
+                </Typography>
+              </Box>
+              <Grid container spacing={2} sx={{ flex: 1 }}>
+                {WORKOUT_PRODUCTS.map((producto) => (
+                  <Grid size={{ xs: 6 }} key={producto.code}>
+                    <ProductCard producto={producto} />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          </Box>
+
+          {/* A) ½ Hybrid */}
+          <Box>
+            <Typography
+              variant="h4"
+              sx={{
+                textAlign: 'center',
+                fontWeight: 900,
+                color: '#E6F2B1',
+                fontFamily: "'Space Grotesk', sans-serif",
+                letterSpacing: '0.02em',
+                fontSize: { xs: '1.3rem', sm: '1.8rem', md: '2.1rem' },
+                mb: 0.5,
+                textTransform: 'uppercase',
+              }}
+            >
+              Vive la Experience ½ Hybrid
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                textAlign: 'center',
+                color: 'text.secondary',
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                fontSize: '0.75rem',
+                mb: 1,
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              Formato by ENFORMA · Sábado 10 AM
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                textAlign: 'center',
+                color: 'text.secondary',
+                mb: 4,
+                maxWidth: 560,
+                mx: 'auto',
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+              }}
+            >
+              {FORMATO_DESCRIPCIONES['½ Hybrid Individual']}
+            </Typography>
+            <Grid container spacing={2}>
+              {HALF_HYBRID_PRODUCTS.map((producto) => (
+                <Grid size={{ xs: 6, sm: 4 }} key={producto.code}>
+                  <ProductCard producto={producto} />
+                </Grid>
+              ))}
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Card
-                sx={{
-                  textAlign: 'center',
-                  py: 4,
-                  px: 2,
-                  bgcolor: '#111111',
-                  border: '1px solid rgba(230, 242, 177, 0.15)',
-                  borderRadius: 0,
-                  height: '100%',
-                  position: 'relative',
-                  backgroundImage:
-                    'url(https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%)',
-                    zIndex: 1,
-                    pointerEvents: 'none',
-                  },
-                }}
-              >
-                <Box sx={{ position: 'relative', zIndex: 2 }}>
-                  <CardioIcon />
-                  <Typography variant="h5" sx={{ mb: 1, fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Corre + Entrena
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                  >
-                    Alterna entre segmentos de carrera y estaciones de ejercicio en un circuito
-                    continuo.
-                  </Typography>
-                </Box>
-              </Card>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Card
-                sx={{
-                  textAlign: 'center',
-                  py: 4,
-                  px: 2,
-                  bgcolor: '#111111',
-                  border: '1px solid rgba(230, 242, 177, 0.15)',
-                  borderRadius: 0,
-                  height: '100%',
-                  position: 'relative',
-                  backgroundImage:
-                    'url(https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&q=80)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%)',
-                    zIndex: 1,
-                    pointerEvents: 'none',
-                  },
-                }}
-              >
-                <Box sx={{ position: 'relative', zIndex: 2 }}>
-                  <TeamsIcon />
-                  <Typography variant="h5" sx={{ mb: 1, fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Individual o en Equipo
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                  >
-                    Compite solo, en dupla o en equipo de relevos. Hay una categoría para
-                    todos.
-                  </Typography>
-                </Box>
-              </Card>
-            </Grid>
-          </Grid>
+          </Box>
         </Container>
       </Box>
 
@@ -1153,7 +1519,7 @@ export default function LandingPage() {
                 lineHeight: 1.8,
               }}
             >
-              Hybrid Event exige estrategia. Cada atleta debe calcular cómo
+              Hybrid Experience exige estrategia. Cada atleta debe calcular cómo
               distribuir su esfuerzo entre fuerza, resistencia cardiovascular y
               capacidad funcional para maximizar su desempeño total.
             </Typography>
@@ -1428,6 +1794,120 @@ export default function LandingPage() {
         </Container>
       </Box>
 
+      {/* ===== TRES DÍAS (TIMELINE) ===== */}
+      <Box
+        sx={{
+          py: { xs: 8, md: 12 },
+          background: 'linear-gradient(180deg, #000000 0%, rgba(230,242,177,0.03) 50%, #000000 100%)',
+        }}
+      >
+        <Container maxWidth="md">
+          <SectionHeading label="TRES DÍAS" />
+          <Typography
+            variant="body1"
+            sx={{
+              textAlign: 'center',
+              color: 'text.secondary',
+              mb: 6,
+              maxWidth: 500,
+              mx: 'auto',
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Qué pasa cada día.
+          </Typography>
+
+          <Stack spacing={0}>
+            {TRES_DIAS.map((dia, i) => (
+              <Box
+                key={dia.titulo}
+                sx={{
+                  display: 'flex',
+                  gap: { xs: 2, sm: 3 },
+                  py: { xs: 3, sm: 3.5 },
+                  borderTop: i === 0 ? '1px solid rgba(230,242,177,0.15)' : 'none',
+                  borderBottom: '1px solid rgba(230,242,177,0.15)',
+                }}
+              >
+                <Box sx={{ flexShrink: 0, width: { xs: 76, sm: 120 } }}>
+                  <Typography
+                    sx={{
+                      color: '#E6F2B1',
+                      fontWeight: 900,
+                      fontSize: { xs: '0.75rem', sm: '0.9rem' },
+                      letterSpacing: '0.05em',
+                      lineHeight: 1.3,
+                      fontFamily: "'Space Grotesk', sans-serif",
+                    }}
+                  >
+                    {dia.fecha}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 700,
+                      fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                      letterSpacing: '0.1em',
+                      fontFamily: "'JetBrains Mono', monospace",
+                    }}
+                  >
+                    {dia.sesion}
+                  </Typography>
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 900,
+                      color: '#FFFFFF',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontSize: { xs: '1rem', sm: '1.15rem' },
+                      mb: 0.5,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {dia.titulo}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                      lineHeight: 1.7,
+                      mb: 1.5,
+                    }}
+                  >
+                    {dia.texto}
+                  </Typography>
+                  <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }}>
+                    {dia.links.map((link) => (
+                      <Box
+                        key={link.label}
+                        component="a"
+                        href={link.href}
+                        sx={{
+                          color: '#E6F2B1',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.02em',
+                          textDecoration: 'none',
+                          borderBottom: '1px solid rgba(230,242,177,0.4)',
+                          '&:hover': { borderBottomColor: '#E6F2B1' },
+                        }}
+                      >
+                        {link.label} →
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+              </Box>
+            ))}
+          </Stack>
+        </Container>
+      </Box>
+
       {/* ===== COMPITE SECTION ===== */}
       <Box
         id="compite"
@@ -1438,21 +1918,7 @@ export default function LandingPage() {
         }}
       >
         <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            sx={{
-              textAlign: 'center',
-              mb: 1,
-              color: '#E6F2B1',
-              fontWeight: 900,
-              fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
-              letterSpacing: '0.05em',
-              textTransform: 'uppercase',
-              fontFamily: "'Space Grotesk', sans-serif",
-            }}
-          >
-            COMPITE
-          </Typography>
+          <SectionHeading label="COMPITE" />
           <Typography
             variant="body1"
             sx={{
@@ -1467,197 +1933,145 @@ export default function LandingPage() {
             Elige la categoría que mejor se adapte a ti y a tu equipo.
           </Typography>
 
-          <Grid container spacing={2}>
-            {CATEGORIES.map((cat) => (
-              <Grid size={{ xs: 6, sm: 4, md: 3 }} key={cat.id}>
-                <Card
+          {COMPITE_GROUPS.map((group) => (
+            <Box key={group.key} id={group.id} sx={{ mb: { xs: 5, md: 6 }, scrollMarginTop: '80px' }}>
+              <Typography
+                variant="overline"
+                sx={{
+                  display: 'block',
+                  textAlign: 'center',
+                  color: '#E6F2B1',
+                  fontWeight: 700,
+                  letterSpacing: '0.15em',
+                  fontSize: '0.75rem',
+                  mb: 1,
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                {`${DIA_FECHA[group.dia]} · ${group.sesion} · ${group.tipo.toUpperCase()} · ${formatPrecio(group.productos[0].precio)} ${group.precioUnidad}`}
+              </Typography>
+              {FORMATO_DESCRIPCIONES[group.tipo] && (
+                <Typography
+                  variant="body2"
                   sx={{
-                    position: 'relative',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderRadius: 0,
-                    border: '1px solid rgba(230, 242, 177, 0.15)',
-                    backgroundImage: `url(${CATEGORY_IMAGES[cat.type] || CATEGORY_IMAGES.Individual})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    transition: 'transform 0.2s ease, border-color 0.2s ease',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      inset: 0,
-                      background:
-                        'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.92) 100%)',
-                      zIndex: 1,
-                      pointerEvents: 'none',
-                    },
-                    '&:hover': {
-                      transform: 'translateY(-3px)',
-                      borderColor: 'rgba(230, 242, 177, 0.5)',
-                    },
+                    textAlign: 'center',
+                    color: 'text.secondary',
+                    maxWidth: 560,
+                    mx: 'auto',
+                    mb: 2.5,
+                    fontSize: '0.85rem',
+                    lineHeight: 1.6,
+                    fontFamily: "'Space Grotesk', sans-serif",
                   }}
                 >
-                  <CardContent
-                    sx={{
-                      position: 'relative',
-                      zIndex: 2,
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      textAlign: 'center',
-                      p: { xs: 2, sm: 3 },
-                      '&:last-child': { pb: { xs: 2, sm: 3 } },
-                    }}
-                  >
-                    <Box sx={{ mb: 0.5, color: '#E6F2B1' }}>
-                      {cat.genderRule === 'female-only'
-                        ? cat.type === 'Individual' ? <IndividualIconF size={40} /> :
-                          cat.type === 'Dupla' ? <DuplaIconF size={40} /> :
-                          <RelevoIconF size={40} />
-                        : cat.genderRule === 'mixed'
-                        ? cat.type === 'Dupla' ? <DuplaIconMx size={40} /> :
-                          <RelevoIconMx size={40} />
-                        : cat.type === 'Individual' ? <IndividualIcon size={40} /> :
-                          cat.type === 'Dupla' ? <DuplaIcon size={40} /> :
-                          <RelevoIcon size={40} />}
-                    </Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 900,
-                        mb: 0.25,
-                        fontSize: { xs: '0.85rem', sm: '1rem' },
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        color: '#E6F2B1',
-                        letterSpacing: '0.02em',
-                      }}
-                    >
-                      {cat.name}
-                    </Typography>
-                    <Chip
-                      label={cat.type}
-                      color={getCategoryChipColor(cat.type)}
-                      size="small"
-                      sx={{ mb: 0.5, fontSize: '0.65rem', height: 20, borderRadius: 0, fontWeight: 700 }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'rgba(255,255,255,0.6)',
-                        mb: 1,
-                        fontSize: { xs: '0.7rem', sm: '0.8rem' },
-                        fontFamily: "'Space Grotesk', sans-serif",
-                      }}
-                    >
-                      {cat.participants}
-                    </Typography>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 900,
-                        fontSize: { xs: '1.1rem', sm: '1.3rem' },
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        color: '#E6F2B1',
-                        mb: 1.5,
-                        letterSpacing: '0.02em',
-                      }}
-                    >
-                      {formatPrice(cat.price)}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                      onClick={() => navigate({ to: '/registro' })}
-                      sx={{
-                        mt: 'auto',
-                        fontSize: { xs: '0.65rem', sm: '0.75rem' },
-                        px: { xs: 1.5, sm: 2 },
-                        py: 0.5,
-                        borderRadius: 0,
-                        fontWeight: 700,
-                        borderWidth: 2,
-                        '&:hover': { borderWidth: 2 },
-                      }}
-                    >
-                      Inscribirse
-                    </Button>
-                  </CardContent>
-                </Card>
+                  {FORMATO_DESCRIPCIONES[group.tipo]}
+                </Typography>
+              )}
+              <Grid container spacing={2}>
+                {group.productos.map((producto) => (
+                  <Grid size={{ xs: 6, sm: 4, md: 3 }} key={producto.code}>
+                    <ProductCard producto={producto} />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
+            </Box>
+          ))}
         </Container>
       </Box>
 
       {/* ===== ASISTE SECTION ===== */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: '#111111' }}>
-        <Container maxWidth="sm">
-          <Box
+      <Box id="asiste" sx={{ py: { xs: 8, md: 12 }, bgcolor: '#111111' }}>
+        <Container maxWidth="lg">
+          <SectionHeading label="ASISTE" color="#E9C7DF" />
+          <Typography
+            variant="body1"
             sx={{
               textAlign: 'center',
-              border: '2px solid rgba(233, 199, 223, 0.25)',
-              p: { xs: 4, md: 6 },
-              position: 'relative',
-              background:
-                'linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.9) 100%), url(https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800&q=80)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundBlendMode: 'normal',
+              color: 'text.secondary',
+              mb: 6,
+              maxWidth: 500,
+              mx: 'auto',
+              fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
-            <Box>
-            <ConfirmationNumberIcon
-              sx={{ fontSize: 56, color: '#E9C7DF', mb: 2 }}
-            />
+            Vive la Hybrid Experience 2026 desde dentro, sin competir.
+          </Typography>
+
+          {/* Público */}
+          <Box sx={{ mb: { xs: 6, md: 7 } }}>
             <Typography
-              variant="h2"
+              variant="overline"
               sx={{
+                display: 'block',
                 textAlign: 'center',
-                mb: 1,
                 color: '#E9C7DF',
-                fontWeight: 900,
-                fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                fontSize: '0.75rem',
+                mb: 0.5,
                 fontFamily: "'Space Grotesk', sans-serif",
               }}
             >
-              ASISTE
+              {`PÚBLICO · ${formatPrecio(250)} POR DÍA`}
             </Typography>
             <Typography
-              variant="body1"
+              variant="body2"
               sx={{
                 textAlign: 'center',
-                color: 'text.secondary',
-                mb: 4,
-                maxWidth: 400,
-                mx: 'auto',
-                fontSize: { xs: '1rem', sm: '1.1rem' },
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: '0.8rem',
+                mb: 2.5,
                 fontFamily: "'Space Grotesk', sans-serif",
               }}
             >
-              Vive la experiencia Hybrid Event 2026 desde dentro.
+              Compra el día en que compite tu atleta.
             </Typography>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="large"
-              onClick={() => navigate({ to: '/tickets' })}
+            <Grid container spacing={2}>
+              {PUBLICO_PRODUCTS.map((producto) => (
+                <Grid size={{ xs: 6, sm: 3 }} key={producto.code}>
+                  <ProductCard producto={producto} accentColor="#E9C7DF" />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+
+          {/* Fotógrafo */}
+          <Box>
+            <Typography
+              variant="overline"
               sx={{
-                px: 5,
-                py: 1.5,
-                fontSize: { xs: '1rem', sm: '1.1rem' },
-                borderRadius: 0,
+                display: 'block',
+                textAlign: 'center',
+                color: '#E9C7DF',
                 fontWeight: 700,
+                letterSpacing: '0.15em',
+                fontSize: '0.75rem',
+                mb: 0.5,
+                fontFamily: "'Space Grotesk', sans-serif",
               }}
             >
-              COMPRAR ACCESO
-            </Button>
+              {`FOTÓGRAFO · ${formatPrecio(350)} POR DÍA`}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                textAlign: 'center',
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: '0.8rem',
+                mb: 2.5,
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              Acreditación para fotógrafos externos.
+            </Typography>
+            <Grid container spacing={2}>
+              {FOTOGRAFO_PRODUCTS.map((producto) => (
+                <Grid size={{ xs: 6, sm: 3 }} key={producto.code}>
+                  <ProductCard producto={producto} accentColor="#E9C7DF" />
+                </Grid>
+              ))}
+            </Grid>
           </Box>
-        </Box>
         </Container>
       </Box>
 
@@ -1713,14 +2127,14 @@ export default function LandingPage() {
             }}
           >
             <Box sx={{ position: 'relative', zIndex: 2, textAlign: 'left' }}>
-              {/* HYBRID EVENT — big lime institutional */}
+              {/* HYBRID EXPERIENCE — big lime institutional */}
               <Typography
                 variant="h1"
                 sx={{
                   fontWeight: 900,
                   fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
                   fontStyle: 'italic',
-                  fontSize: { xs: '3rem', sm: '5rem', md: '6.5rem' },
+                  fontSize: { xs: '2.1rem', sm: '3.6rem', md: '4.8rem' },
                   lineHeight: 1,
                   color: '#E6F2B1',
                   letterSpacing: '-0.03em',
@@ -1728,7 +2142,7 @@ export default function LandingPage() {
                   textTransform: 'uppercase',
                 }}
               >
-                HYBRID EVENT
+                HYBRID EXPERIENCE
               </Typography>
 
               {/* Date — pink institutional */}
@@ -2205,6 +2619,7 @@ export default function LandingPage() {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography
+                    component="div"
                     variant="body2"
                     sx={{ color: 'text.secondary', fontFamily: "'Space Grotesk', sans-serif" }}
                   >
@@ -2214,48 +2629,6 @@ export default function LandingPage() {
               </Accordion>
             ))}
           </Box>
-        </Container>
-      </Box>
-
-      {/* ===== DOCUMENTACIÓN SECTION ===== */}
-      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: 'primary.light' }}>
-        <Container maxWidth="sm">
-          <Card
-            sx={{
-              textAlign: 'center',
-              bgcolor: '#111111',
-              border: '1px solid rgba(230, 242, 177, 0.15)',
-              borderRadius: 0,
-              p: 4,
-            }}
-          >
-            <Typography
-              variant="h5"
-              sx={{ fontWeight: 700, mb: 1, fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              📚 ¿Necesitas más información?
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: 'text.secondary', mb: 3, fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              Accede a nuestras guías detalladas con instrucciones paso-a-paso, FAQ y todo lo que necesitas para participar en Hybrid Event 2026.
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              href="/docs/"
-              sx={{
-                fontWeight: 700,
-                textTransform: 'none',
-                fontSize: '1rem',
-                borderRadius: 0,
-              }}
-            >
-              Ver Documentación Completa
-            </Button>
-          </Card>
         </Container>
       </Box>
 
@@ -2296,7 +2669,7 @@ export default function LandingPage() {
               ml: 0.5,
             }}
           >
-            EVENT
+            EXPERIENCE
           </Typography>
           <Typography
             variant="h6"

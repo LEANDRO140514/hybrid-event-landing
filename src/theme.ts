@@ -1,7 +1,7 @@
 import { createTheme, type ThemeOptions } from '@mui/material/styles'
 
 /**
- * HYBRID EVENT — Design System v2
+ * HYBRID EXPERIENCE — Design System v2
  * Palette: #000000 (bg), #E6F2B1 (primary/text), #E9C7DF (accent)
  * Fonts: TT Norms Pro ExtraBlack (brand only), Space Grotesk (UI)
  */

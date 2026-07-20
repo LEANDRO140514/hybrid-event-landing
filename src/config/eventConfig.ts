@@ -11,11 +11,11 @@
 
 export const eventConfig = {
   /** Full commercial name shown in headers, page titles, and formal contexts. */
-  name: 'The Hybrid Event',
+  name: 'The Hybrid Experience',
   /** Short name for space-constrained UI (buttons, labels, PWA short_name). */
   shortName: 'Hybrid',
   /** URL / filesystem-safe slug. */
-  slug: 'the-hybrid-event',
+  slug: 'the-hybrid-experience',
   /** Organizer brand shown in "BY {organizer}" labels and credits. */
   organizer: 'ENFORMA',
 } as const
