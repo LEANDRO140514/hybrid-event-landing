@@ -28,11 +28,11 @@ import { CATALOGO, porBloque, getInscribirUrl, formatPrecio } from '../data/cata
 import type { Producto } from '../data/catalogo'
 
 const DIA_COMPITO_ROWS = [
-  { formato: 'Dobles', cuando: 'Viernes PM · Sábado AM' },
-  { formato: 'Relay', cuando: 'Sábado PM' },
-  { formato: '½ Hybrid', cuando: 'Sábado AM' },
-  { formato: 'Workout Experience', cuando: 'Sábado AM' },
-  { formato: 'Individual (Open / Pro)', cuando: 'Domingo AM' },
+  { formato: 'Dobles', cuando: 'Viernes Vespertino · Sábado Matutino' },
+  { formato: 'Relay', cuando: 'Sábado Vespertino' },
+  { formato: '½ Hybrid', cuando: 'Sábado Matutino' },
+  { formato: 'Workout Experience', cuando: 'Sábado Matutino' },
+  { formato: 'Individual (Open / Pro)', cuando: 'Domingo Matutino' },
 ]
 
 function DiaCompitoTable() {
@@ -250,6 +250,11 @@ const DIA_SLUG: Record<string, string> = {
   'Vie-Dom': 'vie-dom',
 }
 
+const SESION_LABEL: Record<string, string> = {
+  AM: 'Matutino',
+  PM: 'Vespertino',
+}
+
 const FORMATO_DESCRIPCIONES: Record<string, string> = {
   'Workout Experience':
     'Una hora, un coach de ENFORMA, las instalaciones y el equipo real del evento. Aprendes la técnica de cada estación y haces un entrenamiento completo en formato híbrido. Sin cronómetro, sin ranking, sin experiencia previa. Sales sabiendo si esto es para ti.',
@@ -276,14 +281,14 @@ interface TresDiasItem {
 const TRES_DIAS: TresDiasItem[] = [
   {
     fecha: 'VIERNES 9',
-    sesion: 'PM',
+    sesion: 'Vespertino',
     titulo: 'Arranca la competencia',
     texto: 'Dobles: dos atletas se reparten el trabajo y se relevan. La energía de apertura.',
     links: [{ label: 'Ver Dobles', href: '#compite-vie-pm' }],
   },
   {
     fecha: 'SÁBADO 10',
-    sesion: 'AM',
+    sesion: 'Matutino',
     titulo: 'El día más abierto',
     texto:
       'Vuelven los Dobles, debuta el ½ Hybrid, y quien nunca ha competido puede tomar el Workout. Es el día para entrar al deporte.',
@@ -294,14 +299,14 @@ const TRES_DIAS: TresDiasItem[] = [
   },
   {
     fecha: 'SÁBADO 10',
-    sesion: 'PM',
+    sesion: 'Vespertino',
     titulo: 'Relay',
     texto: 'Cuatro atletas, un solo tiempo. El formato más ruidoso y de mayor ambiente.',
     links: [{ label: 'Ver Relay', href: '#compite-sab-pm' }],
   },
   {
     fecha: 'DOMINGO 11',
-    sesion: 'AM',
+    sesion: 'Matutino',
     titulo: 'Individual',
     texto:
       'Sin relevos, sin equipo: tú contra el reloj. Open y Pro. El cierre y los tiempos que definen el podio.',
@@ -1149,7 +1154,7 @@ export default function LandingPage() {
                     fontFamily: "'Space Grotesk', sans-serif",
                   }}
                 >
-                  Sábado 10 · AM · {formatPrecio(300)}
+                  Sábado 10 · Matutino · {formatPrecio(300)}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -1203,7 +1208,7 @@ export default function LandingPage() {
                 fontFamily: "'Space Grotesk', sans-serif",
               }}
             >
-              Formato by ENFORMA · Sábado 10 AM
+              Formato by ENFORMA · Sábado 10 Matutino
             </Typography>
             <Typography
               variant="body1"
@@ -1948,7 +1953,7 @@ export default function LandingPage() {
                   fontFamily: "'Space Grotesk', sans-serif",
                 }}
               >
-                {`${DIA_FECHA[group.dia]} · ${group.sesion} · ${group.tipo.toUpperCase()} · ${formatPrecio(group.productos[0].precio)} ${group.precioUnidad}`}
+                {`${DIA_FECHA[group.dia]} · ${SESION_LABEL[group.sesion] ?? group.sesion} · ${group.tipo.toUpperCase()} · ${formatPrecio(group.productos[0].precio)} ${group.precioUnidad}`}
               </Typography>
               {FORMATO_DESCRIPCIONES[group.tipo] && (
                 <Typography

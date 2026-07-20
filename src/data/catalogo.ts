@@ -17,19 +17,19 @@ export interface Producto {
 
 export const CATALOGO: Producto[] = [
   // ── COMPITE — Viernes 9 · PM · Dobles · $2,400 por pareja ──
-  { code: 'DOB-VIE-MM', nombre: 'Dobles Mujeres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2400, precioUnidad: 'por pareja', incluyeChip: true },
-  { code: 'DOB-VIE-HH', nombre: 'Dobles Hombres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2400, precioUnidad: 'por pareja', incluyeChip: true },
-  { code: 'DOB-VIE-MH', nombre: 'Dobles Mixto', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2400, precioUnidad: 'por pareja', incluyeChip: true },
+  { code: 'DOB-VIE-MM', nombre: 'Dobles Mujeres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2400, precioUnidad: 'por pareja ($1,200 c/u)', incluyeChip: true },
+  { code: 'DOB-VIE-HH', nombre: 'Dobles Hombres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2400, precioUnidad: 'por pareja ($1,200 c/u)', incluyeChip: true },
+  { code: 'DOB-VIE-MH', nombre: 'Dobles Mixto', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2400, precioUnidad: 'por pareja ($1,200 c/u)', incluyeChip: true },
 
   // ── COMPITE — Sábado 10 · AM · Dobles · $2,400 por pareja ──
-  { code: 'DOB-SAB-MM', nombre: 'Dobles Mujeres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2400, precioUnidad: 'por pareja', incluyeChip: true },
-  { code: 'DOB-SAB-HH', nombre: 'Dobles Hombres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2400, precioUnidad: 'por pareja', incluyeChip: true },
-  { code: 'DOB-SAB-MH', nombre: 'Dobles Mixto', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2400, precioUnidad: 'por pareja', incluyeChip: true },
+  { code: 'DOB-SAB-MM', nombre: 'Dobles Mujeres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2400, precioUnidad: 'por pareja ($1,200 c/u)', incluyeChip: true },
+  { code: 'DOB-SAB-HH', nombre: 'Dobles Hombres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2400, precioUnidad: 'por pareja ($1,200 c/u)', incluyeChip: true },
+  { code: 'DOB-SAB-MH', nombre: 'Dobles Mixto', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2400, precioUnidad: 'por pareja ($1,200 c/u)', incluyeChip: true },
 
   // ── COMPITE — Sábado 10 · PM · Relay (4 personas) · $3,200 por equipo ──
-  { code: 'REL-4H', nombre: 'Relay 4 Hombres', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioUnidad: 'por equipo', incluyeChip: true },
-  { code: 'REL-4M', nombre: 'Relay 4 Mujeres', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioUnidad: 'por equipo', incluyeChip: true },
-  { code: 'REL-2H2M', nombre: 'Relay Mixto 2H+2M', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioUnidad: 'por equipo', incluyeChip: true },
+  { code: 'REL-4H', nombre: 'Relay 4 Hombres', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioUnidad: 'por equipo ($800 c/u)', incluyeChip: true },
+  { code: 'REL-4M', nombre: 'Relay 4 Mujeres', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioUnidad: 'por equipo ($800 c/u)', incluyeChip: true },
+  { code: 'REL-2H2M', nombre: 'Relay Mixto 2H+2M', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioUnidad: 'por equipo ($800 c/u)', incluyeChip: true },
 
   // ── COMPITE — Domingo 11 · AM · Individual · $1,400 por persona ──
   { code: 'IND-H', nombre: 'Individual Hombre (Open)', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1400, precioUnidad: 'por persona', incluyeChip: true },
