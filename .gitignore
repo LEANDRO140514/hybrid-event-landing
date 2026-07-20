@@ -39,6 +39,9 @@ coverage
 playwright-report
 test-results
 
+# Local tooling (agent-specific, not project-relevant)
+.claude/launch.json
+
 # Agent residues (non-institutional)
 .goose
 .cursor
