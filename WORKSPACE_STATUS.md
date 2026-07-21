@@ -81,22 +81,36 @@
 - **Left for a future phase, not authorized this phase:** the two `docs/guiones-origen/*.html` files remain untracked, staged as input for a future "guías públicas" phase.
 - **Next Authorized Phase:** (none yet — awaiting instruction)
 
+## Phase COMPITE-CONTENT-FIXES (opened and closed 2026-07-20)
+
+- **Authorized by:** user, in-session, following HEX-REBRAND-CATALOG close. Two small content corrections to the landing, requested directly (no formal PREFLIGHT — ad hoc text-only scope).
+- **Scope:**
+  1. Display-layer translation of session labels: `AM` → `Matutino`, `PM` → `Vespertino`, everywhere rendered to the user in the EXPERIENCE, COMPITE, and TRES DÍAS sections and the "¿Qué día compito?" FAQ table. The underlying `catalogo.ts` data values (`sesion: 'AM' | 'PM'`) were deliberately left untouched, since they drive the `#compite-{dia}-{am|pm}` deep-link anchor IDs (`groupProductos()` in `LandingPage.tsx`); a new `SESION_LABEL` display map was added instead so the anchors keep working. ASISTE was checked and has no session-time text to translate (Público/Fotógrafo product cards never render `sesion`).
+  2. Per-person cost shown in parentheses on every Dobles and Relay (equipo) product card in COMPITE, matching the pattern `½ Hybrid Dobles` already used (`'por pareja ($800 c/u)'`): Dobles → `'por pareja ($1,200 c/u)'`, Relay → `'por equipo ($800 c/u)'`.
+- **Files touched:** `src/pages/LandingPage.tsx` (added `SESION_LABEL` map; translated `DIA_COMPITO_ROWS`, `TRES_DIAS`, two hardcoded EXPERIENCE strings; COMPITE group heading now looks up `SESION_LABEL[group.sesion]`), `src/data/catalogo.ts` (`precioUnidad` updated on the 6 Dobles + 3 Relay entries only).
+- **Validation:** `tsc -b` clean, `oxlint` 0/0, `vite build` clean (647 modules, 9 PWA precache entries) — run twice, once per fix. Verified in a real browser: page text extracted and confirmed Matutino/Vespertino render correctly in EXPERIENCE/COMPITE/TRES DÍAS/FAQ, and per-person costs render on all Dobles/Relay cards; confirmed the `#compite-*-am/pm` anchors still resolve (anchor IDs unchanged by design).
+- **Commit:** `10eb66a` — "fix: traduce AM/PM a Matutino/Vespertino y añade costo por persona en cards de equipo" (both fixes in one commit, per user instruction). **Pushed** to `origin/main` (user explicitly authorized push for this repo earlier in the same session, when the GitHub remote was first created).
+- **Known issues:** (none)
+- **Pending decisions:** (none)
+- **Left untouched, not in scope:** the two `docs/guiones-origen/*.html` files remain untracked, still reserved for a future "guías públicas" phase.
+- **Next Authorized Phase:** (none yet — awaiting instruction)
+
 ```
 === NEXT_SESSION_BOOTSTRAP ===
 Workspace: C:\vonde\hybrid-event-landing
 Product/System: The Hybrid Experience (hybrid-event-web)
 Workspace Type: standalone-repo / external-development-workspace
 Branch: main
-HEAD: 5a8e1a7
-Last Commits: 5a8e1a7 chore: limpia globIgnores('r2r/**') obsoleto tras eliminar public/r2r/ | e70e439 chore: elimina bundle r2r no utilizado | 3754592 chore: elimina dependencias no utilizadas (react-hook-form, @hookform/resolvers, zod)
-Completed Phase: HEX-REBRAND-CATALOG
+HEAD: 10eb66a
+Last Commits: 10eb66a fix: traduce AM/PM a Matutino/Vespertino y añade costo por persona en cards de equipo | a0ad59c docs: cierra fase HEX-REBRAND-CATALOG en WORKSPACE_STATUS.md | 5a8e1a7 chore: limpia globIgnores('r2r/**') obsoleto tras eliminar public/r2r/
+Completed Phase: COMPITE-CONTENT-FIXES
 Gate: READY_FOR_INSTRUCTIONS
 Known Issues: (none)
 Pending Decisions: (none)
 Protected Sources: (none)
 Next Authorized Phase: (awaiting instruction)
 Files To Read First: WORKSPACE_STATUS.md, src/data/catalogo.ts, src/pages/LandingPage.tsx
-Forbidden Actions: push, modifying docs/guiones-origen/*.html
+Forbidden Actions: push without express authorization, modifying docs/guiones-origen/*.html
 First Command: scripts/workspace-preflight.ps1
 === END_BOOTSTRAP ===
 ```
