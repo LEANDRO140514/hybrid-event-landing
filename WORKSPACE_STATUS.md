@@ -1,7 +1,7 @@
 # WORKSPACE_STATUS
 
 - **Product:** The Hybrid Experience (renamed from "The Hybrid Event" in phase HEX-REBRAND-CATALOG, see below)
-- **Workspace:** `hybrid-event-web`
+- **Workspace:** `hybrid-event-landing` (renamed from `hybrid-event-web` — see "Phase RENAME-HYBRID-EVENT-LANDING" below)
 - **Origin:** `C:\Users\vonde\Proyectos\orchids-hype-pwa-design`
 - **Creation phase:** ENFORMA-EXTRACT-1A
 - **Pruning phase:** ENFORMA-EXTRACT-1B
@@ -95,15 +95,30 @@
 - **Left untouched, not in scope:** the two `docs/guiones-origen/*.html` files remain untracked, still reserved for a future "guías públicas" phase.
 - **Next Authorized Phase:** (none yet — awaiting instruction)
 
+## Outside-session activity (noted, not performed by an agent)
+
+- **Workspace moved:** the user relocated the working copy from `C:\vonde\hybrid-event-landing` to `C:\vonde\enforma-sys\hybrid-event-landing`. Git history and remote (`origin` → `LEANDRO140514/hybrid-event-landing`) are unaffected by a plain folder move.
+- **Commit `c36b8ce`** — "docs: preserve original landing scripts" (user, 2026-07-20 23:48 local, outside this session): tracked the two previously-untracked `docs/guiones-origen/{athlete,captain}.html` reference files into git. They remain unused by the app/build, per the original HEX-REBRAND-CATALOG note.
+
+## Phase RENAME-HYBRID-EVENT-LANDING (opened and closed 2026-07-20)
+
+- **Authorized by:** user, in-session, direct instruction: rename the project identifier from `hybrid-event-web` to `hybrid-event-landing` to match the folder name.
+- **Scope:** `package.json` `"name"` field; `.claude/launch.json` dev-server config `"name"` (local tooling, gitignored); `package-lock.json` resynced via `npm install`. `WORKSPACE_STATUS.md` "Workspace" identity line updated to the new name; the historical HEX-REBRAND-CATALOG-1C note documenting the *earlier* rename (`the-hype-pwa` → `hybrid-event-web`) was left untouched since it accurately records a past fact.
+- **Not renamed (out of scope, no user-facing or functional link to the internal npm package name):** GitHub repo name (`LEANDRO140514/hybrid-event-landing` already matches), PWA manifest `name`/`short_name` (already "The Hybrid Experience" / "Hybrid" — unrelated identifier), source folder names under `src/`.
+- **Validation:** `npm install` completed clean (423 packages, up to date structurally, only the `name` field changed); `package-lock.json` confirmed to carry the new name at both `name` fields (root + lockfileVersion entry).
+- **Known issues:** (none)
+- **Pending decisions:** (none)
+- **Next Authorized Phase:** (none yet — awaiting instruction)
+
 ```
 === NEXT_SESSION_BOOTSTRAP ===
-Workspace: C:\vonde\hybrid-event-landing
-Product/System: The Hybrid Experience (hybrid-event-web)
+Workspace: C:\vonde\enforma-sys\hybrid-event-landing
+Product/System: The Hybrid Experience (hybrid-event-landing)
 Workspace Type: standalone-repo / external-development-workspace
 Branch: main
-HEAD: 10eb66a
-Last Commits: 10eb66a fix: traduce AM/PM a Matutino/Vespertino y añade costo por persona en cards de equipo | a0ad59c docs: cierra fase HEX-REBRAND-CATALOG en WORKSPACE_STATUS.md | 5a8e1a7 chore: limpia globIgnores('r2r/**') obsoleto tras eliminar public/r2r/
-Completed Phase: COMPITE-CONTENT-FIXES
+HEAD: c36b8ce
+Last Commits: c36b8ce docs: preserve original landing scripts | f546ddc docs: cierra fase COMPITE-CONTENT-FIXES en WORKSPACE_STATUS.md | 10eb66a fix: traduce AM/PM a Matutino/Vespertino y añade costo por persona en cards de equipo
+Completed Phase: RENAME-HYBRID-EVENT-LANDING
 Gate: READY_FOR_INSTRUCTIONS
 Known Issues: (none)
 Pending Decisions: (none)
