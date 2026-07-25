@@ -1342,7 +1342,7 @@ export default function LandingPage() {
                     fontFamily: "'Space Grotesk', sans-serif",
                   }}
                 >
-                  Sábado 10 · Matutino · {formatPrecio(300)}
+                  Sábado 10 · Matutino · {formatPrecio(350)}
                 </Typography>
                 <Typography
                   variant="body1"
