@@ -245,12 +245,83 @@ function ArrowUp({ size = 20, color = '#E6F2B1' }: { size?: number; color?: stri
   )
 }
 
+// Hero background — responsive by breakpoint (largest available original is w1248).
+const IMG_HERO_400 =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/hero%2Fhero-corredores-multitud-w400.webp?v=88169c62c615ba9bb61116af9eed197e'
+const IMG_HERO_800 =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/hero%2Fhero-corredores-multitud-w800.webp?v=c83fbdbae44ef58109a443c458ebfeda'
+const IMG_HERO_1248 =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/hero%2Fhero-corredores-multitud-w1248.webp?v=816d22dd74b6710c6f5a59c662c0b133'
+
+// Ubicación (Club Cumbres) background — responsive by breakpoint.
+const IMG_VENUE_400 =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/location%2Fubicacion-club-cumbres-aerea-w400.webp?v=5fa7e655dc6123e7a1fa26cdd30e037e'
+const IMG_VENUE_800 =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/location%2Fubicacion-club-cumbres-aerea-w800.webp?v=164ba70d20e415ed87779f7323757914'
+const IMG_VENUE_907 =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/location%2Fubicacion-club-cumbres-aerea-w907.webp?v=e549b18940cb3c16aa502310a0eeb23b'
+
+// ENFORMA storage (InsForge), w800 variant — sharp enough for card backgrounds, light enough to load 28 of them.
+const IMG_INDIVIDUAL_HOMBRE =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/individual%2Findividual-hombre-corriendo-pista-w800.webp?v=49426bd84482dea102db9a1bc76dc388'
+const IMG_INDIVIDUAL_MUJER =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/individual%2Findividual-mujer-corriendo-pista-w800.webp?v=d3808e7eef83c55a5d0e7866bf61cf1a'
+const IMG_DOBLES_HOMBRES =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/doubles%2Fdobles-hombres-remo-asistido-w800.webp?v=bc444540f47e703aa6f8c744cdaa108b'
+const IMG_DOBLES_MUJERES =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/doubles%2Fdobles-mujeres-remo-equipo-w800.webp?v=77333debedfe851b21a3becbf9c90283'
+const IMG_DOBLES_MIXTO =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/doubles%2Fdobles-mixto-remo-equipo-w800.webp?v=d86b55ae3cfd8a58c58144f12deabdf2'
+const IMG_RELAY_HOMBRES =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/relay%2Frelay-equipo-hombres-legends-w800.webp?v=2cf0d209b5f3f19bdb70afd0bb9a85a4'
+const IMG_RELAY_MUJERES =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/relay%2Frelay-equipo-mujeres-team712-w800.webp?v=ca66d376b2405f2e49837b093eeb9945'
+const IMG_RELAY_MIXTO =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/relay%2Frelay-equipo-mixto-cambio-w800.webp?v=883cfbcdcb9a070de88d05ca113c6ea3'
+const IMG_PUBLICO =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/atmosphere%2Fpublico-animando-graderio-w800.webp?v=0fc58b5ef5b3277b6ab33ce399babea0'
+const IMG_FOTOGRAFO =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/media%2Ffotografos-cubriendo-carrera-w800.webp?v=df02c6283432f9fb887436449c5a12c1'
+const IMG_WORKOUT =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/stations%2Festacion-skierg-concept2-w800.webp?v=f5ff3662c86ba60a6b2f7f8f52cdb14e'
+
+// Keyed by product code (not just tipo) since COMPITE/EXPERIENCE have gender-specific photography.
 const PRODUCT_IMAGES: Record<string, string> = {
-  Individual: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&q=80',
-  Dobles: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80',
-  Relay: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80',
-  '½ Hybrid Individual': 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&q=80',
-  '½ Hybrid Dobles': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80',
+  // COMPITE — Dobles
+  'DOB-VIE-MM': IMG_DOBLES_MUJERES,
+  'DOB-VIE-HH': IMG_DOBLES_HOMBRES,
+  'DOB-VIE-MH': IMG_DOBLES_MIXTO,
+  'DOB-SAB-MM': IMG_DOBLES_MUJERES,
+  'DOB-SAB-HH': IMG_DOBLES_HOMBRES,
+  'DOB-SAB-MH': IMG_DOBLES_MIXTO,
+  // COMPITE — Relay
+  'REL-4H': IMG_RELAY_HOMBRES,
+  'REL-4M': IMG_RELAY_MUJERES,
+  'REL-2H2M': IMG_RELAY_MIXTO,
+  // COMPITE — Individual
+  'IND-H': IMG_INDIVIDUAL_HOMBRE,
+  'IND-M': IMG_INDIVIDUAL_MUJER,
+  'IND-PRO-H': IMG_INDIVIDUAL_HOMBRE,
+  'IND-PRO-M': IMG_INDIVIDUAL_MUJER,
+  // EXPERIENCE — ½ Hybrid (reuses the full-format photography for the same discipline)
+  'HALF-IND-M': IMG_INDIVIDUAL_MUJER,
+  'HALF-IND-H': IMG_INDIVIDUAL_HOMBRE,
+  'HALF-DOB-MM': IMG_DOBLES_MUJERES,
+  'HALF-DOB-HH': IMG_DOBLES_HOMBRES,
+  'HALF-DOB-MH': IMG_DOBLES_MIXTO,
+  // EXPERIENCE — Workout
+  'WOD-M': IMG_WORKOUT,
+  'WOD-H': IMG_WORKOUT,
+  // ASISTE — Público
+  'PUB-VIE': IMG_PUBLICO,
+  'PUB-SAB': IMG_PUBLICO,
+  'PUB-DOM': IMG_PUBLICO,
+  'PUB-3D': IMG_PUBLICO,
+  // ASISTE — Fotógrafo
+  'FOT-VIE': IMG_FOTOGRAFO,
+  'FOT-SAB': IMG_FOTOGRAFO,
+  'FOT-DOM': IMG_FOTOGRAFO,
+  'FOT-3D': IMG_FOTOGRAFO,
 }
 
 function getProductIcon(tipo: string, size = 40) {
@@ -357,7 +428,7 @@ interface ProductCardProps {
 }
 
 function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
-  const imageUrl = PRODUCT_IMAGES[producto.tipo] || PRODUCT_IMAGES.Individual
+  const imageUrl = PRODUCT_IMAGES[producto.code] || IMG_WORKOUT
   const isOpen = SALES_CONFIG.status === 'open'
   const isClosed = SALES_CONFIG.status === 'closed'
   const buttonLabel = isOpen ? 'Inscribirse' : isClosed ? 'Inscripciones cerradas' : 'Ventas abren el lunes'
@@ -926,8 +997,11 @@ export default function LandingPage() {
           textAlign: 'center',
           px: 2,
           py: 4,
-          background:
-            'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,1) 100%), url(https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600&q=80)',
+          backgroundImage: {
+            xs: `linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,1) 100%), url(${IMG_HERO_400})`,
+            sm: `linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,1) 100%), url(${IMG_HERO_800})`,
+            md: `linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,1) 100%), url(${IMG_HERO_1248})`,
+          },
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -2247,8 +2321,11 @@ export default function LandingPage() {
               justifyContent: 'flex-end',
               p: { xs: 3, sm: 5 },
               border: '1px solid rgba(230,242,177,0.2)',
-              backgroundImage:
-                'url(https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1000&q=80)',
+              backgroundImage: {
+                xs: `url(${IMG_VENUE_400})`,
+                sm: `url(${IMG_VENUE_800})`,
+                md: `url(${IMG_VENUE_907})`,
+              },
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               '&::before': {
