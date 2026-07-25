@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   Box,
   Button,
@@ -21,11 +21,37 @@ import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber'
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
 import BoltIcon from '@mui/icons-material/Bolt'
 import InstagramIcon from '@mui/icons-material/Instagram'
-import WhatsAppIcon from '@mui/icons-material/WhatsApp'
-import EmailIcon from '@mui/icons-material/Email'
 import { useCountdown } from '../hooks/useCountdown'
 import { CATALOGO, porBloque, getInscribirUrl, formatPrecio } from '../data/catalogo'
 import type { Producto } from '../data/catalogo'
+import { DOMAINS } from '../config'
+import { eventConfig } from '../config/eventConfig'
+import { SALES_CONFIG } from '../config/salesConfig'
+
+const EVENT_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: eventConfig.name,
+  description:
+    'Vive HYBRID EXPERIENCE del 9 al 11 de octubre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid y Workout Experience, o compra tu acceso como público.',
+  startDate: '2026-10-09T17:00:00-06:00',
+  endDate: '2026-10-11',
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Mérida',
+      addressRegion: 'Yucatán',
+      addressCountry: 'MX',
+    },
+  },
+  organizer: {
+    '@type': 'Organization',
+    name: 'ENFORMA Sports Society',
+  },
+} as const
 
 const DIA_COMPITO_ROWS = [
   { formato: 'Dobles', cuando: 'Viernes Vespertino · Sábado Matutino' },
@@ -112,7 +138,9 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
     <Box sx={{ textAlign: 'center', px: { xs: 1, sm: 2 } }}>
       <Typography
         variant="h2"
+        component="span"
         sx={{
+          display: 'block',
           fontWeight: 900,
           color: 'secondary.main',
           fontSize: { xs: '2rem', sm: '3rem' },
@@ -204,6 +232,15 @@ function ArrowRight({ size = 20, color = '#E6F2B1' }: { size?: number; color?: s
     <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke={color} strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
       <line x1="2" y1="10" x2="18" y2="10" />
       <polyline points="12,4 18,10 12,16" />
+    </svg>
+  )
+}
+
+function ArrowUp({ size = 20, color = '#E6F2B1' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke={color} strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+      <line x1="10" y1="18" x2="10" y2="2" />
+      <polyline points="4,8 10,2 16,8" />
     </svg>
   )
 }
@@ -321,6 +358,9 @@ interface ProductCardProps {
 
 function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const imageUrl = PRODUCT_IMAGES[producto.tipo] || PRODUCT_IMAGES.Individual
+  const isOpen = SALES_CONFIG.status === 'open'
+  const isClosed = SALES_CONFIG.status === 'closed'
+  const buttonLabel = isOpen ? 'Inscribirse' : isClosed ? 'Inscripciones cerradas' : 'Ventas abren el lunes'
   return (
     <Card
       sx={{
@@ -414,8 +454,8 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
         <Typography
           variant="caption"
           sx={{
-            color: 'rgba(255,255,255,0.5)',
-            fontSize: '0.65rem',
+            color: 'rgba(255,255,255,0.65)',
+            fontSize: '0.75rem',
             mb: producto.incluyeChip ? 0.5 : 1.5,
             fontFamily: "'Space Grotesk', sans-serif",
           }}
@@ -426,8 +466,8 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
           <Typography
             variant="caption"
             sx={{
-              color: 'rgba(255,255,255,0.45)',
-              fontSize: '0.6rem',
+              color: 'rgba(255,255,255,0.65)',
+              fontSize: '0.7rem',
               lineHeight: 1.4,
               mb: 1.5,
               fontFamily: "'Space Grotesk', sans-serif",
@@ -437,26 +477,34 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
           </Typography>
         )}
         <Button
-          component="a"
-          href={getInscribirUrl(producto.code)}
-          target="_blank"
-          rel="noopener noreferrer"
+          component={isOpen ? 'a' : 'button'}
+          href={isOpen ? getInscribirUrl(producto.code) : undefined}
+          target={isOpen ? '_blank' : undefined}
+          rel={isOpen ? 'noopener noreferrer' : undefined}
+          disabled={!isOpen}
           variant="outlined"
           size="small"
           sx={{
             mt: 'auto',
-            fontSize: { xs: '0.65rem', sm: '0.75rem' },
+            minHeight: 44,
+            fontSize: { xs: '0.68rem', sm: '0.78rem' },
             px: { xs: 1.5, sm: 2 },
-            py: 0.5,
+            py: { xs: 1, sm: 1.15 },
             borderRadius: 0,
             fontWeight: 700,
             borderWidth: 2,
             borderColor: accentColor,
             color: accentColor,
             '&:hover': { borderWidth: 2, borderColor: accentColor, bgcolor: `${accentColor}1A` },
+            '&:focus-visible': { outline: `3px solid ${accentColor}`, outlineOffset: 2 },
+            '&.Mui-disabled': {
+              borderWidth: 2,
+              borderColor: `${accentColor}55`,
+              color: `${accentColor}99`,
+            },
           }}
         >
-          Inscribirse
+          {buttonLabel}
         </Button>
       </CardContent>
     </Card>
@@ -611,7 +659,7 @@ function Navbar() {
             </Typography>
           ))}
           <Button
-            onClick={() => window.open('https://shop.enforma.mx', '_blank')}
+            onClick={() => window.open(`https://${DOMAINS.shop}`, '_blank')}
             sx={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontSize: '0.7rem',
@@ -635,6 +683,7 @@ function Navbar() {
         {/* Hamburger */}
         <IconButton
           onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
           sx={{ display: { xs: 'flex', md: 'none' }, color: '#E6F2B1', borderRadius: 0 }}
         >
           {menuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -666,7 +715,7 @@ function Navbar() {
             </Box>
           ))}
           <Box
-            onClick={() => { setMenuOpen(false); window.open('https://shop.enforma.mx', '_blank'); }}
+            onClick={() => { setMenuOpen(false); window.open(`https://${DOMAINS.shop}`, '_blank'); }}
             sx={{
               px: 3,
               py: 1.5,
@@ -687,107 +736,152 @@ function Navbar() {
   )
 }
 
-// ── Sponsor Marquee ──────────────────────────────────────────────
-const SPONSORS: { id: string; name: string; logoUrl: string | null; type: 'image' | 'text' }[] = [
-  { id: 'enforma', name: 'ENFORMA', logoUrl: null, type: 'text' },
-  { id: 'algorithmus', name: 'AlgorithmUs.io', logoUrl: null, type: 'text' },
-  { id: 'hybrid-labs', name: 'HYBRID LABS', logoUrl: null, type: 'text' },
-  { id: 'ironclad', name: 'IRONCLAD', logoUrl: null, type: 'text' },
-  { id: 'nexus-fit', name: 'NEXUS FIT', logoUrl: null, type: 'text' },
-  { id: 'primal-gear', name: 'PRIMAL GEAR', logoUrl: null, type: 'text' },
-  { id: 'zero-gravity', name: 'ZERO GRAVITY', logoUrl: null, type: 'text' },
-  { id: 'titan-sport', name: 'TITAN SPORT', logoUrl: null, type: 'text' },
-]
-
-function SponsorMarquee() {
-  const items = [...SPONSORS, ...SPONSORS] // duplicated for seamless loop
-
+// ── Organizer Strip (static — replaces the prior sponsor marquee) ──
+function OrganizerStrip() {
   return (
     <Box
       sx={{
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
+        textAlign: 'center',
         bgcolor: '#000000',
         borderTop: '1px solid rgba(230,242,177,0.15)',
         borderBottom: '1px solid rgba(230,242,177,0.15)',
-        py: { xs: 1.5, sm: 2 },
-        width: '100%',
-        position: 'relative',
-        '&::before, &::after': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          width: 40,
-          zIndex: 2,
-          pointerEvents: 'none',
-        },
-        '&::before': {
-          left: 0,
-          background: 'linear-gradient(90deg, #000000 0%, transparent 100%)',
-        },
-        '&::after': {
-          right: 0,
-          background: 'linear-gradient(270deg, #000000 0%, transparent 100%)',
-        },
+        py: { xs: 2, sm: 2.5 },
+        px: 2,
       }}
     >
-      <Box
+      <Typography
         sx={{
-          display: 'inline-flex',
-          gap: { xs: 6, sm: 10 },
-          alignItems: 'center',
-          animation: 'marquee 30s linear infinite',
-          '@keyframes marquee': {
-            '0%': { transform: 'translateX(0)' },
-            '100%': { transform: 'translateX(-50%)' },
-          },
-          '&:hover': {
-            animationPlayState: 'paused',
-          },
+          fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
+          fontStyle: 'italic',
+          color: '#E6F2B1',
+          fontSize: { xs: '0.9rem', sm: '1.1rem' },
+          mb: 0.5,
         }}
       >
-        {items.map((s, i) => (
-          <Box
-            key={`${s.id}-${i}`}
-            sx={{
-              ...(s.type === 'text' && {
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 800,
-                fontSize: { xs: '0.9rem', sm: '1.1rem' },
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                color: '#ffffff',
-              }),
-              filter: 'grayscale(100%) opacity(0.5)',
-              transition: 'filter 200ms, color 200ms',
-              cursor: 'default',
-              userSelect: 'none',
-              '&:hover': {
-                filter: 'grayscale(0%) opacity(1)',
-                color: '#E6F2B1',
-                textShadow: '0 0 12px rgba(230,242,177,0.4)',
-              },
-            }}
-          >
-            {s.type === 'image' && s.logoUrl ? (
+        HYBRID EXPERIENCE
+      </Typography>
+      <Typography
+        sx={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          color: 'text.secondary',
+          fontWeight: 600,
+          fontSize: { xs: '0.7rem', sm: '0.8rem' },
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+        }}
+      >
+        Organizado por ENFORMA Sports Society · Mérida, Yucatán · 9, 10 y 11 de octubre de 2026
+      </Typography>
+    </Box>
+  )
+}
+
+// ── Elige tu experiencia (three conceptual entry points) ─────────
+interface AccesoConceptual {
+  titulo: string
+  subtitulo: string
+  href: string
+  color: string
+}
+
+const ACCESOS: AccesoConceptual[] = [
+  { titulo: 'QUIERO COMPETIR', subtitulo: 'Individual · Dobles · Relay', href: '#compite', color: '#E6F2B1' },
+  { titulo: 'QUIERO EMPEZAR', subtitulo: 'Workout Experience · ½ Hybrid', href: '#experience', color: '#E6F2B1' },
+  { titulo: 'QUIERO ASISTIR', subtitulo: 'Público · Fotógrafo', href: '#asiste', color: '#E9C7DF' },
+]
+
+function EligeTuExperiencia() {
+  return (
+    <Box
+      id="elige-tu-experiencia"
+      component="section"
+      sx={{ py: { xs: 8, md: 10 }, bgcolor: 'background.default', scrollMarginTop: '80px' }}
+    >
+      <Container maxWidth="lg">
+        <Typography
+          variant="h2"
+          component="h2"
+          sx={{
+            textAlign: 'center',
+            mb: { xs: 5, md: 6 },
+            fontWeight: 900,
+            fontSize: { xs: '1.6rem', sm: '2.1rem', md: '2.4rem' },
+            textTransform: 'uppercase',
+            letterSpacing: '0.02em',
+            fontFamily: "'Space Grotesk', sans-serif",
+            color: '#E6F2B1',
+          }}
+        >
+          Elige cómo vivir la experiencia
+        </Typography>
+        <Grid container spacing={3}>
+          {ACCESOS.map((acceso) => (
+            <Grid size={{ xs: 12, sm: 4 }} key={acceso.href}>
               <Box
-                component="img"
-                src={s.logoUrl}
-                alt={s.name}
+                component="a"
+                href={acceso.href}
                 sx={{
-                  height: { xs: 28, sm: 36 },
-                  width: 'auto',
-                  objectFit: 'contain',
                   display: 'block',
+                  textAlign: 'center',
+                  height: '100%',
+                  p: { xs: 3.5, sm: 4 },
+                  border: '2px solid',
+                  borderColor: `${acceso.color}4D`,
+                  textDecoration: 'none',
+                  transition: 'border-color 0.15s ease, transform 0.15s ease',
+                  '&:hover': { borderColor: acceso.color, transform: 'translateY(-3px)' },
+                  '&:focus-visible': { outline: `3px solid ${acceso.color}`, outlineOffset: 3 },
                 }}
-              />
-            ) : (
-              s.name
-            )}
-          </Box>
-        ))}
-      </Box>
+              >
+                <Typography
+                  component="h3"
+                  sx={{
+                    fontWeight: 900,
+                    color: acceso.color,
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    letterSpacing: '0.03em',
+                    fontSize: { xs: '1.15rem', sm: '1.3rem' },
+                    textTransform: 'uppercase',
+                    mb: 1,
+                  }}
+                >
+                  {acceso.titulo}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: 'text.secondary', fontFamily: "'Space Grotesk', sans-serif" }}
+                >
+                  {acceso.subtitulo}
+                </Typography>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
+  )
+}
+
+// ── Sales status banner (visible while registration isn't open) ──
+function SalesStatusBanner() {
+  if (SALES_CONFIG.status === 'open') return null
+  const text = SALES_CONFIG.status === 'coming_soon' ? SALES_CONFIG.openingLabel : 'Inscripciones cerradas'
+  return (
+    <Box
+      sx={{
+        bgcolor: '#E6F2B1',
+        color: '#000000',
+        textAlign: 'center',
+        py: 1,
+        px: 2,
+        fontFamily: "'Space Grotesk', sans-serif",
+        fontWeight: 800,
+        fontSize: { xs: '0.7rem', sm: '0.8rem' },
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+      }}
+    >
+      {text}
     </Box>
   )
 }
@@ -797,10 +891,29 @@ export default function LandingPage() {
   const timeLeft = useCountdown(targetDate)
   const [desafioTab, setDesafioTab] = useState(0)
   const currentData = desafioTab === 0 ? OPEN_DATA : PRO_DATA
+  const [showBackToTop, setShowBackToTop] = useState(false)
+
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.type = 'application/ld+json'
+    script.text = JSON.stringify(EVENT_JSON_LD)
+    document.head.appendChild(script)
+    return () => {
+      document.head.removeChild(script)
+    }
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 800)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
     <Box>
       <Navbar />
+      <SalesStatusBanner />
       {/* ===== HERO SECTION ===== */}
       <Box
         id="hero"
@@ -833,7 +946,7 @@ export default function LandingPage() {
           },
         }}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 1 }}>
+        <Box component="h1" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 1, m: 0 }}>
           <Typography
             variant="h1"
             component="span"
@@ -849,6 +962,7 @@ export default function LandingPage() {
           >
             HYBRID
           </Typography>
+          <Box component="span" sx={{ fontSize: 0, lineHeight: 0 }}> </Box>
           <Typography
             variant="h1"
             component="span"
@@ -926,21 +1040,20 @@ export default function LandingPage() {
         </Stack>
 
         <Button
+          component="a"
+          href="#elige-tu-experiencia"
           variant="contained"
           color="primary"
           size="large"
-          onClick={() => {
-            const el = document.getElementById('compite')
-            if (el) el.scrollIntoView({ behavior: 'smooth' })
-          }}
           sx={{
             px: 5,
             py: 1.5,
             fontSize: { xs: '1rem', sm: '1.1rem' },
             mb: 3,
+            '&:focus-visible': { outline: '3px solid #E6F2B1', outlineOffset: 3 },
           }}
         >
-          ¡Inscríbete ahora!
+          Elige tu experiencia
         </Button>
 
         <Typography
@@ -951,7 +1064,8 @@ export default function LandingPage() {
         </Typography>
       </Box>
 
-      <SponsorMarquee />
+      <EligeTuExperiencia />
+      <OrganizerStrip />
 
       {/* ===== QUÉ ES EL DEPORTE HÍBRIDO ===== */}
       <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
@@ -1000,7 +1114,7 @@ export default function LandingPage() {
                 fontFamily: "'Space Grotesk', sans-serif",
               }}
             >
-              No es CrossFit. No es una carrera. Es resistencia y fuerza en el mismo reloj.
+              Esto es deporte híbrido: resistencia y fuerza puestas a prueba en el mismo reloj. El reto completo.
             </Typography>
           </Stack>
 
@@ -1168,7 +1282,7 @@ export default function LandingPage() {
                   {FORMATO_DESCRIPCIONES['Workout Experience']}
                 </Typography>
               </Box>
-              <Grid container spacing={2} sx={{ flex: 1 }}>
+              <Grid container spacing={2} sx={{ flex: 1, justifyContent: 'center' }}>
                 {WORKOUT_PRODUCTS.map((producto) => (
                   <Grid size={{ xs: 6 }} key={producto.code}>
                     <ProductCard producto={producto} />
@@ -1224,7 +1338,7 @@ export default function LandingPage() {
             >
               {FORMATO_DESCRIPCIONES['½ Hybrid Individual']}
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
               {HALF_HYBRID_PRODUCTS.map((producto) => (
                 <Grid size={{ xs: 6, sm: 4 }} key={producto.code}>
                   <ProductCard producto={producto} />
@@ -1972,7 +2086,7 @@ export default function LandingPage() {
                   {FORMATO_DESCRIPCIONES[group.tipo]}
                 </Typography>
               )}
-              <Grid container spacing={2}>
+              <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 {group.productos.map((producto) => (
                   <Grid size={{ xs: 6, sm: 4, md: 3 }} key={producto.code}>
                     <ProductCard producto={producto} />
@@ -2031,7 +2145,7 @@ export default function LandingPage() {
             >
               Compra el día en que compite tu atleta.
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
               {PUBLICO_PRODUCTS.map((producto) => (
                 <Grid size={{ xs: 6, sm: 3 }} key={producto.code}>
                   <ProductCard producto={producto} accentColor="#E9C7DF" />
@@ -2069,7 +2183,7 @@ export default function LandingPage() {
             >
               Acreditación para fotógrafos externos.
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
               {FOTOGRAFO_PRODUCTS.map((producto) => (
                 <Grid size={{ xs: 6, sm: 3 }} key={producto.code}>
                   <ProductCard producto={producto} accentColor="#E9C7DF" />
@@ -2090,6 +2204,23 @@ export default function LandingPage() {
         }}
       >
         <Container maxWidth="md">
+          {/* Section kicker — semantic H2 for SEO hierarchy */}
+          <Typography
+            variant="h2"
+            component="h2"
+            sx={{
+              textAlign: 'center',
+              fontWeight: 700,
+              fontSize: { xs: '0.75rem', sm: '0.85rem' },
+              color: 'text.secondary',
+              fontFamily: "'Space Grotesk', sans-serif",
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              mb: 1.5,
+            }}
+          >
+            Sede y fechas
+          </Typography>
           {/* Challenge header */}
           <Typography
             variant="h3"
@@ -2132,9 +2263,10 @@ export default function LandingPage() {
             }}
           >
             <Box sx={{ position: 'relative', zIndex: 2, textAlign: 'left' }}>
-              {/* HYBRID EXPERIENCE — big lime institutional */}
+              {/* HYBRID EXPERIENCE — big lime institutional (decorative repeat, not a heading: the page H1 lives in the hero) */}
               <Typography
                 variant="h1"
+                component="p"
                 sx={{
                   fontWeight: 900,
                   fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
@@ -2150,9 +2282,10 @@ export default function LandingPage() {
                 HYBRID EXPERIENCE
               </Typography>
 
-              {/* Date — pink institutional */}
+              {/* Date — pink institutional (stylistic, not a heading) */}
               <Typography
                 variant="h2"
+                component="p"
                 sx={{
                   fontWeight: 900,
                   fontSize: { xs: '2.5rem', sm: '4rem', md: '5rem' },
@@ -2169,6 +2302,7 @@ export default function LandingPage() {
               {/* Venue name */}
               <Typography
                 variant="h1"
+                component="h3"
                 sx={{
                   fontWeight: 900,
                   fontSize: { xs: '2rem', sm: '3.5rem', md: '4.5rem' },
@@ -2185,6 +2319,7 @@ export default function LandingPage() {
               {/* City */}
               <Typography
                 variant="h1"
+                component="p"
                 sx={{
                   fontWeight: 900,
                   fontSize: { xs: '2rem', sm: '3.5rem', md: '4.5rem' },
@@ -2576,7 +2711,7 @@ export default function LandingPage() {
                   <li>Realiza una vuelta a la calma con estiramientos suaves.</li>
                   <li>Rehidrátate y consume proteínas para favorecer la recuperación muscular.</li>
                   <li>Revisa tus resultados y celebra tu esfuerzo — ¡lo lograste!</li>
-                  <li>Comparte tu experiencia en redes sociales y etiqueta a @hybridevent.</li>
+                  <li>Comparte tu experiencia en redes sociales y etiqueta a @enforma.sports_.</li>
                 </Box>
               </AccordionDetails>
             </Accordion>
@@ -2708,28 +2843,12 @@ export default function LandingPage() {
         <Stack direction="row" spacing={1} sx={{ mb: 2, justifyContent: 'center' }}>
           <IconButton
             color="primary"
-            href="https://instagram.com"
+            href="https://www.instagram.com/enforma.sports_/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Instagram"
+            aria-label="Instagram de ENFORMA Sports Society"
           >
             <InstagramIcon />
-          </IconButton>
-          <IconButton
-            color="primary"
-            href="https://wa.me/5215512345678"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="WhatsApp"
-          >
-            <WhatsAppIcon />
-          </IconButton>
-          <IconButton
-            color="primary"
-            href="mailto:info@enforma.mx"
-            aria-label="Email"
-          >
-            <EmailIcon />
           </IconButton>
         </Stack>
 
@@ -2738,12 +2857,38 @@ export default function LandingPage() {
         </Typography>
       </Box>
 
-      {/* Floating CTA - COMPITE */}
+      {/* Back to top — appears once the user has scrolled past the hero, so a long page never leaves them stranded */}
+      {showBackToTop && (
+        <Box
+          component="a"
+          href="#hero"
+          aria-label="Volver arriba"
+          sx={{
+            position: 'fixed',
+            bottom: 24,
+            left: 24,
+            zIndex: 1200,
+            width: 48,
+            height: 48,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: '#000000',
+            border: '2px solid #E6F2B1',
+            boxShadow: '0 0 16px rgba(0,0,0,0.6)',
+            transition: 'transform 150ms, background-color 150ms',
+            '&:hover': { bgcolor: '#111111', transform: 'translateY(-2px)' },
+            '&:focus-visible': { outline: '3px solid #E6F2B1', outlineOffset: 3 },
+          }}
+        >
+          <ArrowUp size={20} />
+        </Box>
+      )}
+
+      {/* Floating CTA - Elige tu experiencia */}
       <Box
-        onClick={() => {
-          const el = document.getElementById('compite')
-          if (el) el.scrollIntoView({ behavior: 'smooth' })
-        }}
+        component="a"
+        href="#elige-tu-experiencia"
         sx={{
           position: 'fixed',
           bottom: 24,
@@ -2757,6 +2902,7 @@ export default function LandingPage() {
           px: 2.5,
           py: 1.5,
           cursor: 'pointer',
+          textDecoration: 'none',
           border: '2px solid #E6F2B1',
           boxShadow: '0 0 24px rgba(230,242,177,0.3)',
           transition: 'box-shadow 200ms, transform 200ms',
@@ -2769,6 +2915,10 @@ export default function LandingPage() {
             boxShadow: '0 0 48px rgba(230,242,177,0.8)',
             transform: 'scale(1.05)',
           },
+          '&:focus-visible': {
+            outline: '3px solid #FFFFFF',
+            outlineOffset: 3,
+          },
           display: { xs: 'flex', sm: 'flex' },
           alignItems: 'center',
           gap: 1,
@@ -2777,7 +2927,7 @@ export default function LandingPage() {
         }}
       >
         <Box sx={{ fontSize: '1.2rem', lineHeight: 1 }}>🏆</Box>
-        ¡Quiero Competir!
+        Elige tu experiencia
       </Box>
     </Box>
   )

@@ -11,7 +11,8 @@ export default defineConfig({
       manifest: {
         name: 'The Hybrid Experience',
         short_name: 'Hybrid',
-        description: 'Entrena, compite y conecta con la comunidad The Hybrid Experience 2026',
+        description:
+          'Vive HYBRID EXPERIENCE del 9 al 11 de octubre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid y Workout Experience, o compra tu acceso como público.',
         lang: 'es-MX',
         start_url: '/',
         display: 'standalone',

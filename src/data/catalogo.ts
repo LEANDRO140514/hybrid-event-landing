@@ -1,3 +1,5 @@
+import { DOMAINS } from '../config'
+
 export type ProductoBloque = 'COMPITE' | 'EXPERIENCE' | 'ASISTE'
 export type ProductoDia = 'Viernes' | 'Sábado' | 'Domingo' | 'Vie-Dom'
 export type ProductoSesion = 'AM' | 'PM'
@@ -62,7 +64,7 @@ export const CATALOGO: Producto[] = [
 ]
 
 export function getInscribirUrl(code: string): string {
-  return `https://app.enforma.mx/inscribir?cat=${code}`
+  return `https://${DOMAINS.app}/inscribir?cat=${code}`
 }
 
 export function formatPrecio(precio: number): string {
