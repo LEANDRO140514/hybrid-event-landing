@@ -64,7 +64,7 @@ export const CATALOGO: Producto[] = [
 ]
 
 export function getInscribirUrl(code: string): string {
-  return `https://${DOMAINS.app}/inscribir?cat=${code}`
+  return `https://${DOMAINS.registration}/inscribir?cat=${code}`
 }
 
 export function formatPrecio(precio: number): string {

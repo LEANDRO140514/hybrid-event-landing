@@ -34,6 +34,7 @@ const EVENT_JSON_LD = {
   name: eventConfig.name,
   description:
     'Vive HYBRID EXPERIENCE del 9 al 11 de octubre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid y Workout Experience, o compra tu acceso como público.',
+  url: 'https://hybrid-experience.enforma.mx/',
   startDate: '2026-10-09T17:00:00-06:00',
   endDate: '2026-10-11',
   eventStatus: 'https://schema.org/EventScheduled',
@@ -676,12 +677,6 @@ function Navbar() {
     { label: 'FAQ', href: '#faq' },
   ]
 
-  const handleClick = (href: string) => {
-    setMenuOpen(false)
-    const el = document.querySelector(href)
-    el?.scrollIntoView({ behavior: 'smooth' })
-  }
-
   return (
     <Box
       sx={{
@@ -714,16 +709,19 @@ function Navbar() {
           {links.map((link) => (
             <Typography
               key={link.label}
-              onClick={() => handleClick(link.href)}
+              component="a"
+              href={link.href}
               sx={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 color: 'rgba(255,255,255,0.6)',
+                textDecoration: 'none',
                 cursor: 'pointer',
                 transition: 'color 150ms',
                 '&:hover': { color: '#E6F2B1' },
+                '&:focus-visible': { outline: '2px solid #E6F2B1', outlineOffset: 2 },
               }}
             >
               {link.label}
@@ -767,8 +765,11 @@ function Navbar() {
           {links.map((link) => (
             <Box
               key={link.label}
-              onClick={() => handleClick(link.href)}
+              component="a"
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
               sx={{
+                display: 'block',
                 px: 3,
                 py: 1.5,
                 fontFamily: "'Space Grotesk', sans-serif",
@@ -776,10 +777,12 @@ function Navbar() {
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 color: 'rgba(255,255,255,0.6)',
+                textDecoration: 'none',
                 cursor: 'pointer',
                 borderBottom: '1px solid rgba(230,242,177,0.06)',
                 transition: 'color 150ms',
                 '&:hover': { color: '#E6F2B1', bgcolor: 'rgba(230,242,177,0.03)' },
+                '&:focus-visible': { outline: '2px solid #E6F2B1', outlineOffset: -2 },
               }}
             >
               {link.label}
@@ -2987,6 +2990,9 @@ export default function LandingPage() {
           '@keyframes pulseGlow': {
             '0%, 100%': { boxShadow: '0 0 24px rgba(230,242,177,0.3)', transform: 'scale(1)' },
             '50%': { boxShadow: '0 0 40px rgba(230,242,177,0.6)', transform: 'scale(1.05)' },
+          },
+          '@media (prefers-reduced-motion: reduce)': {
+            animation: 'none',
           },
           '&:hover': {
             boxShadow: '0 0 48px rgba(230,242,177,0.8)',

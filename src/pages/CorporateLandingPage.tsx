@@ -1,11 +1,22 @@
+import type { ReactNode } from 'react'
 import { Box, Button, Card, CardContent, Container, Stack, Typography } from '@mui/material'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import SportsScoreIcon from '@mui/icons-material/SportsScore'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import { DOMAINS } from '../config'
 import { eventConfig } from '../config/eventConfig'
+import RouteMetadata from '../components/RouteMetadata'
 
-const products = [
+interface CorporateProduct {
+  title: string
+  description: string
+  /** Omitted while the destination isn't deployed/validated yet — renders as a disabled, non-navigable button. */
+  href?: string
+  icon: ReactNode
+  cta: string
+}
+
+const products: CorporateProduct[] = [
   {
     title: eventConfig.name,
     description: 'Competencia de fitness funcional. Inscripciones abiertas para atletas, duplas y relevos.',
@@ -16,9 +27,9 @@ const products = [
   {
     title: 'Ready2Hybrid',
     description: 'Plataforma de gestión de eventos deportivos con inscripciones, QR, cronometraje y resultados.',
-    href: `https://${DOMAINS.app}`,
+    // registro.enforma.mx todavía no está desplegado ni validado — sin href hasta entonces.
     icon: <SportsScoreIcon sx={{ fontSize: 38 }} />,
-    cta: 'Abrir plataforma',
+    cta: 'Próximamente',
   },
   {
     title: 'Admin',
@@ -43,6 +54,11 @@ export default function CorporateLandingPage() {
         py: { xs: 8, md: 12 },
       }}
     >
+      <RouteMetadata
+        title="ENFORMA Sports Society"
+        description="Donde nace la competencia. Diseñamos, operamos y escalamos experiencias deportivas con tecnología, comunidad y ejecución profesional."
+        path="/corporate"
+      />
       <Container maxWidth="lg">
         <Stack spacing={5} sx={{ alignItems: 'center', textAlign: 'center' }}>
           <Stack spacing={2} sx={{ alignItems: 'center' }}>
@@ -133,7 +149,7 @@ export default function CorporateLandingPage() {
                       </Typography>
                     </Stack>
                     <Button
-                      href={product.href}
+                      {...(product.href ? { href: product.href } : { disabled: true })}
                       variant={product.title === eventConfig.name ? 'contained' : 'outlined'}
                       color="secondary"
                       fullWidth

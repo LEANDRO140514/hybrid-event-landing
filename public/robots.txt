@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hybrid-experience.enforma.mx/sitemap.xml
