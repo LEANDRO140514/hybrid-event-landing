@@ -5,8 +5,9 @@ import { SnackbarProvider } from 'notistack'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { theme } from './theme'
 import { routeTree } from './routeTree.gen'
+import NotFoundPage from './pages/NotFoundPage'
 
-const router = createRouter({ routeTree })
+const router = createRouter({ routeTree, defaultNotFoundComponent: NotFoundPage })
 
 declare module '@tanstack/react-router' {
   interface Register {

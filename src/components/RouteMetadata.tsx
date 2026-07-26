@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 interface RouteMetadataProps {
   title: string
   description: string
-  /** Path relative to the canonical origin, e.g. '/corporate'. */
+  /** Path relative to the canonical origin, e.g. '/404'. */
   path: string
 }
 

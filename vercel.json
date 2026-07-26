@@ -1,3 +1,6 @@
 {
+  "redirects": [
+    { "source": "/corporate", "destination": "https://enforma.mx", "statusCode": 308 }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
