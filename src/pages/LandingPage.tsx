@@ -13,6 +13,7 @@ import {
   Stack,
   Chip,
   IconButton,
+  TextField,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -27,6 +28,13 @@ import type { Producto } from '../data/catalogo'
 import { DOMAINS } from '../config'
 import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
+import { isSandboxCheckoutActive } from '../config/checkoutConfig'
+import { createCheckout, messageForCheckoutError, CheckoutApiError } from '../api/checkout'
+import {
+  getCheckoutAttempt,
+  getOrCreateCheckoutAttempt,
+  savePublicOrderReference,
+} from '../lib/checkoutSession'
 
 const EVENT_JSON_LD = {
   '@context': 'https://schema.org',
@@ -433,6 +441,57 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const isOpen = SALES_CONFIG.status === 'open'
   const isClosed = SALES_CONFIG.status === 'closed'
   const buttonLabel = isOpen ? 'Inscribirse' : isClosed ? 'Inscripciones cerradas' : 'Ventas abren el lunes'
+  const sandboxSpectator = isSandboxCheckoutActive() && producto.code === 'PUB-VIE'
+  const [quantityInput, setQuantityInput] = useState('1')
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const parseQuantity = (raw: string): number | null => {
+    if (!/^\d+$/.test(raw.trim())) return null
+    const n = Number(raw)
+    if (!Number.isInteger(n) || n < 1) return null
+    return n
+  }
+
+  const startSandboxCheckout = async () => {
+    if (submitting) return
+    if (!navigator.onLine) {
+      setErrorMessage('Se necesita conexión para iniciar el pago.')
+      return
+    }
+    const quantity = parseQuantity(quantityInput)
+    if (quantity == null) {
+      setErrorMessage('Revisa la cantidad e inténtalo de nuevo.')
+      return
+    }
+    setSubmitting(true)
+    setErrorMessage(null)
+    try {
+      const attempt = getOrCreateCheckoutAttempt({
+        productCode: producto.code,
+        quantity,
+      })
+      const result = await createCheckout({
+        productCode: attempt.productCode,
+        quantity: attempt.quantity,
+        idempotencyKey: attempt.idempotencyKey,
+      })
+      savePublicOrderReference(result.public_order_reference)
+      const stored = getCheckoutAttempt()
+      if (stored?.publicOrderReference !== result.public_order_reference) {
+        throw new Error('Checkout attempt was not persisted')
+      }
+      window.location.assign(result.checkout_url)
+    } catch (err) {
+      if (err instanceof CheckoutApiError) {
+        setErrorMessage(messageForCheckoutError(err.code))
+      } else {
+        setErrorMessage('No pudimos iniciar el proceso de pago.')
+      }
+      setSubmitting(false)
+    }
+  }
+
   return (
     <Card
       sx={{
@@ -548,16 +607,69 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             Incluye chip de cronometraje y seguro del atleta
           </Typography>
         )}
+        {sandboxSpectator && (
+          <Stack spacing={1} sx={{ width: '100%', mt: 'auto', mb: 1.25 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: accentColor,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                fontSize: '0.65rem',
+              }}
+            >
+              Entorno de prueba
+            </Typography>
+            <TextField
+              label="Cantidad"
+              value={quantityInput}
+              onChange={(e) => {
+                setQuantityInput(e.target.value)
+                setErrorMessage(null)
+              }}
+              slotProps={{
+                htmlInput: {
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
+                  min: 1,
+                  'aria-label': 'Cantidad de accesos',
+                },
+              }}
+              size="small"
+              fullWidth
+              sx={{
+                '& .MuiInputBase-root': {
+                  color: '#fff',
+                  borderRadius: 0,
+                  bgcolor: 'rgba(0,0,0,0.35)',
+                },
+                '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: `${accentColor}66` },
+              }}
+            />
+            {errorMessage && (
+              <Typography
+                role="alert"
+                variant="caption"
+                sx={{ color: '#E9C7DF', fontSize: '0.72rem', textAlign: 'left' }}
+              >
+                {errorMessage}
+              </Typography>
+            )}
+          </Stack>
+        )}
         <Button
-          component={isOpen ? 'a' : 'button'}
-          href={isOpen ? getInscribirUrl(producto.code) : undefined}
-          target={isOpen ? '_blank' : undefined}
-          rel={isOpen ? 'noopener noreferrer' : undefined}
-          disabled={!isOpen}
+          component={sandboxSpectator ? 'button' : isOpen ? 'a' : 'button'}
+          href={!sandboxSpectator && isOpen ? getInscribirUrl(producto.code) : undefined}
+          target={!sandboxSpectator && isOpen ? '_blank' : undefined}
+          rel={!sandboxSpectator && isOpen ? 'noopener noreferrer' : undefined}
+          disabled={sandboxSpectator ? submitting : !isOpen}
+          onClick={sandboxSpectator ? () => void startSandboxCheckout() : undefined}
           variant="outlined"
           size="small"
           sx={{
-            mt: 'auto',
+            mt: sandboxSpectator ? 0 : 'auto',
             minHeight: 44,
             fontSize: { xs: '0.68rem', sm: '0.78rem' },
             px: { xs: 1.5, sm: 2 },
@@ -576,7 +688,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             },
           }}
         >
-          {buttonLabel}
+          {sandboxSpectator ? (submitting ? 'Iniciando…' : 'Probar checkout') : buttonLabel}
         </Button>
       </CardContent>
     </Card>
