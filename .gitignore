@@ -62,3 +62,6 @@ test-results
 .kilocode
 .trae
 .swt
+
+# Local InsForge metadata
+.insforge/
