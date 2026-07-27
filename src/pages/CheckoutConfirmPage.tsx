@@ -61,7 +61,7 @@ export default function CheckoutConfirmPage() {
       const result = await getOrderStatus(reference)
       setView({ kind: 'status', status: result.status, terminal: result.terminal })
       if (result.terminal) {
-        clearCheckoutAttempt()
+        clearCheckoutAttempt(reference)
         clearTimer()
         return
       }

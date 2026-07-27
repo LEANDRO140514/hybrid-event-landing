@@ -1,6 +1,56 @@
 export type CheckoutMode = 'off' | 'sandbox'
 
+export type SandboxCheckoutFamily = 'spectator' | 'press'
+export type SandboxQuantityMode = 'editable' | 'fixed'
+
+export type SandboxCheckoutProductConfig = {
+  productCode: string
+  family: SandboxCheckoutFamily
+  quantityMode: SandboxQuantityMode
+  minimumQuantity: number
+}
+
 const PRODUCTION_HOST = 'hybrid-experience.enforma.mx'
+
+/** Explicit sandbox allowlist — no monetary fields. */
+const SANDBOX_CHECKOUT_PRODUCTS: Record<string, SandboxCheckoutProductConfig> = {
+  'PUB-VIE': {
+    productCode: 'PUB-VIE',
+    family: 'spectator',
+    quantityMode: 'editable',
+    minimumQuantity: 1,
+  },
+  'PUB-SAB': {
+    productCode: 'PUB-SAB',
+    family: 'spectator',
+    quantityMode: 'editable',
+    minimumQuantity: 1,
+  },
+  'PUB-DOM': {
+    productCode: 'PUB-DOM',
+    family: 'spectator',
+    quantityMode: 'editable',
+    minimumQuantity: 1,
+  },
+  'FOT-VIE': {
+    productCode: 'FOT-VIE',
+    family: 'press',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'FOT-SAB': {
+    productCode: 'FOT-SAB',
+    family: 'press',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'FOT-DOM': {
+    productCode: 'FOT-DOM',
+    family: 'press',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+}
 
 function readBool(raw: string | undefined): boolean {
   return (raw ?? '').trim().toLowerCase() === 'true'
@@ -35,6 +85,20 @@ export function isSandboxCheckoutActive(): boolean {
   if (!functionsBase) return false
   if (currentHostname() === PRODUCTION_HOST) return false
   return true
+}
+
+export function getSandboxCheckoutProductConfig(
+  productCode: string,
+): SandboxCheckoutProductConfig | null {
+  return SANDBOX_CHECKOUT_PRODUCTS[productCode] ?? null
+}
+
+export function isSandboxCheckoutProduct(productCode: string): boolean {
+  return getSandboxCheckoutProductConfig(productCode) != null
+}
+
+export function listSandboxCheckoutProductCodes(): string[] {
+  return Object.keys(SANDBOX_CHECKOUT_PRODUCTS)
 }
 
 export function getCheckoutConfig() {

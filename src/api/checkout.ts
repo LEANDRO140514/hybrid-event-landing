@@ -3,9 +3,11 @@ import { checkoutEndpoint } from '../config/checkoutConfig'
 export type CheckoutPublicErrorCode =
   | 'INVALID_REQUEST'
   | 'PRODUCT_NOT_FOUND'
+  | 'PRODUCT_NOT_AVAILABLE'
   | 'SALES_NOT_OPEN'
   | 'WAIVER_REQUIRED'
   | 'SOLD_OUT'
+  | 'ORIGIN_NOT_ALLOWED'
   | 'CONFIGURATION_ERROR'
   | 'UNKNOWN'
 
@@ -34,9 +36,11 @@ function mapErrorCode(raw: unknown): CheckoutPublicErrorCode {
   switch (code) {
     case 'INVALID_REQUEST':
     case 'PRODUCT_NOT_FOUND':
+    case 'PRODUCT_NOT_AVAILABLE':
     case 'SALES_NOT_OPEN':
     case 'WAIVER_REQUIRED':
     case 'SOLD_OUT':
+    case 'ORIGIN_NOT_ALLOWED':
     case 'CONFIGURATION_ERROR':
       return code
     default:
@@ -50,10 +54,14 @@ export function messageForCheckoutError(code: CheckoutPublicErrorCode): string {
       return 'Revisa la cantidad e inténtalo de nuevo.'
     case 'PRODUCT_NOT_FOUND':
       return 'Este acceso no está disponible.'
+    case 'PRODUCT_NOT_AVAILABLE':
+      return 'Este producto todavía no está disponible.'
     case 'SALES_NOT_OPEN':
       return 'Las ventas todavía no están disponibles.'
     case 'SOLD_OUT':
       return 'Este acceso está agotado.'
+    case 'ORIGIN_NOT_ALLOWED':
+      return 'No pudimos iniciar el proceso de pago.'
     case 'CONFIGURATION_ERROR':
       return 'No pudimos iniciar el pago. Inténtalo más tarde.'
     case 'WAIVER_REQUIRED':

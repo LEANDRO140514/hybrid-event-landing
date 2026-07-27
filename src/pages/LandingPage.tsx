@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react'
 import {
   Box,
   Button,
@@ -28,14 +28,23 @@ import type { Producto } from '../data/catalogo'
 import { DOMAINS } from '../config'
 import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
-import { isSandboxCheckoutActive } from '../config/checkoutConfig'
+import {
+  getSandboxCheckoutProductConfig,
+  isSandboxCheckoutActive,
+  isSandboxCheckoutProduct,
+} from '../config/checkoutConfig'
 import { createCheckout, messageForCheckoutError, CheckoutApiError } from '../api/checkout'
 import {
   getCheckoutAttempt,
   getOrCreateCheckoutAttempt,
   savePublicOrderReference,
 } from '../lib/checkoutSession'
-import { createSubmitLock } from '../lib/submitLock'
+import {
+  getActiveCheckoutProductCode,
+  getSandboxCheckoutPageLock,
+  setActiveCheckoutProductCode,
+  subscribeActiveCheckoutProductCode,
+} from '../lib/submitLock'
 
 const EVENT_JSON_LD = {
   '@context': 'https://schema.org',
@@ -442,11 +451,19 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const isOpen = SALES_CONFIG.status === 'open'
   const isClosed = SALES_CONFIG.status === 'closed'
   const buttonLabel = isOpen ? 'Inscribirse' : isClosed ? 'Inscripciones cerradas' : 'Ventas abren el lunes'
-  const sandboxSpectator = isSandboxCheckoutActive() && producto.code === 'PUB-VIE'
+  const productConfig = getSandboxCheckoutProductConfig(producto.code)
+  const sandboxCheckout =
+    isSandboxCheckoutActive() && isSandboxCheckoutProduct(producto.code) && productConfig != null
+  const quantityEditable = productConfig?.quantityMode === 'editable'
   const [quantityInput, setQuantityInput] = useState('1')
-  const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const submitLockRef = useRef(createSubmitLock())
+  const activeCheckoutProductCode = useSyncExternalStore(
+    subscribeActiveCheckoutProductCode,
+    getActiveCheckoutProductCode,
+    () => null,
+  )
+  const submitting = activeCheckoutProductCode === producto.code
+  const checkoutBusy = activeCheckoutProductCode != null
 
   const parseQuantity = (raw: string): number | null => {
     if (!/^\d+$/.test(raw.trim())) return null
@@ -456,21 +473,35 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   }
 
   const startSandboxCheckout = async () => {
-    // Synchronous lock: must run before any await / setState so rapid clicks share one POST.
-    if (!submitLockRef.current.tryAcquire()) return
-    if (!navigator.onLine) {
-      submitLockRef.current.release()
-      setErrorMessage('Se necesita conexión para iniciar el pago.')
-      return
-    }
-    const quantity = parseQuantity(quantityInput)
-    if (quantity == null) {
-      submitLockRef.current.release()
-      setErrorMessage('Revisa la cantidad e inténtalo de nuevo.')
-      return
-    }
-    setSubmitting(true)
+    if (!productConfig) return
+    // Page-wide synchronous lock: must run before any await / setState.
+    const pageLock = getSandboxCheckoutPageLock()
+    if (!pageLock.tryAcquire()) return
+    setActiveCheckoutProductCode(producto.code)
     setErrorMessage(null)
+
+    if (!navigator.onLine) {
+      setErrorMessage('Se necesita conexión para iniciar el pago.')
+      setActiveCheckoutProductCode(null)
+      pageLock.release()
+      return
+    }
+
+    const quantity =
+      productConfig.quantityMode === 'fixed' ? 1 : parseQuantity(quantityInput)
+    if (quantity == null || quantity < productConfig.minimumQuantity) {
+      setErrorMessage('Revisa la cantidad e inténtalo de nuevo.')
+      setActiveCheckoutProductCode(null)
+      pageLock.release()
+      return
+    }
+    if (productConfig.quantityMode === 'fixed' && quantity !== 1) {
+      setErrorMessage('Revisa la cantidad e inténtalo de nuevo.')
+      setActiveCheckoutProductCode(null)
+      pageLock.release()
+      return
+    }
+
     try {
       const attempt = getOrCreateCheckoutAttempt({
         productCode: producto.code,
@@ -481,8 +512,8 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
         quantity: attempt.quantity,
         idempotencyKey: attempt.idempotencyKey,
       })
-      savePublicOrderReference(result.public_order_reference)
-      const stored = getCheckoutAttempt()
+      savePublicOrderReference(producto.code, result.public_order_reference)
+      const stored = getCheckoutAttempt(producto.code)
       if (stored?.publicOrderReference !== result.public_order_reference) {
         throw new Error('Checkout attempt was not persisted')
       }
@@ -494,8 +525,8 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
       } else {
         setErrorMessage('No pudimos iniciar el proceso de pago.')
       }
-      submitLockRef.current.release()
-      setSubmitting(false)
+      setActiveCheckoutProductCode(null)
+      pageLock.release()
     }
   }
 
@@ -614,7 +645,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             Incluye chip de cronometraje y seguro del atleta
           </Typography>
         )}
-        {sandboxSpectator && (
+        {sandboxCheckout && (
           <Stack spacing={1} sx={{ width: '100%', mt: 'auto', mb: 1.25 }}>
             <Typography
               variant="caption"
@@ -628,33 +659,36 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             >
               Entorno de prueba
             </Typography>
-            <TextField
-              label="Cantidad"
-              value={quantityInput}
-              onChange={(e) => {
-                setQuantityInput(e.target.value)
-                setErrorMessage(null)
-              }}
-              slotProps={{
-                htmlInput: {
-                  inputMode: 'numeric',
-                  pattern: '[0-9]*',
-                  min: 1,
-                  'aria-label': 'Cantidad de accesos',
-                },
-              }}
-              size="small"
-              fullWidth
-              sx={{
-                '& .MuiInputBase-root': {
-                  color: '#fff',
-                  borderRadius: 0,
-                  bgcolor: 'rgba(0,0,0,0.35)',
-                },
-                '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: `${accentColor}66` },
-              }}
-            />
+            {quantityEditable && (
+              <TextField
+                label="Cantidad"
+                value={quantityInput}
+                onChange={(e) => {
+                  setQuantityInput(e.target.value)
+                  setErrorMessage(null)
+                }}
+                disabled={checkoutBusy}
+                slotProps={{
+                  htmlInput: {
+                    inputMode: 'numeric',
+                    pattern: '[0-9]*',
+                    min: 1,
+                    'aria-label': 'Cantidad de accesos',
+                  },
+                }}
+                size="small"
+                fullWidth
+                sx={{
+                  '& .MuiInputBase-root': {
+                    color: '#fff',
+                    borderRadius: 0,
+                    bgcolor: 'rgba(0,0,0,0.35)',
+                  },
+                  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: `${accentColor}66` },
+                }}
+              />
+            )}
             {errorMessage && (
               <Typography
                 role="alert"
@@ -667,16 +701,16 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
           </Stack>
         )}
         <Button
-          component={sandboxSpectator ? 'button' : isOpen ? 'a' : 'button'}
-          href={!sandboxSpectator && isOpen ? getInscribirUrl(producto.code) : undefined}
-          target={!sandboxSpectator && isOpen ? '_blank' : undefined}
-          rel={!sandboxSpectator && isOpen ? 'noopener noreferrer' : undefined}
-          disabled={sandboxSpectator ? submitting : !isOpen}
-          onClick={sandboxSpectator ? () => void startSandboxCheckout() : undefined}
+          component={sandboxCheckout ? 'button' : isOpen ? 'a' : 'button'}
+          href={!sandboxCheckout && isOpen ? getInscribirUrl(producto.code) : undefined}
+          target={!sandboxCheckout && isOpen ? '_blank' : undefined}
+          rel={!sandboxCheckout && isOpen ? 'noopener noreferrer' : undefined}
+          disabled={sandboxCheckout ? checkoutBusy : !isOpen}
+          onClick={sandboxCheckout ? () => void startSandboxCheckout() : undefined}
           variant="outlined"
           size="small"
           sx={{
-            mt: sandboxSpectator ? 0 : 'auto',
+            mt: sandboxCheckout ? 0 : 'auto',
             minHeight: 44,
             fontSize: { xs: '0.68rem', sm: '0.78rem' },
             px: { xs: 1.5, sm: 2 },
@@ -695,7 +729,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             },
           }}
         >
-          {sandboxSpectator ? (submitting ? 'Iniciando…' : 'Probar checkout') : buttonLabel}
+          {sandboxCheckout ? (submitting ? 'Iniciando…' : 'Probar checkout') : buttonLabel}
         </Button>
       </CardContent>
     </Card>
