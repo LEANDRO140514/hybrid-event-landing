@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   Box,
   Button,
@@ -35,6 +35,7 @@ import {
   getOrCreateCheckoutAttempt,
   savePublicOrderReference,
 } from '../lib/checkoutSession'
+import { createSubmitLock } from '../lib/submitLock'
 
 const EVENT_JSON_LD = {
   '@context': 'https://schema.org',
@@ -445,6 +446,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const [quantityInput, setQuantityInput] = useState('1')
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const submitLockRef = useRef(createSubmitLock())
 
   const parseQuantity = (raw: string): number | null => {
     if (!/^\d+$/.test(raw.trim())) return null
@@ -454,13 +456,16 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   }
 
   const startSandboxCheckout = async () => {
-    if (submitting) return
+    // Synchronous lock: must run before any await / setState so rapid clicks share one POST.
+    if (!submitLockRef.current.tryAcquire()) return
     if (!navigator.onLine) {
+      submitLockRef.current.release()
       setErrorMessage('Se necesita conexión para iniciar el pago.')
       return
     }
     const quantity = parseQuantity(quantityInput)
     if (quantity == null) {
+      submitLockRef.current.release()
       setErrorMessage('Revisa la cantidad e inténtalo de nuevo.')
       return
     }
@@ -481,6 +486,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
       if (stored?.publicOrderReference !== result.public_order_reference) {
         throw new Error('Checkout attempt was not persisted')
       }
+      // Keep lock held through navigation; do not release on success path.
       window.location.assign(result.checkout_url)
     } catch (err) {
       if (err instanceof CheckoutApiError) {
@@ -488,6 +494,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
       } else {
         setErrorMessage('No pudimos iniciar el proceso de pago.')
       }
+      submitLockRef.current.release()
       setSubmitting(false)
     }
   }
