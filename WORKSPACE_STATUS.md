@@ -194,15 +194,34 @@
 - **Git:** change left uncommitted in the working tree, pending explicit user authorization to commit.
 - **Next Authorized Phase:** HEX-PRICING-STAGES-01 (below).
 
-## Phase HEX-PRICING-STAGES-01 (opened 2026-08-03 — OPEN, not yet started)
+## Phase HEX-PRICING-STAGES-01 (opened 2026-08-03, closed 2026-08-04) — COMPLETADA / CERRADA
 
-- **Authorized by:** user, in-session, immediately following HEAD-RECONCILIATION-01.
-- **Objective:** Migrate `src/data/catalogo.ts` from a single scalar `precio` per product to a staged pricing matrix (Lanzamiento / Preventa / Regular) for **display purposes**, with 3-MSI (meses sin intereses) eligibility per product. Sales remain **CLOSED** during this phase — no flip of `salesConfig.ts` to `open`. The InsForge backend remains the authority for actual charge amounts; this phase is display/data-model only unless a later instruction expands scope.
-- **Scope:** not yet detailed — awaiting a PREFLIGHT / scoping instruction before any implementation.
-- **Status:** OPEN
-- **Gate:** `READY_FOR_WORK`
-- **Known inputs to reconcile when work starts:** the stale `salesConfig.ts` opening-copy finding above (HEAD-RECONCILIATION-01); the current single-price `CATALOGO` structure (11 distinct price points across 28 products in `catalogo.ts`); the sandbox checkout has no monetary fields today, so its compatibility with staged pricing should be checked once the matrix exists.
-- **Next Authorized Phase:** (none yet — awaiting PREFLIGHT/scope instruction)
+- **Authorized by:** user, in-session, immediately following HEAD-RECONCILIATION-01. Executed as two authorized sub-phases in the same session: Parte 1 (datos) and Parte 2 (UI de venta completa).
+- **Objective (as executed):** migrate `src/data/catalogo.ts` to a staged pricing matrix (Lanzamiento/Preventa/Regular) with 3-MSI eligibility per product, for **display purposes only**, and wire the landing UI to present it. Sales remained **CLOSED** throughout — no flip of `salesConfig.status`, no flip of `ventasArrancadas`. The InsForge backend remains the authority for actual charge amounts.
+- **Commits (in order):**
+  1. `4010ac4` (2026-08-03) — docs(workspace): reconcile HEAD drift and open HEX-PRICING-STAGES-01 (documentation-only; the phase's opening act, not pricing work itself)
+  2. `4a8845d` (2026-08-04) — feat(pricing): add staged pricing matrix and 3-MSI eligibility (data layer)
+  3. `1ead98c` (2026-08-04) — feat(landing): staged pricing table, prizes, and community section (UI layer)
+- **Result:**
+  - `src/data/catalogo.ts`: every product now carries `precioPorEtapa: { lanzamiento, preventa, regular } | null` and `msi: boolean`. Legacy `precio` scalar kept (mirrors the `lanzamiento` tier for staged products) — still consumed by the UI, not dead. `getPrecioVigente(producto, etapa)` resolves the display price for a given stage.
+  - `src/lib/pricingStage.ts` (new): `resolveEtapaComercial()` — manual-start gate (`SALES_CONFIG.ventasArrancadas`, default `false`) plus date-based stage resolution in America/Mérida (fixed UTC-6, no DST) for the 2026 window: lanzamiento 10–23 ago, preventa 24 ago–13 sep, regular 14 sep–2 oct 23:59. Returns `null` (no stage active) until the switch is flipped.
+  - `src/config/salesConfig.ts`: added `ventasArrancadas: false` (independent of `status`); `openingLabel` corrected from the stale "Ventas abren el lunes 27 de julio" to "Próximamente".
+  - `src/pages/LandingPage.tsx`:
+    - Product cards: price and "c/u" unit computed live from `precioPorEtapa`/`integrantes` instead of static fields; exact MSI messaging block per product (Workout / msi=true / msi=false-not-Workout).
+    - New "Asegura tu lugar al mejor precio" section — pricing table grouped by COMPITE/EXPERIENCE/ASISTE, all values derived from `catalogo.ts` (no hardcoded amounts), high-contrast solid-color figures (no `textShadow`/blurred overlays — corrected mid-phase after an explicit legibility note).
+    - Cash-prizes table (PRO/OPEN podiums) inside COMPITE → Individual; "Reconocimiento y premios a los mejores tiempos por categoría." line on Dobles, Relay, ½ Hybrid, and Workout.
+    - New "¿Por qué perteneces aquí?" section: 6-item benefits grid (icons from the project's existing `@mui/icons-material` — confirmed via `git diff` on `package.json`/`package-lock.json` that no new dependency was added) and the full community manifesto, with "No importa de dónde vienes..." visually set apart.
+    - Navbar "SHOP" replaced with "En construcción" (disabled, no navigation to `shop.enforma.mx`) — desktop and mobile menu; a small authorized follow-up in the same phase, unrelated to pricing itself.
+- **Verification performed:** `npm run build` (`tsc -b && vite build`) and `npm run lint` (oxlint) clean at every step; live browser verification via dev server (console 0 errors) after each block; desktop (1440px) and mobile (375px) screenshots of the 4 new visual zones (pricing table, prizes table, benefits grid, manifesto) reviewed and approved by the user before this close.
+- **Invariant state confirmed unchanged throughout:** `salesConfig.status = 'coming_soon'`, `SALES_CONFIG.ventasArrancadas = false`. Checkout sandbox (`src/api/checkout.ts`, `src/api/orderStatus.ts`, `src/config/checkoutConfig.ts`, `src/lib/checkoutSession.ts`, `src/lib/submitLock.ts`, `src/pages/CheckoutConfirmPage.tsx`) was not touched at any point in this phase — confirmed via `git status`/`git diff` before every commit. Nothing in this phase creates or modifies a payment path; InsForge remains the sole charge authority.
+- **Known issues:** (none new)
+- **Pending decisions, left open for the next session:**
+  1. Push to `origin/main` — local is 3 commits ahead (`4010ac4`, `4a8845d`, `1ead98c`); remote still at `b4f50c0`. Not authorized this phase.
+  2. Sales activation — manual flip of `ventasArrancadas` (and separately, `salesConfig.status` to `'open'`) once the InsForge backend is confirmed ready. Explicitly out of scope here; requires its own authorization.
+  3. OD-020: `PUB-3D`/`FOT-3D` (3-day passes) are **not** in `SANDBOX_CHECKOUT_PRODUCTS` (`checkoutConfig.ts`), unlike the per-day `PUB-*`/`FOT-*` codes — fail-closed by omission. Confirm whether that's intentional or an oversight.
+  4. `producto.precioUnidad` (legacy field in `catalogo.ts`) is no longer read directly by the new pricing table (it derives its own strings via `formatMonto`), but it **is** still read by `unidadConPrecioVigente()` in `LandingPage.tsx` (product cards + COMPITE group heading) — confirmed via grep, not dead code. The "por pareja"/"por equipo"/"por persona" base text now lives in two places (the static field and the dynamic c/u layer on top of it); worth a consolidation pass.
+  5. All pre-existing items carried from HEX-LAUNCH-01 REV B / HEAD-RECONCILIATION-01 (canonical URL, media subdomain, bucket policy, og:image confirmation, Club Cumbres in JSON-LD, `#formatos` duplication, VITE_MEDIA_BASE_URL centralization) remain unresolved — untouched by this phase.
+- **Next Authorized Phase:** (none yet — awaiting user decision, likely push authorization and/or sales-activation scoping)
 
 ```
 === NEXT_SESSION_BOOTSTRAP ===
@@ -210,30 +229,33 @@ Workspace: C:\vonde\enforma-sys\hybrid-event-landing
 Product/System: The Hybrid Experience (hybrid-event-landing)
 Workspace Type: standalone-repo / external-development-workspace
 Branch: main
-HEAD: b4f50c0 (working tree clean at reconciliation time, except this WORKSPACE_STATUS.md edit — see git status)
-Last Commits: b4f50c0 feat(checkout): expand public and press sandbox wiring [Cursor] | 9b9cf48 fix(checkout): prevent duplicate checkout submissions [Cursor] | 5cb5848 feat(checkout): add spectator sandbox wiring [Cursor] | 5c9a3a1 chore(security): ignore local InsForge metadata | b39d432 feat: finalize event-only landing hardening
-Completed Phase: HEAD-RECONCILIATION-01 (documentation-only, closed 2026-08-03)
-Open Phase (NOT closed): HEX-PRICING-STAGES-01 — opened 2026-08-03, not yet scoped/started
-Gate: READY_FOR_WORK (HEX-PRICING-STAGES-01, awaiting scope/PREFLIGHT)
+HEAD: 1ead98c (working tree clean)
+Last Commits: 1ead98c feat(landing): staged pricing table, prizes, and community section | 4a8845d feat(pricing): add staged pricing matrix and 3-MSI eligibility | 4010ac4 docs(workspace): reconcile HEAD drift and open HEX-PRICING-STAGES-01 | b4f50c0 feat(checkout): expand public and press sandbox wiring [Cursor] | 9b9cf48 fix(checkout): prevent duplicate checkout submissions [Cursor]
+Completed Phase: HEX-PRICING-STAGES-01 (closed 2026-08-04) — staged pricing (data + UI), prizes, community section
+Open Phase (NOT closed): (none)
+Gate: CONTEXT_RECOVERED_READY_FOR_INSTRUCTIONS
 Known Issues:
-  - salesConfig.ts status stuck at 'coming_soon' with stale openingLabel ("lunes 27 de julio") — carried MAJOR finding from HEAD-RECONCILIATION-01, unresolved.
+  - Local `main` is 3 commits ahead of `origin/main` (still at `b4f50c0`) — not pushed, awaiting authorization.
+  - OD-020: PUB-3D/FOT-3D absent from the sandbox checkout allowlist — confirm intentional.
+  - `precioUnidad` legacy field now has two source-of-truth layers (static text + dynamic c/u calc) — candidate for consolidation.
   - FORMATOS/COMPITE content duplication (carried over from HEX-LAUNCH-01 REV B, still not fixed).
   - Hardcoded InsForge hostname still pending centralization via VITE_MEDIA_BASE_URL (carried over, still not fixed).
-  - HEX-LAUNCH-01 REV B itself was never formally closed in this file before the 10-commit gap — its open pending decisions below are carried forward unresolved, not assumed answered.
 Pending Decisions:
-  1. Canonical production URL for the landing.
-  2. Definitive public media subdomain for InsForge Storage.
-  3. Nombre y política del bucket público de HYBRID EXPERIENCE.
-  4. Official 1200×630 social image for og:image (public/og/hybrid-experience-social.jpg now exists per commit b39d432 — confirm if this is the approved final asset, not independently verified this phase).
-  5. Whether "Club Cumbres" and its address can be published in JSON-LD.
-  6. salesConfig 'coming_soon' → 'open' flip: date/copy needs a fresh decision, the 2026-07-27 target has passed.
-  7. Future of the `#formatos` section (merge or remove — duplicates COMPITE).
-  8. When to centralize the current hardcoded InsForge URLs behind VITE_MEDIA_BASE_URL.
-  9. HEX-PRICING-STAGES-01 scope details: exact stage definitions/dates for Lanzamiento/Preventa/Regular, and how 3-MSI eligibility is represented per product.
+  1. Push to origin/main.
+  2. Sales activation (ventasArrancadas + salesConfig.status flip) — requires backend confirmation first, own authorization.
+  3. OD-020 — PUB-3D/FOT-3D sandbox allowlist gap.
+  4. precioUnidad consolidation (static field vs. dynamic c/u).
+  5. Canonical production URL for the landing.
+  6. Definitive public media subdomain for InsForge Storage.
+  7. Nombre y política del bucket público de HYBRID EXPERIENCE.
+  8. Official 1200×630 social image for og:image (public/og/hybrid-experience-social.jpg exists per commit b39d432 — confirm if approved final asset).
+  9. Whether "Club Cumbres" and its address can be published in JSON-LD.
+  10. Future of the `#formatos` section (merge or remove — duplicates COMPITE).
+  11. When to centralize the current hardcoded InsForge URLs behind VITE_MEDIA_BASE_URL.
 Protected Sources: (none)
-Next Authorized Phase: HEX-PRICING-STAGES-01 scoping (this session) — see Phase section above
-Files To Read First: WORKSPACE_STATUS.md, src/config/salesConfig.ts, src/data/catalogo.ts, src/pages/LandingPage.tsx, src/config/checkoutConfig.ts
-Forbidden Actions: push without express authorization, modifying docs/guiones-origen/*.html, flipping salesConfig to `open` without explicit authorization, moving images into public/, using signed/expiring URLs for public media, exposing InsForge secrets, enabling sandbox checkout on the production host, expanding the sandbox checkout allowlist without explicit authorization
+Next Authorized Phase: (none yet — awaiting user decision)
+Files To Read First: WORKSPACE_STATUS.md, src/config/salesConfig.ts, src/data/catalogo.ts, src/lib/pricingStage.ts, src/pages/LandingPage.tsx, src/config/checkoutConfig.ts
+Forbidden Actions: push without express authorization, modifying docs/guiones-origen/*.html, flipping salesConfig to `open` or ventasArrancadas to `true` without explicit authorization, moving images into public/, using signed/expiring URLs for public media, exposing InsForge secrets, enabling sandbox checkout on the production host, expanding the sandbox checkout allowlist without explicit authorization
 First Command: scripts/workspace-preflight.ps1
 === END_BOOTSTRAP ===
 ```
