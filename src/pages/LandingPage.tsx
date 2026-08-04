@@ -22,12 +22,25 @@ import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber'
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
 import BoltIcon from '@mui/icons-material/Bolt'
 import InstagramIcon from '@mui/icons-material/Instagram'
+import Inventory2Icon from '@mui/icons-material/Inventory2'
+import TimerIcon from '@mui/icons-material/Timer'
+import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety'
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
+import SpaIcon from '@mui/icons-material/Spa'
+import StadiumIcon from '@mui/icons-material/Stadium'
 import { useCountdown } from '../hooks/useCountdown'
-import { CATALOGO, porBloque, getInscribirUrl, formatPrecio } from '../data/catalogo'
+import {
+  CATALOGO,
+  porBloque,
+  getInscribirUrl,
+  formatPrecio,
+  getPrecioVigente,
+} from '../data/catalogo'
 import type { Producto } from '../data/catalogo'
-import { DOMAINS } from '../config'
 import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
+import { resolveEtapaComercial } from '../lib/pricingStage'
+import type { EtapaComercial } from '../lib/pricingStage'
 import {
   getSandboxCheckoutProductConfig,
   isSandboxCheckoutActive,
@@ -441,6 +454,23 @@ const TRES_DIAS: TresDiasItem[] = [
   },
 ]
 
+const CU_SUFFIX_RE = /\s*\(\$[\d,]+(?:\.\d+)? c\/u\)\s*$/
+
+/** Compact currency, no "MXN" suffix — used for c/u breakdowns and the pricing table. */
+function formatMonto(n: number): string {
+  return `$${Math.round(n).toLocaleString('es-MX')}`
+}
+
+/** Recomputes the "($X c/u)" suffix from the current vigent price so it never drifts from precioPorEtapa. */
+function unidadConPrecioVigente(producto: Producto, precioVigente: number): string {
+  const base = producto.precioUnidad.replace(CU_SUFFIX_RE, '')
+  if (producto.integrantes > 1) {
+    const unitario = precioVigente / producto.integrantes
+    return `${base} (${formatMonto(unitario)} c/u)`
+  }
+  return base
+}
+
 interface ProductCardProps {
   producto: Producto
   accentColor?: string
@@ -450,7 +480,10 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const imageUrl = PRODUCT_IMAGES[producto.code] || IMG_WORKOUT
   const isOpen = SALES_CONFIG.status === 'open'
   const isClosed = SALES_CONFIG.status === 'closed'
-  const buttonLabel = isOpen ? 'Inscribirse' : isClosed ? 'Inscripciones cerradas' : 'Ventas abren el lunes'
+  const buttonLabel = isOpen ? 'Inscribirse' : isClosed ? 'Inscripciones cerradas' : SALES_CONFIG.openingLabel
+  const etapaVigente = resolveEtapaComercial() ?? 'lanzamiento'
+  const precioVigente = getPrecioVigente(producto, etapaVigente)
+  const isWorkout = producto.tipo === 'Workout Experience'
   const productConfig = getSandboxCheckoutProductConfig(producto.code)
   const sandboxCheckout =
     isSandboxCheckoutActive() && isSandboxCheckoutProduct(producto.code) && productConfig != null
@@ -618,7 +651,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             letterSpacing: '0.02em',
           }}
         >
-          {formatPrecio(producto.precio)}
+          {formatPrecio(precioVigente)}
         </Typography>
         <Typography
           variant="caption"
@@ -629,7 +662,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             fontFamily: "'Space Grotesk', sans-serif",
           }}
         >
-          {producto.precioUnidad}
+          {unidadConPrecioVigente(producto, precioVigente)}
         </Typography>
         {producto.incluyeChip && (
           <Typography
@@ -645,6 +678,77 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             Incluye chip de cronometraje y seguro del atleta
           </Typography>
         )}
+        <Box
+          sx={{
+            width: '100%',
+            pt: 1,
+            mb: 1.25,
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          {isWorkout ? (
+            <>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  color: accentColor,
+                  fontWeight: 800,
+                  letterSpacing: '0.1em',
+                  fontSize: '0.65rem',
+                  mb: 0.25,
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                PRECIO ÚNICO
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: '0.68rem', lineHeight: 1.4, fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                $350 durante todas las etapas. Sin meses sin intereses.
+              </Typography>
+            </>
+          ) : producto.msi ? (
+            <>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  color: accentColor,
+                  fontWeight: 800,
+                  letterSpacing: '0.1em',
+                  fontSize: '0.65rem',
+                  mb: 0.25,
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                3 MESES SIN INTERESES
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: '0.68rem', lineHeight: 1.4, fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                Disponible con tarjetas participantes a través de Mercado Pago.
+              </Typography>
+            </>
+          ) : (
+            <>
+              <Typography
+                variant="caption"
+                sx={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: '0.68rem', lineHeight: 1.4, fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                Pago seguro mediante Mercado Pago.
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: '0.68rem', lineHeight: 1.4, fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                Este producto no participa en 3 meses sin intereses.
+              </Typography>
+            </>
+          )}
+        </Box>
         {sandboxCheckout && (
           <Stack spacing={1} sx={{ width: '100%', mt: 'auto', mb: 1.25 }}>
             <Typography
@@ -881,7 +985,7 @@ function Navbar() {
             </Typography>
           ))}
           <Button
-            onClick={() => window.open(`https://${DOMAINS.shop}`, '_blank')}
+            disabled
             sx={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontSize: '0.7rem',
@@ -895,10 +999,13 @@ function Navbar() {
               minHeight: 0,
               minWidth: 0,
               lineHeight: 1.2,
-              '&:hover': { bgcolor: '#F0F7CD' },
+              '&.Mui-disabled': {
+                color: 'rgba(0,0,0,0.6)',
+                bgcolor: 'rgba(230,242,177,0.4)',
+              },
             }}
           >
-            SHOP
+            En construcción
           </Button>
         </Box>
 
@@ -942,7 +1049,7 @@ function Navbar() {
             </Box>
           ))}
           <Box
-            onClick={() => { setMenuOpen(false); window.open(`https://${DOMAINS.shop}`, '_blank'); }}
+            aria-disabled="true"
             sx={{
               px: 3,
               py: 1.5,
@@ -950,12 +1057,11 @@ function Navbar() {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#E6F2B1',
-              cursor: 'pointer',
-              '&:hover': { bgcolor: 'rgba(230,242,177,0.03)' },
+              color: 'rgba(230,242,177,0.4)',
+              cursor: 'default',
             }}
           >
-            SHOP
+            En construcción
           </Box>
         </Box>
       )}
@@ -1084,6 +1190,775 @@ function EligeTuExperiencia() {
             </Grid>
           ))}
         </Grid>
+      </Container>
+    </Box>
+  )
+}
+
+// ── Etapas de precio → tabla por experiencia (transparent, no invented numbers) ──
+const ETAPA_ORDEN: EtapaComercial[] = ['lanzamiento', 'preventa', 'regular']
+const ETAPA_LABEL: Record<EtapaComercial, string> = {
+  lanzamiento: 'Lanzamiento',
+  preventa: 'Preventa',
+  regular: 'Regular',
+}
+
+function productoPorTipo(tipo: string): Producto {
+  const p = CATALOGO.find((x) => x.tipo === tipo)
+  if (!p) throw new Error(`Producto no encontrado para tipo: ${tipo}`)
+  return p
+}
+function productoPorCode(code: string): Producto {
+  const p = CATALOGO.find((x) => x.code === code)
+  if (!p) throw new Error(`Producto no encontrado para code: ${code}`)
+  return p
+}
+
+interface FilaTablaPrecio {
+  categoria: string
+  producto: Producto | null
+  /** Merged single cell across the 3 stage columns — Workout (fixed) and Público/Fotógrafo (no stages). */
+  singleCelda?: string
+}
+interface GrupoTablaPrecio {
+  bloque: string
+  color: string
+  filas: FilaTablaPrecio[]
+}
+
+const TABLA_PRECIOS_GRUPOS: GrupoTablaPrecio[] = [
+  {
+    bloque: 'COMPITE',
+    color: '#E6F2B1',
+    filas: [
+      { categoria: 'Individual', producto: productoPorTipo('Individual') },
+      { categoria: 'Dobles', producto: productoPorTipo('Dobles') },
+      { categoria: 'Relay', producto: productoPorTipo('Relay') },
+    ],
+  },
+  {
+    bloque: 'EXPERIENCE',
+    color: '#E6F2B1',
+    filas: [
+      { categoria: '½ Hybrid Individual', producto: productoPorTipo('½ Hybrid Individual') },
+      { categoria: '½ Hybrid Dobles', producto: productoPorTipo('½ Hybrid Dobles') },
+      { categoria: 'Workout', producto: productoPorTipo('Workout Experience') },
+    ],
+  },
+  {
+    bloque: 'ASISTE',
+    color: '#E9C7DF',
+    filas: [
+      {
+        categoria: 'Público',
+        producto: null,
+        singleCelda: `${formatMonto(productoPorCode('PUB-VIE').precio)} por día · ${formatMonto(productoPorCode('PUB-3D').precio)} pase 3 días`,
+      },
+      {
+        categoria: 'Fotógrafo',
+        producto: null,
+        singleCelda: `${formatMonto(productoPorCode('FOT-VIE').precio)} por día · ${formatMonto(productoPorCode('FOT-3D').precio)} pase 3 días`,
+      },
+    ],
+  },
+]
+
+function PrecioCelda({ total, cu }: { total: number; cu?: number }) {
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Box
+        component="span"
+        sx={{
+          fontFamily: "'JetBrains Mono', 'Space Grotesk', monospace",
+          fontWeight: 800,
+          fontSize: { xs: '0.85rem', sm: '0.92rem' },
+          color: '#ffffff',
+          letterSpacing: '0.01em',
+        }}
+      >
+        {formatMonto(total)}
+      </Box>
+      {cu != null && (
+        <Box
+          component="span"
+          sx={{
+            fontFamily: "'JetBrains Mono', 'Space Grotesk', monospace",
+            fontSize: { xs: '0.68rem', sm: '0.7rem' },
+            color: 'rgba(255,255,255,0.6)',
+          }}
+        >
+          {formatMonto(cu)} c/u
+        </Box>
+      )}
+    </Box>
+  )
+}
+
+function FilaPrecioTabla({ fila }: { fila: FilaTablaPrecio }) {
+  const p = fila.producto
+  const isWorkout = p?.tipo === 'Workout Experience'
+  const isMerged = fila.singleCelda != null || isWorkout
+  const mergedText = fila.singleCelda ?? (p ? formatMonto(p.precioPorEtapa!.lanzamiento) : '')
+  const msi = p?.msi === true
+
+  return (
+    <Box
+      sx={{
+        display: { xs: 'block', sm: 'grid' },
+        gridTemplateColumns: { sm: '1.5fr 1fr 1fr 1fr 0.9fr' },
+        borderBottom: '1px solid rgba(230,242,177,0.08)',
+        py: { xs: 1.75, sm: 0 },
+        px: { xs: 2, sm: 0 },
+        '&:hover': { bgcolor: 'rgba(230,242,177,0.04)' },
+      }}
+    >
+      <Box
+        sx={{
+          px: { sm: 2.5 },
+          py: { sm: 1.6 },
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontWeight: 800,
+          fontSize: { xs: '0.9rem', sm: '0.85rem' },
+          color: '#ffffff',
+          mb: { xs: 1, sm: 0 },
+          borderRight: { sm: '1px solid rgba(230,242,177,0.1)' },
+        }}
+      >
+        <Box component="span" sx={{ width: 6, height: 6, bgcolor: '#E6F2B1', flexShrink: 0 }} />
+        {fila.categoria}
+      </Box>
+
+      {isMerged ? (
+        <Box
+          sx={{
+            gridColumn: { sm: 'span 3' },
+            px: { sm: 2.5 },
+            py: { xs: 0.5, sm: 1.6 },
+            display: 'flex',
+            alignItems: 'center',
+            fontFamily: "'JetBrains Mono', 'Space Grotesk', monospace",
+            fontSize: { xs: '0.8rem', sm: '0.85rem' },
+            fontWeight: 700,
+            color: '#ffffff',
+          }}
+        >
+          {mergedText}
+        </Box>
+      ) : (
+        ETAPA_ORDEN.map((etapa) => (
+          <Box
+            key={etapa}
+            sx={{
+              px: { sm: 2.5 },
+              py: { xs: 0.4, sm: 1.4 },
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              borderRight: { sm: '1px solid rgba(230,242,177,0.06)' },
+              '&::before': {
+                content: { xs: `"${ETAPA_LABEL[etapa]}: "`, sm: '""' },
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.4)',
+                fontSize: '0.72rem',
+              },
+            }}
+          >
+            <PrecioCelda
+              total={p!.precioPorEtapa![etapa]}
+              cu={p!.integrantes > 1 ? p!.precioPorEtapa![etapa] / p!.integrantes : undefined}
+            />
+          </Box>
+        ))
+      )}
+
+      <Box
+        sx={{
+          px: { sm: 2.5 },
+          py: { xs: 0.4, sm: 1.6 },
+          display: 'flex',
+          alignItems: 'center',
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: '0.72rem',
+          fontWeight: 800,
+          letterSpacing: '0.04em',
+          color: msi ? '#E6F2B1' : 'rgba(255,255,255,0.3)',
+          '&::before': {
+            content: { xs: '"MSI: "', sm: '""' },
+            fontWeight: 400,
+            color: 'rgba(255,255,255,0.4)',
+            fontSize: '0.72rem',
+          },
+        }}
+      >
+        {msi ? '✓ 3 MSI' : '—'}
+      </Box>
+    </Box>
+  )
+}
+
+function EtapasDePrecio() {
+  return (
+    <Box
+      component="section"
+      sx={{
+        py: { xs: 7, md: 9 },
+        bgcolor: '#111111',
+        borderTop: '1px solid rgba(230,242,177,0.12)',
+        borderBottom: '1px solid rgba(230,242,177,0.12)',
+      }}
+    >
+      <Container maxWidth="md">
+        <Typography
+          variant="h2"
+          component="h2"
+          sx={{
+            textAlign: 'center',
+            mb: 2,
+            fontWeight: 900,
+            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.3rem' },
+            textTransform: 'uppercase',
+            letterSpacing: '0.02em',
+            fontFamily: "'Space Grotesk', sans-serif",
+            color: '#E6F2B1',
+          }}
+        >
+          Asegura tu lugar al mejor precio
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            textAlign: 'center',
+            color: 'text.secondary',
+            maxWidth: 620,
+            mx: 'auto',
+            mb: { xs: 5, md: 6 },
+            fontSize: { xs: '0.95rem', sm: '1.05rem' },
+            lineHeight: 1.7,
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          Cada etapa tiene un precio distinto. Al avanzar las etapas, el costo aumenta. Si ya
+          decidiste asistir, comprar antes significa pagar menos.
+        </Typography>
+
+        <Box
+          sx={{
+            border: '1px solid rgba(230,242,177,0.2)',
+            overflow: 'hidden',
+            mb: 3,
+          }}
+        >
+          {/* Header (desktop only — mobile uses inline labels per cell) */}
+          <Box
+            sx={{
+              display: { xs: 'none', sm: 'grid' },
+              gridTemplateColumns: '1.5fr 1fr 1fr 1fr 0.9fr',
+              borderBottom: '1px solid rgba(230,242,177,0.2)',
+              bgcolor: 'rgba(230,242,177,0.05)',
+            }}
+          >
+            {['Categoría', 'Lanzamiento', 'Preventa', 'Regular', 'MSI'].map((h) => (
+              <Box
+                key={h}
+                sx={{
+                  px: 2.5,
+                  py: 1.5,
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  color: '#E6F2B1',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.12em',
+                }}
+              >
+                {h}
+              </Box>
+            ))}
+          </Box>
+
+          {TABLA_PRECIOS_GRUPOS.map((grupo) => (
+            <Box key={grupo.bloque}>
+              <Box
+                sx={{
+                  px: { xs: 2, sm: 2.5 },
+                  py: 0.85,
+                  bgcolor: 'rgba(255,255,255,0.03)',
+                  borderBottom: '1px solid rgba(230,242,177,0.08)',
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontWeight: 900,
+                    fontSize: '0.68rem',
+                    letterSpacing: '0.15em',
+                    color: grupo.color,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {grupo.bloque}
+                </Typography>
+              </Box>
+              {grupo.filas.map((fila) => (
+                <FilaPrecioTabla key={fila.categoria} fila={fila} />
+              ))}
+            </Box>
+          ))}
+        </Box>
+
+        <Typography
+          variant="body2"
+          sx={{
+            textAlign: 'center',
+            color: '#E6F2B1',
+            fontWeight: 700,
+            mb: 1,
+            fontSize: { xs: '0.8rem', sm: '0.85rem' },
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          ✓ 3 meses sin intereses disponibles en categorías seleccionadas.
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            display: 'block',
+            textAlign: 'center',
+            color: 'rgba(255,255,255,0.5)',
+            mb: 4,
+            fontSize: '0.72rem',
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          Los precios se actualizan conforme cambia cada etapa de venta.
+        </Typography>
+
+        <Box sx={{ textAlign: 'center' }}>
+          <Button
+            component="a"
+            href="#experience"
+            variant="outlined"
+            sx={{
+              borderRadius: 0,
+              borderWidth: 2,
+              borderColor: '#E6F2B1',
+              color: '#E6F2B1',
+              fontWeight: 700,
+              minHeight: 44,
+              '&:hover': { borderWidth: 2, borderColor: '#E6F2B1', bgcolor: '#E6F2B11A' },
+              '&:focus-visible': { outline: '3px solid #E6F2B1', outlineOffset: 2 },
+            }}
+          >
+            Ver categorías
+          </Button>
+        </Box>
+      </Container>
+    </Box>
+  )
+}
+
+// ── Premios (Individual) + línea de reconocimiento (Dobles/Relay/½ Hybrid/Workout) ──
+const PODIOS_INDIVIDUAL: { categoria: string; nota: string; premios: [string, string][] }[] = [
+  {
+    categoria: 'PRO',
+    nota: 'Hombre y Mujer, podios independientes por género',
+    premios: [
+      ['1°', '$7,000'],
+      ['2°', '$5,000'],
+      ['3°', '$3,000'],
+    ],
+  },
+  {
+    categoria: 'OPEN',
+    nota: 'Hombre y Mujer, podios independientes por género',
+    premios: [
+      ['1°', '$5,000'],
+      ['2°', '$3,500'],
+      ['3°', '$2,000'],
+    ],
+  },
+]
+
+function PremiosIndividual() {
+  return (
+    <Box
+      sx={{
+        maxWidth: 480,
+        mx: 'auto',
+        mb: 3,
+        p: { xs: 2.5, sm: 3 },
+        border: '1px solid rgba(230,242,177,0.25)',
+        bgcolor: 'rgba(230,242,177,0.04)',
+      }}
+    >
+      <Typography
+        sx={{
+          textAlign: 'center',
+          fontWeight: 900,
+          color: '#E6F2B1',
+          textTransform: 'uppercase',
+          letterSpacing: '0.04em',
+          fontSize: { xs: '0.95rem', sm: '1.05rem' },
+          mb: 2.5,
+          fontFamily: "'Space Grotesk', sans-serif",
+        }}
+      >
+        Más de $50,000 en premios en efectivo
+      </Typography>
+      <Stack spacing={2.5}>
+        {PODIOS_INDIVIDUAL.map((cat) => (
+          <Box key={cat.categoria}>
+            <Typography
+              sx={{
+                fontWeight: 800,
+                color: '#ffffff',
+                fontSize: '0.8rem',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              {cat.categoria}
+            </Typography>
+            <Typography
+              sx={{
+                color: 'text.secondary',
+                fontSize: '0.72rem',
+                mb: 1,
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              ({cat.nota})
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2.5, flexWrap: 'wrap' }}>
+              {cat.premios.map(([place, amount]) => (
+                <Box key={place} sx={{ display: 'flex', alignItems: 'baseline', gap: 0.6 }}>
+                  <Box
+                    component="span"
+                    sx={{ color: '#E6F2B1', fontWeight: 900, fontSize: '0.85rem', fontFamily: "'Space Grotesk', sans-serif" }}
+                  >
+                    {place}
+                  </Box>
+                  <Box
+                    component="span"
+                    sx={{
+                      fontFamily: "'JetBrains Mono', 'Space Grotesk', monospace",
+                      color: '#ffffff',
+                      fontWeight: 800,
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    {amount}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        ))}
+      </Stack>
+    </Box>
+  )
+}
+
+function ReconocimientoLine({ align = 'center' }: { align?: 'left' | 'center' }) {
+  return (
+    <Typography
+      sx={{
+        textAlign: align,
+        color: 'rgba(255,255,255,0.55)',
+        fontSize: '0.78rem',
+        fontStyle: 'italic',
+        mt: align === 'left' ? 1 : 0,
+        mb: 2.5,
+        fontFamily: "'Space Grotesk', sans-serif",
+      }}
+    >
+      Reconocimiento y premios a los mejores tiempos por categoría.
+    </Typography>
+  )
+}
+
+// ── ¿Por qué perteneces aquí? ─────────────────────────────────────
+interface Beneficio {
+  icon: ReactNode
+  texto: string
+}
+
+const BENEFICIOS: Beneficio[] = [
+  { icon: <Inventory2Icon />, texto: 'Kit oficial del evento.' },
+  { icon: <TimerIcon />, texto: 'Chip de cronometraje.' },
+  { icon: <HealthAndSafetyIcon />, texto: 'Seguro para competidores.' },
+  { icon: <MedicalServicesIcon />, texto: 'Asistencia médica durante el evento.' },
+  { icon: <SpaIcon />, texto: 'Zona de recovery y experiencias wellness.' },
+  {
+    icon: <StadiumIcon />,
+    texto:
+      'Las instalaciones de Club Cumbres, el escenario donde la comunidad HYBRID EXPERIENCE se reúne para desafiar sus propios límites.',
+  },
+]
+
+const MANIFIESTO_INTRO = [
+  'El deporte híbrido está transformando la forma de entrenar, competir y conectar.',
+  'HYBRID EXPERIENCE reúne a quienes ya viven este deporte, a quienes sueñan con competir por primera vez y a quienes entienden que el verdadero reto siempre es convertirse en una mejor versión de sí mismos.',
+  'Aquí no importa si buscas tu mejor marca, tu primera meta o simplemente vivir una experiencia diferente.',
+]
+const MANIFIESTO_NO_IMPORTA = ['No importa tu edad.', 'No importa tu experiencia.']
+const MANIFIESTO_DESTACADO = 'No importa de dónde vienes. Lo importante es que hoy perteneces.'
+const MANIFIESTO_CIERRE = [
+  'Cada entrenamiento suma.',
+  'Cada meta inspira.',
+  'Cada historia fortalece esta comunidad.',
+  'Porque HYBRID EXPERIENCE no es solo un evento.',
+  'Es un movimiento que crece con cada persona que decide aceptar el reto.',
+]
+const MANIFIESTO_CTA_LINE = 'Únete a la comunidad HYBRID EXPERIENCE.'
+
+function PorQuePerteneces() {
+  return (
+    <Box
+      component="section"
+      id="por-que-perteneces"
+      sx={{
+        py: { xs: 8, md: 12 },
+        background: 'linear-gradient(180deg, #000000 0%, rgba(230,242,177,0.04) 50%, #000000 100%)',
+      }}
+    >
+      <Container maxWidth="md">
+        <Typography
+          variant="h2"
+          component="h2"
+          sx={{
+            textAlign: 'center',
+            fontWeight: 900,
+            fontSize: { xs: '1.8rem', sm: '2.4rem', md: '2.8rem' },
+            textTransform: 'uppercase',
+            letterSpacing: '0.02em',
+            fontFamily: "'Space Grotesk', sans-serif",
+            color: '#E6F2B1',
+            mb: 1,
+          }}
+        >
+          ¿Por qué perteneces aquí?
+        </Typography>
+        <Typography
+          sx={{
+            textAlign: 'center',
+            color: 'text.secondary',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            fontSize: { xs: '0.8rem', sm: '0.9rem' },
+            mb: { xs: 6, md: 8 },
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          Más que una inscripción. Una experiencia.
+        </Typography>
+
+        {/* Sub-bloque A — todo lo que incluye tu experiencia */}
+        <Typography
+          variant="body1"
+          sx={{
+            textAlign: 'center',
+            color: 'text.secondary',
+            maxWidth: 640,
+            mx: 'auto',
+            mb: 4,
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontSize: { xs: '0.95rem', sm: '1.05rem' },
+            lineHeight: 1.7,
+          }}
+        >
+          Tu inscripción incluye todo lo necesario para que vivas HYBRID EXPERIENCE al máximo:
+        </Typography>
+        <Grid container spacing={2.5} sx={{ mb: { xs: 6, md: 8 } }}>
+          {BENEFICIOS.map((b) => (
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={b.texto}>
+              <Box
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1.75,
+                  p: { xs: 2.5, sm: 3 },
+                  border: '1px solid rgba(230,242,177,0.18)',
+                  transition: 'border-color 0.15s ease, transform 0.15s ease',
+                  '&:hover': { borderColor: '#E6F2B1', transform: 'translateY(-2px)' },
+                }}
+              >
+                <Box sx={{ color: '#E6F2B1', display: 'flex', flexShrink: 0, mt: 0.25 }}>
+                  {b.icon}
+                </Box>
+                <Typography
+                  sx={{
+                    color: 'rgba(255,255,255,0.85)',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: { xs: '0.88rem', sm: '0.92rem' },
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {b.texto}
+                </Typography>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Puente */}
+        <Stack spacing={0.5} sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
+          <Typography
+            sx={{
+              color: '#E6F2B1',
+              fontWeight: 800,
+              fontSize: { xs: '1.05rem', sm: '1.25rem' },
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Pero lo más importante no viene dentro del kit.
+          </Typography>
+          <Typography
+            sx={{
+              color: '#E6F2B1',
+              fontWeight: 800,
+              fontSize: { xs: '1.05rem', sm: '1.25rem' },
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Viene con las personas que estarán a tu lado.
+          </Typography>
+        </Stack>
+
+        {/* Sub-bloque B — más que una competencia, una comunidad */}
+        <Typography
+          sx={{
+            textAlign: 'center',
+            fontWeight: 900,
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            letterSpacing: '0.03em',
+            fontSize: { xs: '1.1rem', sm: '1.4rem' },
+            mb: 3,
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          Más que una competencia. Una comunidad.
+        </Typography>
+
+        <Stack spacing={1.75} sx={{ maxWidth: 680, mx: 'auto', mb: 4 }}>
+          {MANIFIESTO_INTRO.map((line) => (
+            <Typography
+              key={line}
+              sx={{
+                textAlign: 'center',
+                color: 'text.secondary',
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                lineHeight: 1.7,
+              }}
+            >
+              {line}
+            </Typography>
+          ))}
+        </Stack>
+
+        <Stack spacing={0.5} sx={{ textAlign: 'center', mb: 4 }}>
+          {MANIFIESTO_NO_IMPORTA.map((line) => (
+            <Typography
+              key={line}
+              sx={{
+                color: 'rgba(255,255,255,0.75)',
+                fontWeight: 700,
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: { xs: '0.95rem', sm: '1.05rem' },
+              }}
+            >
+              {line}
+            </Typography>
+          ))}
+        </Stack>
+
+        <Box
+          sx={{
+            maxWidth: 680,
+            mx: 'auto',
+            mb: 4,
+            py: { xs: 2.5, sm: 3 },
+            px: { xs: 2.5, sm: 4 },
+            borderLeft: { xs: '4px solid #E6F2B1', sm: 'none' },
+            borderTop: { sm: '2px solid #E6F2B1' },
+            borderBottom: { sm: '2px solid #E6F2B1' },
+            textAlign: 'center',
+          }}
+        >
+          <Typography
+            sx={{
+              color: '#E6F2B1',
+              fontWeight: 900,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: { xs: '1.15rem', sm: '1.5rem', md: '1.7rem' },
+              lineHeight: 1.4,
+              letterSpacing: '0.01em',
+            }}
+          >
+            {MANIFIESTO_DESTACADO}
+          </Typography>
+        </Box>
+
+        <Stack spacing={1.75} sx={{ maxWidth: 680, mx: 'auto', mb: 3 }}>
+          {MANIFIESTO_CIERRE.map((line) => (
+            <Typography
+              key={line}
+              sx={{
+                textAlign: 'center',
+                color: 'text.secondary',
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                lineHeight: 1.7,
+              }}
+            >
+              {line}
+            </Typography>
+          ))}
+        </Stack>
+
+        <Typography
+          sx={{
+            textAlign: 'center',
+            color: '#ffffff',
+            fontWeight: 900,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+            fontSize: { xs: '1rem', sm: '1.2rem' },
+            mb: { xs: 5, md: 6 },
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          {MANIFIESTO_CTA_LINE}
+        </Typography>
+
+        <Box sx={{ textAlign: 'center' }}>
+          <Button
+            component="a"
+            href="#experience"
+            variant="outlined"
+            sx={{
+              borderRadius: 0,
+              borderWidth: 2,
+              borderColor: '#E6F2B1',
+              color: '#E6F2B1',
+              fontWeight: 700,
+              minHeight: 44,
+              '&:hover': { borderWidth: 2, borderColor: '#E6F2B1', bgcolor: '#E6F2B11A' },
+              '&:focus-visible': { outline: '3px solid #E6F2B1', outlineOffset: 2 },
+            }}
+          >
+            Ver categorías
+          </Button>
+        </Box>
       </Container>
     </Box>
   )
@@ -1410,6 +2285,9 @@ export default function LandingPage() {
         </Container>
       </Box>
 
+      <EtapasDePrecio />
+      <PorQuePerteneces />
+
       {/* ===== EXPERIENCE SECTION ===== */}
       <Box
         id="experience"
@@ -1511,6 +2389,7 @@ export default function LandingPage() {
                 >
                   {FORMATO_DESCRIPCIONES['Workout Experience']}
                 </Typography>
+                <ReconocimientoLine align="left" />
               </Box>
               <Grid container spacing={2} sx={{ flex: 1, justifyContent: 'center' }}>
                 {WORKOUT_PRODUCTS.map((producto) => (
@@ -1568,6 +2447,7 @@ export default function LandingPage() {
             >
               {FORMATO_DESCRIPCIONES['½ Hybrid Individual']}
             </Typography>
+            <ReconocimientoLine />
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
               {HALF_HYBRID_PRODUCTS.map((producto) => (
                 <Grid size={{ xs: 6, sm: 4 }} key={producto.code}>
@@ -2282,7 +3162,10 @@ export default function LandingPage() {
             Elige la categoría que mejor se adapte a ti y a tu equipo.
           </Typography>
 
-          {COMPITE_GROUPS.map((group) => (
+          {COMPITE_GROUPS.map((group) => {
+            const etapaVigente = resolveEtapaComercial() ?? 'lanzamiento'
+            const precioVigente = getPrecioVigente(group.productos[0], etapaVigente)
+            return (
             <Box key={group.key} id={group.id} sx={{ mb: { xs: 5, md: 6 }, scrollMarginTop: '80px' }}>
               <Typography
                 variant="overline"
@@ -2297,7 +3180,7 @@ export default function LandingPage() {
                   fontFamily: "'Space Grotesk', sans-serif",
                 }}
               >
-                {`${DIA_FECHA[group.dia]} · ${SESION_LABEL[group.sesion] ?? group.sesion} · ${group.tipo.toUpperCase()} · ${formatPrecio(group.productos[0].precio)} ${group.precioUnidad}`}
+                {`${DIA_FECHA[group.dia]} · ${SESION_LABEL[group.sesion] ?? group.sesion} · ${group.tipo.toUpperCase()} · ${formatPrecio(precioVigente)} ${unidadConPrecioVigente(group.productos[0], precioVigente)}`}
               </Typography>
               {FORMATO_DESCRIPCIONES[group.tipo] && (
                 <Typography
@@ -2316,6 +3199,8 @@ export default function LandingPage() {
                   {FORMATO_DESCRIPCIONES[group.tipo]}
                 </Typography>
               )}
+              {group.tipo === 'Individual' && <PremiosIndividual />}
+              {(group.tipo === 'Dobles' || group.tipo === 'Relay') && <ReconocimientoLine />}
               <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 {group.productos.map((producto) => (
                   <Grid size={{ xs: 6, sm: 4, md: 3 }} key={producto.code}>
@@ -2324,7 +3209,8 @@ export default function LandingPage() {
                 ))}
               </Grid>
             </Box>
-          ))}
+            )
+          })}
         </Container>
       </Box>
 

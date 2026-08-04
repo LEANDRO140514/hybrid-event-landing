@@ -3,7 +3,7 @@ export type RegistrationStatus = 'coming_soon' | 'open' | 'closed'
 export const SALES_CONFIG = {
   status: 'coming_soon' as RegistrationStatus,
   openingDate: '2026-07-27',
-  openingLabel: 'Ventas abren el lunes 27 de julio',
+  openingLabel: 'Próximamente',
   /**
    * Manual kill-switch for staged pricing (see src/lib/pricingStage.ts).
    * Defaults to false: no commercial stage resolves as active until this is
