@@ -164,31 +164,76 @@
 - **Validation:** `npm run build` clean, `npm run lint` clean, both re-run after each of the three changes above. Browser-verified in-session (DOM/computed-style, per the methodology noted since HEX-LANDING-SALES-01).
 - **Not done, explicitly deferred:** migrating the hardcoded InsForge URLs to the `VITE_MEDIA_BASE_URL` + object-path pattern; confirming the InsForge bucket/objects are actually public+permanent+unsigned (assumed true, not independently verified against InsForge config); reviewing cache headers / `Content-Type` / error behavior; deciding the official `og:image` (1200×630) from the now-available real photography; deciding whether "Club Cumbres" (venue name) can be added to `Event` JSON-LD now that a real venue photo exists; migrating hero/Ubicación/cards from CSS `background-image` to `<img>` elements with proper `loading`/`fetchpriority`/`alt` for performance and accessibility.
 
+## Phase HEAD-RECONCILIATION-01 (opened and closed 2026-08-03)
+
+- **Authorized by:** user, in-session, "Fase 0 — RECONCILIACIÓN DE ACTA". Documentation-only phase — no `src/` files touched, no commit performed in this phase (change left in the working tree pending explicit user authorization to commit).
+- **Trigger:** a RESUME pass (controlled-monorepo-workflow) detected HEAD drift — the prior `NEXT_SESSION_BOOTSTRAP` below documented HEAD `6da9fee` (dirty tree, open phase HEX-LAUNCH-01 REV B awaiting CEO/CTO review). Physical HEAD was `b4f50c0` (clean tree), 10 commits ahead, none documented in this file.
+- **Reconciled commit history (`6da9fee` → `b4f50c0`, oldest first):**
+  1. `f673a73` feat: prepare landing for ticket sales launch — introduced `src/config/salesConfig.ts` (`status: 'coming_soon'`, `openingLabel: 'Ventas abren el lunes 27 de julio'`)
+  2. `c87a1a2` feat: replace stock imagery with Enforma media
+  3. `970ba21` docs: document Hybrid Experience launch preparation
+  4. `0f6a88f` fix: update Hybrid Experience ticket prices — raised Dobles / ½ Hybrid Dobles to $1,250 c/u and Relay to $850 c/u (supersedes the $1,200/$800 c/u figures recorded under Phase COMPITE-CONTENT-FIXES above; that entry is left unedited as a historical record of what was true at the time, not corrected retroactively)
+  5. `84290b2` fix: finalize Hybrid Experience canonical domain and navigation
+  6. `b39d432` feat: finalize event-only landing hardening — removed `CorporateLandingPage.tsx` and its route, added `NotFoundPage.tsx`, added real PWA icons (`icon-192.png`, `icon-512.png`) and `public/og/hybrid-experience-social.jpg`, added `vercel.json` redirect `/corporate → enforma.mx`
+  7. `5c9a3a1` chore(security): ignore local InsForge metadata — `.gitignore` only
+  8. `5cb5848` **[Cursor]** feat(checkout): add spectator sandbox wiring
+  9. `9b9cf48` **[Cursor]** fix(checkout): prevent duplicate checkout submissions
+  10. `b4f50c0` **[Cursor]** feat(checkout): expand public and press sandbox wiring
+
+  Commits 8–10 are co-authored `Cursor <cursoragent@cursor.com>` — a different agent, working outside this protocol, with no corresponding phase entry until this reconciliation.
+- **Checkout sandbox — investigated and RECOGNIZED / ACCEPTED as fail-closed, non-production:**
+  - Adds `src/api/checkout.ts`, `src/api/orderStatus.ts`, `src/config/checkoutConfig.ts`, `src/lib/checkoutSession.ts`, `src/lib/submitLock.ts`, `src/pages/CheckoutConfirmPage.tsx`, wired into `ProductCard` in `src/pages/LandingPage.tsx`.
+  - Talks to InsForge edge functions (`mp-create-checkout`, `get-order-status`) — no Mercado Pago credentials or payment logic live in this repo; the backend is the payment authority (and its own sales gate — see `SALES_NOT_OPEN`/`SOLD_OUT` error codes in `checkout.ts`).
+  - Scoped to a 6-product allowlist only: `PUB-VIE`, `PUB-SAB`, `PUB-DOM`, `FOT-VIE`, `FOT-SAB`, `FOT-DOM` (Público/Fotógrafo). Never touches the other 22 COMPITE/EXPERIENCE/3-day-pass products.
+  - `isSandboxCheckoutActive()` (`checkoutConfig.ts`) requires all four: `VITE_CHECKOUT_MODE==='sandbox'` (no "production" mode exists in code), `VITE_CHECKOUT_ENABLED==='true'`, a valid https `VITE_INSFORGE_FUNCTIONS_BASE`, **and** `window.location.hostname !== 'hybrid-experience.enforma.mx'` — the last check is a code-level kill-switch that disables the sandbox unconditionally on the canonical production host, independent of env var configuration.
+  - `CheckoutConfirmPage.tsx` (`/checkout/confirmando`) visibly labels itself "Entorno de prueba" and independently re-checks `isSandboxCheckoutActive()` before polling order status.
+  - **Disposition:** accepted as-is, fail-closed, outside the production purchase path. Not treated as a violation requiring rollback. The "Not done in this phase" exclusion list under HEX-LAUNCH-01 REV B (Ready2Hybrid/Mercado Pago/forms/payments) is understood to have scoped that specific phase, not to stand as a blanket prohibition on all future checkout-related work — this sandbox is a distinct, narrowly-scoped exception, documented here for the first time.
+- **Pending finding, NOT resolved this phase — MAJOR:** `src/config/salesConfig.ts` `status` remains `'coming_soon'` with `openingLabel: 'Ventas abren el lunes 27 de julio'` (2026-07-27) — a date roughly a week in the past relative to today (2026-08-03). If `b4f50c0` is what's live at `https://hybrid-experience.enforma.mx/`, all 28 product buttons currently render disabled with stale copy. Not fixed in this phase (documentation-only) — carried into HEX-PRICING-STAGES-01 below.
+- **Files touched this phase:** `WORKSPACE_STATUS.md` only. No `src/`, no `catalogo.ts`, no `salesConfig.ts`, no other code.
+- **Validation:** N/A — documentation-only, no build/lint/test run.
+- **Git:** change left uncommitted in the working tree, pending explicit user authorization to commit.
+- **Next Authorized Phase:** HEX-PRICING-STAGES-01 (below).
+
+## Phase HEX-PRICING-STAGES-01 (opened 2026-08-03 — OPEN, not yet started)
+
+- **Authorized by:** user, in-session, immediately following HEAD-RECONCILIATION-01.
+- **Objective:** Migrate `src/data/catalogo.ts` from a single scalar `precio` per product to a staged pricing matrix (Lanzamiento / Preventa / Regular) for **display purposes**, with 3-MSI (meses sin intereses) eligibility per product. Sales remain **CLOSED** during this phase — no flip of `salesConfig.ts` to `open`. The InsForge backend remains the authority for actual charge amounts; this phase is display/data-model only unless a later instruction expands scope.
+- **Scope:** not yet detailed — awaiting a PREFLIGHT / scoping instruction before any implementation.
+- **Status:** OPEN
+- **Gate:** `READY_FOR_WORK`
+- **Known inputs to reconcile when work starts:** the stale `salesConfig.ts` opening-copy finding above (HEAD-RECONCILIATION-01); the current single-price `CATALOGO` structure (11 distinct price points across 28 products in `catalogo.ts`); the sandbox checkout has no monetary fields today, so its compatibility with staged pricing should be checked once the matrix exists.
+- **Next Authorized Phase:** (none yet — awaiting PREFLIGHT/scope instruction)
+
 ```
 === NEXT_SESSION_BOOTSTRAP ===
 Workspace: C:\vonde\enforma-sys\hybrid-event-landing
 Product/System: The Hybrid Experience (hybrid-event-landing)
 Workspace Type: standalone-repo / external-development-workspace
 Branch: main
-HEAD: 6da9fee (working tree has uncommitted changes — see git status)
-Last Commits: 6da9fee chore: complete hybrid event landing rename | c36b8ce docs: preserve original landing scripts | f546ddc docs: cierra fase COMPITE-CONTENT-FIXES en WORKSPACE_STATUS.md
-Completed Phase: HEX-LANDING-SALES-01 (audit, read-only)
-Open Phase (NOT closed): HEX-LAUNCH-01 REV B, including its same-day sub-phase "UX follow-ups & media architecture" — awaiting CEO/CTO review, see sections above
-Gate: HEX_LAUNCH_01_REV_B_READY_FOR_CEO_CTO_REVIEW
-Known Issues: FORMATOS/COMPITE content duplication (carried over, not fixed); hardcoded InsForge hostname pending centralization via VITE_MEDIA_BASE_URL
+HEAD: b4f50c0 (working tree clean at reconciliation time, except this WORKSPACE_STATUS.md edit — see git status)
+Last Commits: b4f50c0 feat(checkout): expand public and press sandbox wiring [Cursor] | 9b9cf48 fix(checkout): prevent duplicate checkout submissions [Cursor] | 5cb5848 feat(checkout): add spectator sandbox wiring [Cursor] | 5c9a3a1 chore(security): ignore local InsForge metadata | b39d432 feat: finalize event-only landing hardening
+Completed Phase: HEAD-RECONCILIATION-01 (documentation-only, closed 2026-08-03)
+Open Phase (NOT closed): HEX-PRICING-STAGES-01 — opened 2026-08-03, not yet scoped/started
+Gate: READY_FOR_WORK (HEX-PRICING-STAGES-01, awaiting scope/PREFLIGHT)
+Known Issues:
+  - salesConfig.ts status stuck at 'coming_soon' with stale openingLabel ("lunes 27 de julio") — carried MAJOR finding from HEAD-RECONCILIATION-01, unresolved.
+  - FORMATOS/COMPITE content duplication (carried over from HEX-LAUNCH-01 REV B, still not fixed).
+  - Hardcoded InsForge hostname still pending centralization via VITE_MEDIA_BASE_URL (carried over, still not fixed).
+  - HEX-LAUNCH-01 REV B itself was never formally closed in this file before the 10-commit gap — its open pending decisions below are carried forward unresolved, not assumed answered.
 Pending Decisions:
   1. Canonical production URL for the landing.
   2. Definitive public media subdomain for InsForge Storage.
   3. Nombre y política del bucket público de HYBRID EXPERIENCE.
-  4. Official 1200×630 social image for og:image (now unblocked by the real photography — asset choice pending).
+  4. Official 1200×630 social image for og:image (public/og/hybrid-experience-social.jpg now exists per commit b39d432 — confirm if this is the approved final asset, not independently verified this phase).
   5. Whether "Club Cumbres" and its address can be published in JSON-LD.
-  6. Confirm the Monday 2026-07-27 sales opening is still accurate.
+  6. salesConfig 'coming_soon' → 'open' flip: date/copy needs a fresh decision, the 2026-07-27 target has passed.
   7. Future of the `#formatos` section (merge or remove — duplicates COMPITE).
   8. When to centralize the current hardcoded InsForge URLs behind VITE_MEDIA_BASE_URL.
+  9. HEX-PRICING-STAGES-01 scope details: exact stage definitions/dates for Lanzamiento/Preventa/Regular, and how 3-MSI eligibility is represented per product.
 Protected Sources: (none)
-Next Authorized Phase: (awaiting CEO/CTO decision on the above — likely a scoped media-architecture phase, then the manual flip of salesConfig to `open`)
-Files To Read First: WORKSPACE_STATUS.md, src/config/salesConfig.ts, src/pages/LandingPage.tsx, src/data/catalogo.ts, src/config.ts
-Forbidden Actions: push without express authorization, modifying docs/guiones-origen/*.html, flipping salesConfig to `open` without explicit authorization, moving images into public/, using signed/expiring URLs for public media, exposing InsForge secrets
+Next Authorized Phase: HEX-PRICING-STAGES-01 scoping (this session) — see Phase section above
+Files To Read First: WORKSPACE_STATUS.md, src/config/salesConfig.ts, src/data/catalogo.ts, src/pages/LandingPage.tsx, src/config/checkoutConfig.ts
+Forbidden Actions: push without express authorization, modifying docs/guiones-origen/*.html, flipping salesConfig to `open` without explicit authorization, moving images into public/, using signed/expiring URLs for public media, exposing InsForge secrets, enabling sandbox checkout on the production host, expanding the sandbox checkout allowlist without explicit authorization
 First Command: scripts/workspace-preflight.ps1
 === END_BOOTSTRAP ===
 ```
