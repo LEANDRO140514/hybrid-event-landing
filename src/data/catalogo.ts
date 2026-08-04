@@ -1,8 +1,15 @@
 import { DOMAINS } from '../config'
+import type { EtapaComercial } from '../lib/pricingStage'
 
 export type ProductoBloque = 'COMPITE' | 'EXPERIENCE' | 'ASISTE'
 export type ProductoDia = 'Viernes' | 'Sábado' | 'Domingo' | 'Vie-Dom'
 export type ProductoSesion = 'AM' | 'PM'
+
+export interface PrecioPorEtapa {
+  lanzamiento: number
+  preventa: number
+  regular: number
+}
 
 export interface Producto {
   code: string
@@ -12,55 +19,64 @@ export interface Producto {
   integrantes: number
   dia: ProductoDia
   sesion: ProductoSesion
+  /**
+   * Legacy flat display price — still what the current UI renders (Fase 2
+   * migrates the UI to precioPorEtapa). For staged products this mirrors
+   * the `lanzamiento` tier value.
+   */
   precio: number
+  /** Per-stage price for display. null = product has no staged pricing (Público/Fotógrafo). */
+  precioPorEtapa: PrecioPorEtapa | null
+  /** MSI (meses sin intereses) eligibility. */
+  msi: boolean
   precioUnidad: string
   incluyeChip: boolean
 }
 
 export const CATALOGO: Producto[] = [
-  // ── COMPITE — Viernes 9 · PM · Dobles · $2,500 por pareja ──
-  { code: 'DOB-VIE-MM', nombre: 'Dobles Mujeres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2500, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
-  { code: 'DOB-VIE-HH', nombre: 'Dobles Hombres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2500, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
-  { code: 'DOB-VIE-MH', nombre: 'Dobles Mixto', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2500, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
+  // ── COMPITE — Viernes 9 · PM · Dobles · lanzamiento $2,500 / preventa $2,750 / regular $3,000 por pareja · MSI ──
+  { code: 'DOB-VIE-MM', nombre: 'Dobles Mujeres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2500, precioPorEtapa: { lanzamiento: 2500, preventa: 2750, regular: 3000 }, msi: true, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
+  { code: 'DOB-VIE-HH', nombre: 'Dobles Hombres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2500, precioPorEtapa: { lanzamiento: 2500, preventa: 2750, regular: 3000 }, msi: true, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
+  { code: 'DOB-VIE-MH', nombre: 'Dobles Mixto', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Viernes', sesion: 'PM', precio: 2500, precioPorEtapa: { lanzamiento: 2500, preventa: 2750, regular: 3000 }, msi: true, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
 
-  // ── COMPITE — Sábado 10 · AM · Dobles · $2,500 por pareja ──
-  { code: 'DOB-SAB-MM', nombre: 'Dobles Mujeres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2500, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
-  { code: 'DOB-SAB-HH', nombre: 'Dobles Hombres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2500, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
-  { code: 'DOB-SAB-MH', nombre: 'Dobles Mixto', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2500, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
+  // ── COMPITE — Sábado 10 · AM · Dobles · lanzamiento $2,500 / preventa $2,750 / regular $3,000 por pareja · MSI ──
+  { code: 'DOB-SAB-MM', nombre: 'Dobles Mujeres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2500, precioPorEtapa: { lanzamiento: 2500, preventa: 2750, regular: 3000 }, msi: true, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
+  { code: 'DOB-SAB-HH', nombre: 'Dobles Hombres', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2500, precioPorEtapa: { lanzamiento: 2500, preventa: 2750, regular: 3000 }, msi: true, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
+  { code: 'DOB-SAB-MH', nombre: 'Dobles Mixto', bloque: 'COMPITE', tipo: 'Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 2500, precioPorEtapa: { lanzamiento: 2500, preventa: 2750, regular: 3000 }, msi: true, precioUnidad: 'por pareja ($1,250 c/u)', incluyeChip: true },
 
-  // ── COMPITE — Sábado 10 · PM · Relay (4 personas) · $3,400 por equipo ──
-  { code: 'REL-4H', nombre: 'Relay 4 Hombres', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3400, precioUnidad: 'por equipo ($850 c/u)', incluyeChip: true },
-  { code: 'REL-4M', nombre: 'Relay 4 Mujeres', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3400, precioUnidad: 'por equipo ($850 c/u)', incluyeChip: true },
-  { code: 'REL-2H2M', nombre: 'Relay Mixto 2H+2M', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3400, precioUnidad: 'por equipo ($850 c/u)', incluyeChip: true },
+  // ── COMPITE — Sábado 10 · PM · Relay (4 personas) · lanzamiento $3,200 / preventa $3,500 / regular $3,800 por equipo · MSI ──
+  { code: 'REL-4H', nombre: 'Relay 4 Hombres', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioPorEtapa: { lanzamiento: 3200, preventa: 3500, regular: 3800 }, msi: true, precioUnidad: 'por equipo ($850 c/u)', incluyeChip: true },
+  { code: 'REL-4M', nombre: 'Relay 4 Mujeres', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioPorEtapa: { lanzamiento: 3200, preventa: 3500, regular: 3800 }, msi: true, precioUnidad: 'por equipo ($850 c/u)', incluyeChip: true },
+  { code: 'REL-2H2M', nombre: 'Relay Mixto 2H+2M', bloque: 'COMPITE', tipo: 'Relay', integrantes: 4, dia: 'Sábado', sesion: 'PM', precio: 3200, precioPorEtapa: { lanzamiento: 3200, preventa: 3500, regular: 3800 }, msi: true, precioUnidad: 'por equipo ($850 c/u)', incluyeChip: true },
 
-  // ── COMPITE — Domingo 11 · AM · Individual · $1,500 por persona ──
-  { code: 'IND-H', nombre: 'Individual Hombre (Open)', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1500, precioUnidad: 'por persona', incluyeChip: true },
-  { code: 'IND-M', nombre: 'Individual Mujer (Open)', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1500, precioUnidad: 'por persona', incluyeChip: true },
-  { code: 'IND-PRO-H', nombre: 'Individual Pro Hombre', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1500, precioUnidad: 'por persona', incluyeChip: true },
-  { code: 'IND-PRO-M', nombre: 'Individual Pro Mujer', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1500, precioUnidad: 'por persona', incluyeChip: true },
+  // ── COMPITE — Domingo 11 · AM · Individual · lanzamiento $1,500 / preventa $1,650 / regular $1,800 por persona · MSI ──
+  { code: 'IND-H', nombre: 'Individual Hombre (Open)', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1500, precioPorEtapa: { lanzamiento: 1500, preventa: 1650, regular: 1800 }, msi: true, precioUnidad: 'por persona', incluyeChip: true },
+  { code: 'IND-M', nombre: 'Individual Mujer (Open)', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1500, precioPorEtapa: { lanzamiento: 1500, preventa: 1650, regular: 1800 }, msi: true, precioUnidad: 'por persona', incluyeChip: true },
+  { code: 'IND-PRO-H', nombre: 'Individual Pro Hombre', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1500, precioPorEtapa: { lanzamiento: 1500, preventa: 1650, regular: 1800 }, msi: true, precioUnidad: 'por persona', incluyeChip: true },
+  { code: 'IND-PRO-M', nombre: 'Individual Pro Mujer', bloque: 'COMPITE', tipo: 'Individual', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 1500, precioPorEtapa: { lanzamiento: 1500, preventa: 1650, regular: 1800 }, msi: true, precioUnidad: 'por persona', incluyeChip: true },
 
   // ── EXPERIENCE — ½ Hybrid — Sábado 10 · AM ──
-  { code: 'HALF-IND-M', nombre: '½ Hybrid Individual Mujer', bloque: 'EXPERIENCE', tipo: '½ Hybrid Individual', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 850, precioUnidad: 'por persona', incluyeChip: true },
-  { code: 'HALF-IND-H', nombre: '½ Hybrid Individual Hombre', bloque: 'EXPERIENCE', tipo: '½ Hybrid Individual', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 850, precioUnidad: 'por persona', incluyeChip: true },
-  { code: 'HALF-DOB-MM', nombre: '½ Hybrid Dobles Mujeres', bloque: 'EXPERIENCE', tipo: '½ Hybrid Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 1700, precioUnidad: 'por pareja ($850 c/u)', incluyeChip: true },
-  { code: 'HALF-DOB-HH', nombre: '½ Hybrid Dobles Hombres', bloque: 'EXPERIENCE', tipo: '½ Hybrid Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 1700, precioUnidad: 'por pareja ($850 c/u)', incluyeChip: true },
-  { code: 'HALF-DOB-MH', nombre: '½ Hybrid Dobles Mixto', bloque: 'EXPERIENCE', tipo: '½ Hybrid Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 1700, precioUnidad: 'por pareja ($850 c/u)', incluyeChip: true },
+  { code: 'HALF-IND-M', nombre: '½ Hybrid Individual Mujer', bloque: 'EXPERIENCE', tipo: '½ Hybrid Individual', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 800, precioPorEtapa: { lanzamiento: 800, preventa: 900, regular: 1000 }, msi: true, precioUnidad: 'por persona', incluyeChip: true },
+  { code: 'HALF-IND-H', nombre: '½ Hybrid Individual Hombre', bloque: 'EXPERIENCE', tipo: '½ Hybrid Individual', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 800, precioPorEtapa: { lanzamiento: 800, preventa: 900, regular: 1000 }, msi: true, precioUnidad: 'por persona', incluyeChip: true },
+  { code: 'HALF-DOB-MM', nombre: '½ Hybrid Dobles Mujeres', bloque: 'EXPERIENCE', tipo: '½ Hybrid Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 1600, precioPorEtapa: { lanzamiento: 1600, preventa: 1800, regular: 2000 }, msi: true, precioUnidad: 'por pareja ($850 c/u)', incluyeChip: true },
+  { code: 'HALF-DOB-HH', nombre: '½ Hybrid Dobles Hombres', bloque: 'EXPERIENCE', tipo: '½ Hybrid Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 1600, precioPorEtapa: { lanzamiento: 1600, preventa: 1800, regular: 2000 }, msi: true, precioUnidad: 'por pareja ($850 c/u)', incluyeChip: true },
+  { code: 'HALF-DOB-MH', nombre: '½ Hybrid Dobles Mixto', bloque: 'EXPERIENCE', tipo: '½ Hybrid Dobles', integrantes: 2, dia: 'Sábado', sesion: 'AM', precio: 1600, precioPorEtapa: { lanzamiento: 1600, preventa: 1800, regular: 2000 }, msi: true, precioUnidad: 'por pareja ($850 c/u)', incluyeChip: true },
 
-  // ── EXPERIENCE — Workout Experience — Sábado 10 · AM · $350 ──
-  { code: 'WOD-M', nombre: 'Workout Experience Mujer', bloque: 'EXPERIENCE', tipo: 'Workout Experience', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 350, precioUnidad: 'por persona', incluyeChip: false },
-  { code: 'WOD-H', nombre: 'Workout Experience Hombre', bloque: 'EXPERIENCE', tipo: 'Workout Experience', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 350, precioUnidad: 'por persona', incluyeChip: false },
+  // ── EXPERIENCE — Workout Experience — Sábado 10 · AM · $350 (todas las etapas, sin MSI) ──
+  { code: 'WOD-M', nombre: 'Workout Experience Mujer', bloque: 'EXPERIENCE', tipo: 'Workout Experience', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 350, precioPorEtapa: { lanzamiento: 350, preventa: 350, regular: 350 }, msi: false, precioUnidad: 'por persona', incluyeChip: false },
+  { code: 'WOD-H', nombre: 'Workout Experience Hombre', bloque: 'EXPERIENCE', tipo: 'Workout Experience', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 350, precioPorEtapa: { lanzamiento: 350, preventa: 350, regular: 350 }, msi: false, precioUnidad: 'por persona', incluyeChip: false },
 
-  // ── ASISTE — Público · $250 por día ──
-  { code: 'PUB-VIE', nombre: 'Público — Viernes', bloque: 'ASISTE', tipo: 'Público', integrantes: 1, dia: 'Viernes', sesion: 'AM', precio: 250, precioUnidad: 'por día', incluyeChip: false },
-  { code: 'PUB-SAB', nombre: 'Público — Sábado', bloque: 'ASISTE', tipo: 'Público', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 250, precioUnidad: 'por día', incluyeChip: false },
-  { code: 'PUB-DOM', nombre: 'Público — Domingo', bloque: 'ASISTE', tipo: 'Público', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 250, precioUnidad: 'por día', incluyeChip: false },
-  { code: 'PUB-3D', nombre: 'Público — Pase 3 Días', bloque: 'ASISTE', tipo: 'Público', integrantes: 1, dia: 'Vie-Dom', sesion: 'AM', precio: 600, precioUnidad: 'pase 3 días', incluyeChip: false },
+  // ── ASISTE — Público · $250 por día (sin etapas, sin MSI) ──
+  { code: 'PUB-VIE', nombre: 'Público — Viernes', bloque: 'ASISTE', tipo: 'Público', integrantes: 1, dia: 'Viernes', sesion: 'AM', precio: 250, precioPorEtapa: null, msi: false, precioUnidad: 'por día', incluyeChip: false },
+  { code: 'PUB-SAB', nombre: 'Público — Sábado', bloque: 'ASISTE', tipo: 'Público', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 250, precioPorEtapa: null, msi: false, precioUnidad: 'por día', incluyeChip: false },
+  { code: 'PUB-DOM', nombre: 'Público — Domingo', bloque: 'ASISTE', tipo: 'Público', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 250, precioPorEtapa: null, msi: false, precioUnidad: 'por día', incluyeChip: false },
+  { code: 'PUB-3D', nombre: 'Público — Pase 3 Días', bloque: 'ASISTE', tipo: 'Público', integrantes: 1, dia: 'Vie-Dom', sesion: 'AM', precio: 600, precioPorEtapa: null, msi: false, precioUnidad: 'pase 3 días', incluyeChip: false },
 
-  // ── ASISTE — Fotógrafo · $350 por día (acreditación para fotógrafos externos) ──
-  { code: 'FOT-VIE', nombre: 'Fotógrafo — Viernes', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Viernes', sesion: 'AM', precio: 350, precioUnidad: 'por día', incluyeChip: false },
-  { code: 'FOT-SAB', nombre: 'Fotógrafo — Sábado', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 350, precioUnidad: 'por día', incluyeChip: false },
-  { code: 'FOT-DOM', nombre: 'Fotógrafo — Domingo', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 350, precioUnidad: 'por día', incluyeChip: false },
-  { code: 'FOT-3D', nombre: 'Fotógrafo — Pase 3 Días', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Vie-Dom', sesion: 'AM', precio: 800, precioUnidad: 'pase 3 días', incluyeChip: false },
+  // ── ASISTE — Fotógrafo · $350 por día (acreditación para fotógrafos externos, sin etapas, sin MSI) ──
+  { code: 'FOT-VIE', nombre: 'Fotógrafo — Viernes', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Viernes', sesion: 'AM', precio: 350, precioPorEtapa: null, msi: false, precioUnidad: 'por día', incluyeChip: false },
+  { code: 'FOT-SAB', nombre: 'Fotógrafo — Sábado', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Sábado', sesion: 'AM', precio: 350, precioPorEtapa: null, msi: false, precioUnidad: 'por día', incluyeChip: false },
+  { code: 'FOT-DOM', nombre: 'Fotógrafo — Domingo', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Domingo', sesion: 'AM', precio: 350, precioPorEtapa: null, msi: false, precioUnidad: 'por día', incluyeChip: false },
+  { code: 'FOT-3D', nombre: 'Fotógrafo — Pase 3 Días', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Vie-Dom', sesion: 'AM', precio: 800, precioPorEtapa: null, msi: false, precioUnidad: 'pase 3 días', incluyeChip: false },
 ]
 
 export function getInscribirUrl(code: string): string {
@@ -73,4 +89,17 @@ export function formatPrecio(precio: number): string {
 
 export function porBloque(bloque: ProductoBloque): Producto[] {
   return CATALOGO.filter((p) => p.bloque === bloque)
+}
+
+/**
+ * Resolves the display price for a product given a commercial stage.
+ * Falls back to the legacy `precio` scalar when the product has no staged
+ * pricing (Público/Fotógrafo) or when no stage is currently active
+ * (etapa === null, e.g. ventasArrancadas is still false).
+ */
+export function getPrecioVigente(producto: Producto, etapa: EtapaComercial | null): number {
+  if (producto.precioPorEtapa && etapa) {
+    return producto.precioPorEtapa[etapa]
+  }
+  return producto.precio
 }
