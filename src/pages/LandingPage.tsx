@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode, type FormEvent } from 'react'
 import {
   Box,
   Button,
@@ -14,6 +14,11 @@ import {
   Chip,
   IconButton,
   TextField,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -39,6 +44,7 @@ import {
 import type { Producto } from '../data/catalogo'
 import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
+import { SIMULACRO_PRO_ACTIVE } from '../config/simulacroProConfig'
 import { resolveEtapaComercial } from '../lib/pricingStage'
 import type { EtapaComercial } from '../lib/pricingStage'
 import {
@@ -64,10 +70,10 @@ const EVENT_JSON_LD = {
   '@type': 'Event',
   name: eventConfig.name,
   description:
-    'Vive HYBRID EXPERIENCE del 9 al 11 de octubre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid y Workout Experience, o compra tu acceso como público.',
+    'Vive HYBRID EXPERIENCE del 13 al 15 de noviembre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid y Workout Experience, o compra tu acceso como público.',
   url: 'https://hybrid-experience.enforma.mx/',
-  startDate: '2026-10-09T17:00:00-06:00',
-  endDate: '2026-10-11',
+  startDate: '2026-11-13T17:00:00-06:00',
+  endDate: '2026-11-15',
   eventStatus: 'https://schema.org/EventScheduled',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   location: {
@@ -86,11 +92,11 @@ const EVENT_JSON_LD = {
 } as const
 
 const DIA_COMPITO_ROWS = [
-  { formato: 'Dobles', cuando: 'Viernes Vespertino · Sábado Matutino' },
-  { formato: 'Relay', cuando: 'Sábado Vespertino' },
-  { formato: '½ Hybrid', cuando: 'Sábado Matutino' },
-  { formato: 'Workout Experience', cuando: 'Sábado Matutino' },
-  { formato: 'Individual (Open / Pro)', cuando: 'Domingo Matutino' },
+  { formato: 'Dobles', cuando: 'Viernes Vespertino (Mujeres) · Sábado Día completo (Hombres y Mixto)' },
+  { formato: 'Individual (Open)', cuando: 'Viernes Vespertino' },
+  { formato: '½ Hybrid', cuando: 'Sábado Día completo' },
+  { formato: 'Workout Experience', cuando: 'Sábado Día completo' },
+  { formato: 'Relay', cuando: 'Domingo Matutino' },
 ]
 
 function DiaCompitoTable() {
@@ -316,14 +322,15 @@ const IMG_FOTOGRAFO =
   'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/media%2Ffotografos-cubriendo-carrera-w800.webp?v=df02c6283432f9fb887436449c5a12c1'
 const IMG_WORKOUT =
   'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/stations%2Festacion-skierg-concept2-w800.webp?v=f5ff3662c86ba60a6b2f7f8f52cdb14e'
+const IMG_WORKOUT_HOMBRE =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/workout%2Fworkout-atleta-hombre-w600.webp?v=080575586a60e80938d84ab10c861264'
+const IMG_WORKOUT_MUJER =
+  'https://3e9sriq7.us-east.insforge.app/api/storage/buckets/images/objects/workout%2Fworkout-atleta-mujer-w800.webp?v=a748115eb4fff6a76ecf16d762879831'
 
 // Keyed by product code (not just tipo) since COMPITE/EXPERIENCE have gender-specific photography.
 const PRODUCT_IMAGES: Record<string, string> = {
   // COMPITE — Dobles
   'DOB-VIE-MM': IMG_DOBLES_MUJERES,
-  'DOB-VIE-HH': IMG_DOBLES_HOMBRES,
-  'DOB-VIE-MH': IMG_DOBLES_MIXTO,
-  'DOB-SAB-MM': IMG_DOBLES_MUJERES,
   'DOB-SAB-HH': IMG_DOBLES_HOMBRES,
   'DOB-SAB-MH': IMG_DOBLES_MIXTO,
   // COMPITE — Relay
@@ -333,17 +340,15 @@ const PRODUCT_IMAGES: Record<string, string> = {
   // COMPITE — Individual
   'IND-H': IMG_INDIVIDUAL_HOMBRE,
   'IND-M': IMG_INDIVIDUAL_MUJER,
-  'IND-PRO-H': IMG_INDIVIDUAL_HOMBRE,
-  'IND-PRO-M': IMG_INDIVIDUAL_MUJER,
   // EXPERIENCE — ½ Hybrid (reuses the full-format photography for the same discipline)
   'HALF-IND-M': IMG_INDIVIDUAL_MUJER,
   'HALF-IND-H': IMG_INDIVIDUAL_HOMBRE,
   'HALF-DOB-MM': IMG_DOBLES_MUJERES,
   'HALF-DOB-HH': IMG_DOBLES_HOMBRES,
   'HALF-DOB-MH': IMG_DOBLES_MIXTO,
-  // EXPERIENCE — Workout
-  'WOD-M': IMG_WORKOUT,
-  'WOD-H': IMG_WORKOUT,
+  // EXPERIENCE — Workout (fotografía por género, igual que la landing B)
+  'WOD-M': IMG_WORKOUT_MUJER,
+  'WOD-H': IMG_WORKOUT_HOMBRE,
   // ASISTE — Público
   'PUB-VIE': IMG_PUBLICO,
   'PUB-SAB': IMG_PUBLICO,
@@ -377,10 +382,10 @@ function getProductIcon(tipo: string, size = 40) {
 }
 
 const DIA_FECHA: Record<string, string> = {
-  Viernes: 'VIERNES 9',
-  Sábado: 'SÁBADO 10',
-  Domingo: 'DOMINGO 11',
-  'Vie-Dom': 'VIE 9 – DOM 11',
+  Viernes: 'VIERNES 13',
+  Sábado: 'SÁBADO 14',
+  Domingo: 'DOMINGO 15',
+  'Vie-Dom': 'VIE 13 – DOM 15',
 }
 
 const DIA_SLUG: Record<string, string> = {
@@ -393,6 +398,7 @@ const DIA_SLUG: Record<string, string> = {
 const SESION_LABEL: Record<string, string> = {
   AM: 'Matutino',
   PM: 'Vespertino',
+  DIA: 'Día completo',
 }
 
 const FORMATO_DESCRIPCIONES: Record<string, string> = {
@@ -407,7 +413,7 @@ const FORMATO_DESCRIPCIONES: Record<string, string> = {
   Relay:
     'Cuatro atletas por equipo. Cada quien toma su tramo. El formato más social y el mejor para llegar en grupo.',
   Individual:
-    'El formato completo, tú solo, de principio a fin. Open para competidores; Pro para quien busca el podio. Mismo recorrido, distinta liga.',
+    'El formato completo, tú solo, de principio a fin. Categoría Open — la apertura del evento el viernes por la tarde.',
 }
 
 interface TresDiasItem {
@@ -420,37 +426,32 @@ interface TresDiasItem {
 
 const TRES_DIAS: TresDiasItem[] = [
   {
-    fecha: 'VIERNES 9',
+    fecha: 'VIERNES 13',
     sesion: 'Vespertino',
     titulo: 'Arranca la competencia',
-    texto: 'Dobles: dos atletas se reparten el trabajo y se relevan. La energía de apertura.',
-    links: [{ label: 'Ver Dobles', href: '#compite-vie-pm' }],
+    texto: 'Dobles Mujeres e Individual (Open) abren la competencia. La energía del primer día.',
+    links: [
+      { label: 'Ver Dobles', href: '#compite-vie-pm-dobles' },
+      { label: 'Ver Individual', href: '#compite-vie-pm-individual' },
+    ],
   },
   {
-    fecha: 'SÁBADO 10',
-    sesion: 'Matutino',
+    fecha: 'SÁBADO 14',
+    sesion: 'Día completo',
     titulo: 'El día más abierto',
     texto:
-      'Vuelven los Dobles, debuta el ½ Hybrid, y quien nunca ha competido puede tomar el Workout. Es el día para entrar al deporte.',
+      'Dobles Hombres y Mixto, debuta el ½ Hybrid, y quien nunca ha competido puede tomar el Workout. Día completo, abierto a todos los niveles.',
     links: [
-      { label: 'Ver Dobles', href: '#compite-sab-am' },
+      { label: 'Ver Dobles', href: '#compite-sab-dia-dobles' },
       { label: 'Ver ½ Hybrid y Workout', href: '#experience' },
     ],
   },
   {
-    fecha: 'SÁBADO 10',
-    sesion: 'Vespertino',
-    titulo: 'Relay',
-    texto: 'Cuatro atletas, un solo tiempo. El formato más ruidoso y de mayor ambiente.',
-    links: [{ label: 'Ver Relay', href: '#compite-sab-pm' }],
-  },
-  {
-    fecha: 'DOMINGO 11',
+    fecha: 'DOMINGO 15',
     sesion: 'Matutino',
-    titulo: 'Individual',
-    texto:
-      'Sin relevos, sin equipo: tú contra el reloj. Open y Pro. El cierre y los tiempos que definen el podio.',
-    links: [{ label: 'Ver Individual', href: '#compite-dom-am' }],
+    titulo: 'Relay',
+    texto: 'Cuatro atletas, un solo tiempo. El cierre del evento con el formato más social y de mayor ambiente.',
+    links: [{ label: 'Ver Relay', href: '#compite-dom-am-relay' }],
   },
 ]
 
@@ -856,7 +857,8 @@ function groupProductos(productos: Producto[]): ProductoGroup[] {
     const key = `${p.dia}|${p.sesion}|${p.tipo}`
     let group = groups.find((g) => g.key === key)
     if (!group) {
-      const id = `compite-${DIA_SLUG[p.dia]}-${p.sesion.toLowerCase()}`
+      const tipoSlug = p.tipo.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+      const id = `compite-${DIA_SLUG[p.dia]}-${p.sesion.toLowerCase()}-${tipoSlug}`
       group = { key, id, dia: p.dia, sesion: p.sesion, tipo: p.tipo, precioUnidad: p.precioUnidad, productos: [] }
       groups.push(group)
     }
@@ -908,16 +910,136 @@ const OPEN_DATA = [
   { name: 'Wall Balls', distance: '100 repeticiones', weight: '6kg / 4kg' },
 ]
 
-const PRO_DATA = [
-  { name: 'Ski Erg', distance: '1000 m', weight: '—' },
-  { name: 'Sled Push', distance: '4 × 12,5 m (50 m)', weight: '202kg / 152kg' },
-  { name: 'Sled Pull', distance: '4 × 12,5 m (50 m)', weight: '153kg / 103kg' },
-  { name: 'Burpee Broad Jumps', distance: '80 m', weight: '—' },
-  { name: 'Remo', distance: '1000 m', weight: '—' },
-  { name: 'Farmers Carry', distance: '200 m', weight: '2 × 32kg / 2 × 24kg' },
-  { name: 'Sandbag Lunges', distance: '100 m', weight: '30kg / 20kg' },
-  { name: 'Wall Balls', distance: '100 repeticiones', weight: '9kg / 6kg' },
-]
+// ── Simulacro PRO (portado APAGADO desde la landing B) ───────────
+// SIN backend en esta landing: el submit está deshabilitado con un TODO
+// claro. No encender SIMULACRO_PRO_ACTIVE hasta conectarlo.
+type IndividualProModalidad = 'hombre' | 'mujer'
+type DoblesProModalidad = 'hombres' | 'mujeres' | 'mixto'
+
+const EMAIL_PATTERN_SIMULACRO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+type SimulacroProViewState = 'form' | 'submitting' | 'done' | 'error'
+
+function SimulacroProSection() {
+  const [view, setView] = useState<SimulacroProViewState>('form')
+  const [nombre, setNombre] = useState('')
+  const [correo, setCorreo] = useState('')
+  const [telefono, setTelefono] = useState('')
+  const [individualPro, setIndividualPro] = useState<IndividualProModalidad | ''>('')
+  const [doblesPro, setDoblesPro] = useState<DoblesProModalidad | ''>('')
+
+  const isValid =
+    nombre.trim().length > 1 &&
+    EMAIL_PATTERN_SIMULACRO.test(correo.trim()) &&
+    telefono.trim().length >= 10 &&
+    (individualPro !== '' || doblesPro !== '')
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    if (!isValid) return
+    // TODO(Ready2Hybrid): conectar este envío al backend de captación de
+    // interés Pro (equivalente a api/simulacroPro.ts en hybrid-registro)
+    // ANTES de encender SIMULACRO_PRO_ACTIVE. Mientras no exista backend,
+    // el envío reporta error para no simular un registro exitoso.
+    setView('error')
+  }
+
+  return (
+    <Box id="simulacro-pro" sx={{ py: { xs: 8, md: 12 }, bgcolor: '#111111' }}>
+      <Container maxWidth="sm">
+        <SectionHeading label="SIMULACRO PRO" />
+        <Typography
+          variant="h5"
+          sx={{
+            textAlign: 'center',
+            color: '#fff',
+            fontWeight: 900,
+            mb: 2,
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          ¿Interesado en competir en modalidad Pro?
+        </Typography>
+        <Typography
+          sx={{
+            textAlign: 'center',
+            color: 'text.secondary',
+            mb: 4,
+            maxWidth: 480,
+            mx: 'auto',
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          Estamos evaluando la apertura de un simulacro Pro dentro de HYBRID EXPERIENCE. Déjanos tus
+          datos e indícanos la modalidad que te interesa. La organización se comunicará contigo.
+        </Typography>
+
+        {view === 'done' ? (
+          <Typography sx={{ textAlign: 'center', color: '#E6F2B1', fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
+            ¡Listo! Dejamos registrado tu interés — la organización se comunicará contigo.
+          </Typography>
+        ) : (
+          <Stack component="form" spacing={2.5} onSubmit={handleSubmit}>
+            <TextField label="Nombre completo" value={nombre} onChange={(e) => setNombre(e.target.value)} fullWidth required />
+            <TextField label="Correo electrónico" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} fullWidth required />
+            <TextField label="WhatsApp" value={telefono} onChange={(e) => setTelefono(e.target.value)} fullWidth required />
+
+            <FormControl>
+              <FormLabel sx={{ color: '#E6F2B1', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.05em', '&.Mui-focused': { color: '#E6F2B1' } }}>
+                Individual Pro (elige una, opcional)
+              </FormLabel>
+              <RadioGroup value={individualPro} onChange={(e) => setIndividualPro(e.target.value as IndividualProModalidad)}>
+                <FormControlLabel value="hombre" control={<Radio />} label="Individual Pro — Hombre" />
+                <FormControlLabel value="mujer" control={<Radio />} label="Individual Pro — Mujer" />
+              </RadioGroup>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel sx={{ color: '#E6F2B1', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.05em', '&.Mui-focused': { color: '#E6F2B1' } }}>
+                Dobles Pro (elige una, opcional)
+              </FormLabel>
+              <RadioGroup value={doblesPro} onChange={(e) => setDoblesPro(e.target.value as DoblesProModalidad)}>
+                <FormControlLabel value="hombres" control={<Radio />} label="Dobles Pro — Hombres" />
+                <FormControlLabel value="mujeres" control={<Radio />} label="Dobles Pro — Mujeres" />
+                <FormControlLabel value="mixto" control={<Radio />} label="Dobles Pro — Mixto" />
+              </RadioGroup>
+            </FormControl>
+
+            <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', lineHeight: 1.5 }}>
+              La apertura de esta modalidad dependerá del volumen de inscripción y de la valoración de
+              la Dirección Deportiva del evento HYBRID EXPERIENCE. Dejar tus datos es una expresión de
+              interés, no una inscripción confirmada.
+            </Typography>
+
+            <Button
+              type="submit"
+              variant="outlined"
+              size="large"
+              disabled={!isValid || view === 'submitting'}
+              sx={{
+                borderRadius: 0,
+                borderWidth: 2,
+                borderColor: '#E6F2B1',
+                color: '#E6F2B1',
+                fontWeight: 700,
+                py: 1.25,
+                fontFamily: "'Space Grotesk', sans-serif",
+                '&:hover': { borderWidth: 2, borderColor: '#E6F2B1', bgcolor: 'rgba(230,242,177,0.1)' },
+              }}
+            >
+              {view === 'submitting' ? 'Enviando…' : 'Dejar mis datos'}
+            </Button>
+            {view === 'error' && (
+              <Typography sx={{ color: '#ff8a8a', fontSize: '0.85rem', textAlign: 'center' }}>
+                No pudimos guardar tu interés. Inténtalo de nuevo en unos minutos.
+              </Typography>
+            )}
+          </Stack>
+        )}
+      </Container>
+    </Box>
+  )
+}
 
 // ── Navbar ───────────────────────────────────────────────────────
 function Navbar() {
@@ -927,10 +1049,14 @@ function Navbar() {
     { label: 'INICIO', href: '#hero' },
     { label: 'EXPERIENCE', href: '#experience' },
     { label: 'FORMATOS', href: '#formatos' },
+    { label: 'PRECIOS', href: '#precios' },
     { label: 'COMPITE', href: '#compite' },
+    { label: 'PREMIOS', href: '#premios' },
+    ...(SIMULACRO_PRO_ACTIVE ? [{ label: 'PRO', href: '#simulacro-pro' }] : []),
     { label: 'ASISTE', href: '#asiste' },
-    { label: 'PREPARACIÓN', href: '#preparacion' },
     { label: 'UBICACIÓN', href: '#ubicacion' },
+    { label: 'PREPARACIÓN', href: '#preparacion' },
+    { label: 'COMUNIDAD', href: '#comunidad' },
     { label: 'FAQ', href: '#faq' },
   ]
 
@@ -962,7 +1088,7 @@ function Navbar() {
         </Typography>
 
         {/* Desktop links */}
-        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2.5 }}>
+        <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 2.5 }}>
           {links.map((link) => (
             <Typography
               key={link.label}
@@ -984,28 +1110,31 @@ function Navbar() {
               {link.label}
             </Typography>
           ))}
+          {/* Tienda aún no disponible: se muestra a propósito, deshabilitada, para
+              que la audiencia sepa que viene — no navega a DOMAINS.shop todavía. */}
           <Button
             disabled
+            aria-label="Tienda — próximamente"
             sx={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: '0.7rem',
+              fontSize: '0.68rem',
               fontWeight: 700,
-              letterSpacing: '0.1em',
-              color: '#000000',
-              bgcolor: '#E6F2B1',
+              letterSpacing: '0.08em',
               borderRadius: 0,
               py: 0.5,
               px: 1.5,
               minHeight: 0,
               minWidth: 0,
+              flexShrink: 0,
               lineHeight: 1.2,
+              border: '1px solid rgba(230,242,177,0.35)',
               '&.Mui-disabled': {
-                color: 'rgba(0,0,0,0.6)',
-                bgcolor: 'rgba(230,242,177,0.4)',
+                color: 'rgba(230,242,177,0.6)',
+                bgcolor: 'transparent',
               },
             }}
           >
-            En construcción
+            SHOP · PRONTO
           </Button>
         </Box>
 
@@ -1013,7 +1142,7 @@ function Navbar() {
         <IconButton
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
-          sx={{ display: { xs: 'flex', md: 'none' }, color: '#E6F2B1', borderRadius: 0 }}
+          sx={{ display: { xs: 'flex', lg: 'none' }, color: '#E6F2B1', borderRadius: 0, flexShrink: 0 }}
         >
           {menuOpen ? <CloseIcon /> : <MenuIcon />}
         </IconButton>
@@ -1048,6 +1177,7 @@ function Navbar() {
               {link.label}
             </Box>
           ))}
+          {/* Tienda aún no disponible — misma decisión que en el navbar de escritorio. */}
           <Box
             aria-disabled="true"
             sx={{
@@ -1057,11 +1187,11 @@ function Navbar() {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: 'rgba(230,242,177,0.4)',
+              color: 'rgba(230,242,177,0.6)',
               cursor: 'default',
             }}
           >
-            En construcción
+            SHOP · PRONTO
           </Box>
         </Box>
       )}
@@ -1103,7 +1233,7 @@ function OrganizerStrip() {
           textTransform: 'uppercase',
         }}
       >
-        Organizado por ENFORMA Sports Society · Mérida, Yucatán · 9, 10 y 11 de octubre de 2026
+        Organizado por ENFORMA Sports Society · Mérida, Yucatán · 13, 14 y 15 de noviembre de 2026
       </Typography>
     </Box>
   )
@@ -1404,6 +1534,7 @@ function EtapasDePrecio() {
   return (
     <Box
       component="section"
+      id="precios"
       sx={{
         py: { xs: 7, md: 9 },
         bgcolor: '#111111',
@@ -1561,105 +1692,69 @@ function EtapasDePrecio() {
   )
 }
 
-// ── Premios (Individual) + línea de reconocimiento (Dobles/Relay/½ Hybrid/Workout) ──
-const PODIOS_INDIVIDUAL: { categoria: string; nota: string; premios: [string, string][] }[] = [
-  {
-    categoria: 'PRO',
-    nota: 'Hombre y Mujer, podios independientes por género',
-    premios: [
-      ['1°', '$7,000'],
-      ['2°', '$5,000'],
-      ['3°', '$3,000'],
-    ],
-  },
-  {
-    categoria: 'OPEN',
-    nota: 'Hombre y Mujer, podios independientes por género',
-    premios: [
-      ['1°', '$5,000'],
-      ['2°', '$3,500'],
-      ['3°', '$2,000'],
-    ],
-  },
+// ── Premios por día (misma estructura que la landing B) ──
+interface PrizeRow {
+  lugar: string
+  premio: number
+}
+
+const INDIVIDUAL_PRIZES: PrizeRow[] = [
+  { lugar: '1°', premio: 5000 },
+  { lugar: '2°', premio: 3000 },
+  { lugar: '3°', premio: 2000 },
 ]
 
-function PremiosIndividual() {
+const DOBLES_PRIZES: PrizeRow[] = [
+  { lugar: '1°', premio: 7000 },
+  { lugar: '2°', premio: 5000 },
+  { lugar: '3°', premio: 3000 },
+]
+
+function PrizeTable({ title, rows, accentColor = '#E6F2B1' }: { title: string; rows: PrizeRow[]; accentColor?: string }) {
   return (
-    <Box
-      sx={{
-        maxWidth: 480,
-        mx: 'auto',
-        mb: 3,
-        p: { xs: 2.5, sm: 3 },
-        border: '1px solid rgba(230,242,177,0.25)',
-        bgcolor: 'rgba(230,242,177,0.04)',
-      }}
-    >
+    <Box sx={{ flex: 1, minWidth: 220 }}>
       <Typography
+        variant="overline"
         sx={{
+          display: 'block',
           textAlign: 'center',
-          fontWeight: 900,
-          color: '#E6F2B1',
-          textTransform: 'uppercase',
-          letterSpacing: '0.04em',
-          fontSize: { xs: '0.95rem', sm: '1.05rem' },
-          mb: 2.5,
+          color: accentColor,
+          fontWeight: 700,
+          letterSpacing: '0.15em',
+          fontSize: '0.75rem',
+          mb: 1.5,
           fontFamily: "'Space Grotesk', sans-serif",
         }}
       >
-        Más de $50,000 en premios en efectivo
+        {title}
       </Typography>
-      <Stack spacing={2.5}>
-        {PODIOS_INDIVIDUAL.map((cat) => (
-          <Box key={cat.categoria}>
-            <Typography
-              sx={{
-                fontWeight: 800,
-                color: '#ffffff',
-                fontSize: '0.8rem',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}
-            >
-              {cat.categoria}
-            </Typography>
-            <Typography
-              sx={{
-                color: 'text.secondary',
-                fontSize: '0.72rem',
-                mb: 1,
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}
-            >
-              ({cat.nota})
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2.5, flexWrap: 'wrap' }}>
-              {cat.premios.map(([place, amount]) => (
-                <Box key={place} sx={{ display: 'flex', alignItems: 'baseline', gap: 0.6 }}>
-                  <Box
-                    component="span"
-                    sx={{ color: '#E6F2B1', fontWeight: 900, fontSize: '0.85rem', fontFamily: "'Space Grotesk', sans-serif" }}
-                  >
-                    {place}
-                  </Box>
-                  <Box
-                    component="span"
-                    sx={{
-                      fontFamily: "'JetBrains Mono', 'Space Grotesk', monospace",
-                      color: '#ffffff',
-                      fontWeight: 800,
-                      fontSize: '0.9rem',
-                    }}
-                  >
-                    {amount}
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        ))}
-      </Stack>
+      <Box
+        component="table"
+        sx={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontFamily: "'Space Grotesk', sans-serif",
+          '& td': {
+            textAlign: 'center',
+            py: 1,
+            px: 1,
+            borderBottom: '1px solid rgba(230,242,177,0.12)',
+            fontSize: '0.9rem',
+            color: 'rgba(255,255,255,0.85)',
+          },
+          '& td:first-of-type': { textAlign: 'left', fontWeight: 700, color: accentColor },
+          '& td:last-of-type': { textAlign: 'right', fontWeight: 700, color: '#fff' },
+        }}
+      >
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.lugar}>
+              <td>{row.lugar}</td>
+              <td>{formatPrecio(row.premio)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Box>
     </Box>
   )
 }
@@ -1721,7 +1816,7 @@ function PorQuePerteneces() {
   return (
     <Box
       component="section"
-      id="por-que-perteneces"
+      id="comunidad"
       sx={{
         py: { xs: 8, md: 12 },
         background: 'linear-gradient(180deg, #000000 0%, rgba(230,242,177,0.04) 50%, #000000 100%)',
@@ -1989,10 +2084,8 @@ function SalesStatusBanner() {
 }
 
 export default function LandingPage() {
-  const targetDate = useMemo(() => new Date('2026-10-09T17:00:00'), [])
+  const targetDate = useMemo(() => new Date('2026-11-13T17:00:00'), [])
   const timeLeft = useCountdown(targetDate)
-  const [desafioTab, setDesafioTab] = useState(0)
-  const currentData = desafioTab === 0 ? OPEN_DATA : PRO_DATA
   const [showBackToTop, setShowBackToTop] = useState(false)
 
   useEffect(() => {
@@ -2165,7 +2258,7 @@ export default function LandingPage() {
           variant="body2"
           sx={{ color: 'text.secondary', letterSpacing: '0.15em', textTransform: 'uppercase' }}
         >
-          9-11 OCTUBRE 2026 • MÉRIDA YUCATÁN
+          13-15 NOVIEMBRE 2026 • MÉRIDA YUCATÁN
         </Typography>
       </Box>
 
@@ -2376,7 +2469,7 @@ export default function LandingPage() {
                     fontFamily: "'Space Grotesk', sans-serif",
                   }}
                 >
-                  Sábado 10 · Matutino · {formatPrecio(350)}
+                  Sábado 14 · Día completo · {formatPrecio(350)}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -2431,7 +2524,7 @@ export default function LandingPage() {
                 fontFamily: "'Space Grotesk', sans-serif",
               }}
             >
-              Formato by ENFORMA · Sábado 10 Matutino
+              Formato by ENFORMA · Sábado 14 Día completo
             </Typography>
             <Typography
               variant="body1"
@@ -2510,62 +2603,6 @@ export default function LandingPage() {
             como fuerza funcional.
           </Typography>
 
-          {/* Tabs */}
-          <Box
-            sx={{
-              display: 'flex',
-              borderBottom: '1px solid rgba(230,242,177,0.2)',
-              mb: 4,
-            }}
-          >
-            <Box
-              onClick={() => setDesafioTab(0)}
-              sx={{
-                px: 4,
-                py: 1.5,
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '0.85rem',
-                fontWeight: 700,
-                color: desafioTab === 0 ? '#E6F2B1' : 'rgba(255,255,255,0.35)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.15em',
-                borderBottom: '2px solid',
-                borderBottomColor: desafioTab === 0 ? '#E6F2B1' : 'transparent',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                userSelect: 'none',
-                '&:hover': {
-                  color: '#E6F2B1',
-                },
-              }}
-            >
-              OPEN
-            </Box>
-            <Box
-              onClick={() => setDesafioTab(1)}
-              sx={{
-                px: 4,
-                py: 1.5,
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '0.85rem',
-                fontWeight: 700,
-                color: desafioTab === 1 ? '#E6F2B1' : 'rgba(255,255,255,0.35)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.15em',
-                borderBottom: '2px solid',
-                borderBottomColor: desafioTab === 1 ? '#E6F2B1' : 'transparent',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                userSelect: 'none',
-                '&:hover': {
-                  color: '#E6F2B1',
-                },
-              }}
-            >
-              PRO
-            </Box>
-          </Box>
-
           {/* Data Table */}
           <Box
             sx={{
@@ -2606,7 +2643,7 @@ export default function LandingPage() {
             </Box>
 
             {/* Table rows */}
-            {currentData.map((row, i) => (
+            {OPEN_DATA.map((row, i) => (
               <Box
                 key={i}
                 sx={{
@@ -2614,7 +2651,7 @@ export default function LandingPage() {
                   flexDirection: { xs: 'column', sm: 'row' },
                   gridTemplateColumns: { sm: '1fr 120px 110px' },
                   borderBottom:
-                    i < currentData.length - 1
+                    i < OPEN_DATA.length - 1
                       ? '1px solid rgba(230,242,177,0.08)'
                       : 'none',
                   bgcolor:
@@ -2803,7 +2840,7 @@ export default function LandingPage() {
 
           <Grid container spacing={3}>
             {/* Open */}
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Box
                 sx={{
                   p: 3,
@@ -2846,51 +2883,8 @@ export default function LandingPage() {
               </Box>
             </Grid>
 
-            {/* Pro */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Box
-                sx={{
-                  p: 3,
-                  border: '1px solid rgba(230,242,177,0.15)',
-                  height: '100%',
-                  position: 'relative',
-                }}
-              >
-                <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
-                  <CornerBrackets size={14} />
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                  <ArrowRight size={18} />
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontWeight: 900,
-                      color: '#E6F2B1',
-                      letterSpacing: '0.03em',
-                    }}
-                  >
-                    PRO
-                  </Typography>
-                </Box>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: 'text.secondary',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    lineHeight: 1.8,
-                    fontSize: '0.9rem',
-                  }}
-                >
-                  Categoría individual de alto rendimiento. Pesos incrementados y
-                  mayor exigencia física. Recomendada para atletas con experiencia
-                  comprobable en competencias de fitness funcional.
-                </Typography>
-              </Box>
-            </Grid>
-
             {/* Doubles */}
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Box
                 sx={{
                   p: 3,
@@ -2933,7 +2927,7 @@ export default function LandingPage() {
             </Grid>
 
             {/* Relay */}
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Box
                 sx={{
                   p: 3,
@@ -3199,8 +3193,7 @@ export default function LandingPage() {
                   {FORMATO_DESCRIPCIONES[group.tipo]}
                 </Typography>
               )}
-              {group.tipo === 'Individual' && <PremiosIndividual />}
-              {(group.tipo === 'Dobles' || group.tipo === 'Relay') && <ReconocimientoLine />}
+              {group.tipo === 'Relay' && <ReconocimientoLine />}
               <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 {group.productos.map((producto) => (
                   <Grid size={{ xs: 6, sm: 4, md: 3 }} key={producto.code}>
@@ -3211,8 +3204,141 @@ export default function LandingPage() {
             </Box>
             )
           })}
+
+          <Typography
+            sx={{
+              textAlign: 'center',
+              color: 'rgba(255,255,255,0.85)',
+              fontWeight: 600,
+              fontSize: { xs: '0.95rem', sm: '1.05rem' },
+              lineHeight: 1.6,
+              maxWidth: 560,
+              mx: 'auto',
+              mt: 4,
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Los heats y horarios de cada categoría se definen según el volumen de inscripciones.
+            Los cupos son limitados por categoría: inscribirte a tiempo asegura tu lugar.
+          </Typography>
         </Container>
       </Box>
+
+      {/* ===== PREMIOS SECTION ===== */}
+      <Box
+        id="premios"
+        sx={{
+          py: { xs: 8, md: 12 },
+          background: 'linear-gradient(180deg, #000000 0%, rgba(230,242,177,0.04) 100%)',
+        }}
+      >
+        <Container maxWidth="md">
+          <SectionHeading label="PREMIOS" />
+          <Typography
+            variant="body1"
+            sx={{
+              textAlign: 'center',
+              color: '#fff',
+              fontWeight: 700,
+              mb: 6,
+              maxWidth: 560,
+              mx: 'auto',
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Más de {formatPrecio(60000)} en premios en efectivo
+          </Typography>
+
+          {/* VIERNES */}
+          <Typography
+            variant="overline"
+            sx={{
+              display: 'block',
+              textAlign: 'center',
+              color: 'text.secondary',
+              fontWeight: 700,
+              letterSpacing: '0.15em',
+              fontSize: '0.7rem',
+              mb: 3,
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Viernes 13 — Vespertino
+          </Typography>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4} sx={{ mb: 6 }}>
+            <PrizeTable title="INDIVIDUAL MUJERES OPEN" rows={INDIVIDUAL_PRIZES} />
+            <PrizeTable title="INDIVIDUAL HOMBRES OPEN" rows={INDIVIDUAL_PRIZES} />
+          </Stack>
+
+          {/* SÁBADO */}
+          <Typography
+            variant="overline"
+            sx={{
+              display: 'block',
+              textAlign: 'center',
+              color: 'text.secondary',
+              fontWeight: 700,
+              letterSpacing: '0.15em',
+              fontSize: '0.7rem',
+              mb: 3,
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Sábado 14 — Día completo
+          </Typography>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4} sx={{ mb: 3 }}>
+            <PrizeTable title="DOBLES MUJERES OPEN" rows={DOBLES_PRIZES} />
+            <PrizeTable title="DOBLES HOMBRES OPEN" rows={DOBLES_PRIZES} />
+            <PrizeTable title="DOBLES MIXTOS OPEN" rows={DOBLES_PRIZES} />
+          </Stack>
+          <Typography
+            variant="body2"
+            sx={{
+              textAlign: 'center',
+              color: 'text.secondary',
+              fontSize: '0.85rem',
+              maxWidth: 480,
+              mx: 'auto',
+              mb: 6,
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            ½ Hybrid y Workout: reconocimiento y kit para todos los participantes.
+          </Typography>
+
+          {/* DOMINGO */}
+          <Typography
+            variant="overline"
+            sx={{
+              display: 'block',
+              textAlign: 'center',
+              color: 'text.secondary',
+              fontWeight: 700,
+              letterSpacing: '0.15em',
+              fontSize: '0.7rem',
+              mb: 1.5,
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Domingo 15 — Matutino
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              textAlign: 'center',
+              color: 'text.secondary',
+              fontSize: '0.85rem',
+              maxWidth: 480,
+              mx: 'auto',
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Relay: reconocimiento y premios a los mejores tiempos por categoría.
+          </Typography>
+        </Container>
+      </Box>
+
+      {SIMULACRO_PRO_ACTIVE && <SimulacroProSection />}
 
       {/* ===== ASISTE SECTION ===== */}
       <Box id="asiste" sx={{ py: { xs: 8, md: 12 }, bgcolor: '#111111' }}>
@@ -3415,7 +3541,7 @@ export default function LandingPage() {
                   mb: 2,
                 }}
               >
-                9-11 OCT
+                13-15 NOV
               </Typography>
 
               {/* Venue name */}

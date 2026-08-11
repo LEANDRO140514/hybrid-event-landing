@@ -19,29 +19,39 @@ function meridaDate(isoLocalDateTime: string): Date {
   return new Date(`${isoLocalDateTime}${MERIDA_UTC_OFFSET}`)
 }
 
+// Calendario comercial confirmado (11 ago 2026):
+//   lanzamiento: 11 ago – 31 ago 2026
+//   preventa:     1 sep – 30 sep 2026
+//   regular:      1 oct –  7 nov 2026 (cierre de ventas: 7 nov)
 const ETAPA_WINDOWS: EtapaWindow[] = [
   {
     etapa: 'lanzamiento',
-    start: meridaDate('2026-08-10T00:00:00'),
-    end: meridaDate('2026-08-23T23:59:59.999'),
+    start: meridaDate('2026-08-11T00:00:00'),
+    end: meridaDate('2026-08-31T23:59:59.999'),
   },
   {
     etapa: 'preventa',
-    start: meridaDate('2026-08-24T00:00:00'),
-    end: meridaDate('2026-09-13T23:59:59.999'),
+    start: meridaDate('2026-09-01T00:00:00'),
+    end: meridaDate('2026-09-30T23:59:59.999'),
   },
   {
     etapa: 'regular',
-    start: meridaDate('2026-09-14T00:00:00'),
-    end: meridaDate('2026-10-02T23:59:59.999'),
+    start: meridaDate('2026-10-01T00:00:00'),
+    end: meridaDate('2026-11-07T23:59:59.999'),
   },
 ]
+
+// Cierre de ventas confirmado (decisión operativa: logística, kits, seguros,
+// chips). Después de esta fecha resolveEtapaComercial() devuelve null; el
+// cierre visible al público se opera cambiando SALES_CONFIG.status a
+// 'closed' ese día.
+export const FECHA_CIERRE_VENTAS = '2026-11-07'
 
 /**
  * Resolves the current commercial stage by date (America/Merida), gated by
  * the manual `ventasArrancadas` switch in salesConfig. Returns null when
  * sales haven't been manually started, or when `now` falls outside every
- * defined window (before lanzamiento or after the 2 oct 23:59 regular close).
+ * defined window (before lanzamiento or after the 7 nov 23:59 regular close).
  *
  * This does NOT open sales by itself — salesConfig.status is the separate,
  * unchanged authority the landing UI currently reads for that.
