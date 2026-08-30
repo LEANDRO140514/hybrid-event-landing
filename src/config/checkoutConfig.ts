@@ -32,6 +32,12 @@ const SANDBOX_CHECKOUT_PRODUCTS: Record<string, SandboxCheckoutProductConfig> = 
     quantityMode: 'editable',
     minimumQuantity: 1,
   },
+  'PUB-3D': {
+    productCode: 'PUB-3D',
+    family: 'spectator',
+    quantityMode: 'editable',
+    minimumQuantity: 1,
+  },
   'FOT-VIE': {
     productCode: 'FOT-VIE',
     family: 'press',
@@ -46,6 +52,12 @@ const SANDBOX_CHECKOUT_PRODUCTS: Record<string, SandboxCheckoutProductConfig> = 
   },
   'FOT-DOM': {
     productCode: 'FOT-DOM',
+    family: 'press',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'FOT-3D': {
+    productCode: 'FOT-3D',
     family: 'press',
     quantityMode: 'fixed',
     minimumQuantity: 1,
