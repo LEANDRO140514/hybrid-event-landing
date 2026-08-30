@@ -95,13 +95,41 @@ function assertSuccessShape(body: unknown): CreateCheckoutSuccess {
   }
 }
 
-export async function createCheckout(input: {
+export type CreateCheckoutBuyerInput = {
+  email: string
+  name: string
+  phone?: string
+  contactConsent?: boolean
+}
+
+export type CreateCheckoutInput = {
   productCode: string
   quantity: number
   idempotencyKey: string
-}): Promise<CreateCheckoutSuccess> {
+  buyer: CreateCheckoutBuyerInput
+  /** Fixed to Mercado Pago for go-live; no UI provider selector. */
+  selectedProvider: 'MERCADO_PAGO'
+}
+
+export async function createCheckout(input: CreateCheckoutInput): Promise<CreateCheckoutSuccess> {
   if (!navigator.onLine) {
     throw new CheckoutApiError('UNKNOWN', 0)
+  }
+
+  const buyerBody: {
+    email: string
+    name: string
+    phone?: string
+    contact_consent?: boolean
+  } = {
+    email: input.buyer.email,
+    name: input.buyer.name,
+  }
+  if (input.buyer.phone != null && input.buyer.phone.trim() !== '') {
+    buyerBody.phone = input.buyer.phone.trim()
+  }
+  if (input.buyer.contactConsent !== undefined) {
+    buyerBody.contact_consent = input.buyer.contactConsent
   }
 
   const response = await fetch(checkoutEndpoint('mp-create-checkout'), {
@@ -111,6 +139,8 @@ export async function createCheckout(input: {
       product_code: input.productCode,
       quantity: input.quantity,
       idempotency_key: input.idempotencyKey,
+      selected_provider: input.selectedProvider,
+      buyer: buyerBody,
     }),
   })
 
