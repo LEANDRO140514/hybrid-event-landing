@@ -19,6 +19,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Checkbox,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -478,6 +479,111 @@ interface ProductCardProps {
   accentColor?: string
 }
 
+/** Shared with SimulacroProSection — buyer/email validation for checkout. */
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const checkoutFieldSx = (accentColor: string) => ({
+  '& .MuiInputBase-root': {
+    color: '#fff',
+    borderRadius: 0,
+    bgcolor: 'rgba(0,0,0,0.35)',
+  },
+  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+  '& .MuiOutlinedInput-notchedOutline': { borderColor: `${accentColor}66` },
+})
+
+type CheckoutBuyerFieldsProps = {
+  accentColor: string
+  disabled: boolean
+  name: string
+  email: string
+  phone: string
+  contactConsent: boolean
+  onNameChange: (value: string) => void
+  onEmailChange: (value: string) => void
+  onPhoneChange: (value: string) => void
+  onConsentChange: (value: boolean) => void
+}
+
+function CheckoutBuyerFields({
+  accentColor,
+  disabled,
+  name,
+  email,
+  phone,
+  contactConsent,
+  onNameChange,
+  onEmailChange,
+  onPhoneChange,
+  onConsentChange,
+}: CheckoutBuyerFieldsProps) {
+  return (
+    <Stack spacing={1} sx={{ width: '100%' }}>
+      <TextField
+        label="Nombre completo"
+        value={name}
+        onChange={(e) => onNameChange(e.target.value)}
+        disabled={disabled}
+        required
+        size="small"
+        fullWidth
+        autoComplete="name"
+        sx={checkoutFieldSx(accentColor)}
+      />
+      <TextField
+        label="Correo electrónico"
+        type="email"
+        value={email}
+        onChange={(e) => onEmailChange(e.target.value)}
+        disabled={disabled}
+        required
+        size="small"
+        fullWidth
+        autoComplete="email"
+        sx={checkoutFieldSx(accentColor)}
+      />
+      <TextField
+        label="Teléfono / WhatsApp (opcional)"
+        value={phone}
+        onChange={(e) => onPhoneChange(e.target.value)}
+        disabled={disabled}
+        size="small"
+        fullWidth
+        autoComplete="tel"
+        sx={checkoutFieldSx(accentColor)}
+      />
+      <FormControlLabel
+        sx={{
+          alignItems: 'flex-start',
+          mx: 0,
+          gap: 0.5,
+          '& .MuiFormControlLabel-label': {
+            color: 'rgba(255,255,255,0.75)',
+            fontSize: '0.72rem',
+            lineHeight: 1.35,
+            fontFamily: "'Space Grotesk', sans-serif",
+            pt: 0.35,
+          },
+        }}
+        control={
+          <Checkbox
+            checked={contactConsent}
+            onChange={(e) => onConsentChange(e.target.checked)}
+            disabled={disabled}
+            size="small"
+            sx={{
+              color: `${accentColor}99`,
+              p: 0.5,
+              '&.Mui-checked': { color: accentColor },
+            }}
+          />
+        }
+        label="Quiero recibir noticias, novedades, ajustes y avisos de próximos eventos"
+      />
+    </Stack>
+  )
+}
+
 function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const imageUrl = PRODUCT_IMAGES[producto.code] || IMG_WORKOUT
   const isOpen = SALES_CONFIG.status === 'open'
@@ -491,6 +597,10 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
     isCheckoutActive() && isSandboxCheckoutProduct(producto.code) && productConfig != null
   const showSandboxBadge = checkoutActive && isSandboxCheckoutActive()
   const quantityEditable = productConfig?.quantityMode === 'editable'
+  const [buyerName, setBuyerName] = useState('')
+  const [buyerEmail, setBuyerEmail] = useState('')
+  const [buyerPhone, setBuyerPhone] = useState('')
+  const [contactConsent, setContactConsent] = useState(false)
   const [quantityInput, setQuantityInput] = useState('1')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const activeCheckoutProductCode = useSyncExternalStore(
@@ -501,6 +611,11 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const submitting = activeCheckoutProductCode === producto.code
   const checkoutBusy = activeCheckoutProductCode != null
 
+  const isContactValid =
+    buyerName.trim().length > 1 &&
+    EMAIL_PATTERN.test(buyerEmail.trim()) &&
+    (buyerPhone.trim() === '' || buyerPhone.trim().length >= 10)
+
   const parseQuantity = (raw: string): number | null => {
     if (!/^\d+$/.test(raw.trim())) return null
     const n = Number(raw)
@@ -508,8 +623,23 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
     return n
   }
 
-  const startSandboxCheckout = async () => {
-    if (!productConfig) return
+  const resolvedQuantity =
+    productConfig == null
+      ? null
+      : productConfig.quantityMode === 'fixed'
+        ? 1
+        : parseQuantity(quantityInput)
+
+  const quantityOk =
+    productConfig != null &&
+    resolvedQuantity != null &&
+    resolvedQuantity >= productConfig.minimumQuantity &&
+    (productConfig.quantityMode !== 'fixed' || resolvedQuantity === 1)
+
+  const canPay = checkoutActive && isContactValid && quantityOk && !checkoutBusy
+
+  const startCheckout = async () => {
+    if (!productConfig || !canPay || resolvedQuantity == null) return
     // Page-wide synchronous lock: must run before any await / setState.
     const pageLock = getSandboxCheckoutPageLock()
     if (!pageLock.tryAcquire()) return
@@ -523,30 +653,25 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
       return
     }
 
-    const quantity =
-      productConfig.quantityMode === 'fixed' ? 1 : parseQuantity(quantityInput)
-    if (quantity == null || quantity < productConfig.minimumQuantity) {
-      setErrorMessage('Revisa la cantidad e inténtalo de nuevo.')
-      setActiveCheckoutProductCode(null)
-      pageLock.release()
-      return
-    }
-    if (productConfig.quantityMode === 'fixed' && quantity !== 1) {
-      setErrorMessage('Revisa la cantidad e inténtalo de nuevo.')
-      setActiveCheckoutProductCode(null)
-      pageLock.release()
-      return
-    }
+    const quantity = resolvedQuantity
 
     try {
       const attempt = getOrCreateCheckoutAttempt({
         productCode: producto.code,
         quantity,
       })
+      const phoneTrimmed = buyerPhone.trim()
       const result = await createCheckout({
         productCode: attempt.productCode,
         quantity: attempt.quantity,
         idempotencyKey: attempt.idempotencyKey,
+        selectedProvider: 'MERCADO_PAGO',
+        buyer: {
+          email: buyerEmail.trim(),
+          name: buyerName.trim(),
+          ...(phoneTrimmed ? { phone: phoneTrimmed } : {}),
+          contactConsent,
+        },
       })
       savePublicOrderReference(producto.code, result.public_order_reference)
       const stored = getCheckoutAttempt(producto.code)
@@ -768,6 +893,30 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
                 Entorno de prueba
               </Typography>
             )}
+            <CheckoutBuyerFields
+              accentColor={accentColor}
+              disabled={checkoutBusy}
+              name={buyerName}
+              email={buyerEmail}
+              phone={buyerPhone}
+              contactConsent={contactConsent}
+              onNameChange={(value) => {
+                setBuyerName(value)
+                setErrorMessage(null)
+              }}
+              onEmailChange={(value) => {
+                setBuyerEmail(value)
+                setErrorMessage(null)
+              }}
+              onPhoneChange={(value) => {
+                setBuyerPhone(value)
+                setErrorMessage(null)
+              }}
+              onConsentChange={(value) => {
+                setContactConsent(value)
+                setErrorMessage(null)
+              }}
+            />
             {quantityEditable && (
               <TextField
                 label="Cantidad"
@@ -787,15 +936,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
                 }}
                 size="small"
                 fullWidth
-                sx={{
-                  '& .MuiInputBase-root': {
-                    color: '#fff',
-                    borderRadius: 0,
-                    bgcolor: 'rgba(0,0,0,0.35)',
-                  },
-                  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: `${accentColor}66` },
-                }}
+                sx={checkoutFieldSx(accentColor)}
               />
             )}
             {errorMessage && (
@@ -814,8 +955,8 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
           href={!checkoutActive && isOpen ? getInscribirUrl(producto.code) : undefined}
           target={!checkoutActive && isOpen ? '_blank' : undefined}
           rel={!checkoutActive && isOpen ? 'noopener noreferrer' : undefined}
-          disabled={checkoutActive ? checkoutBusy : !isOpen}
-          onClick={checkoutActive ? () => void startSandboxCheckout() : undefined}
+          disabled={checkoutActive ? !canPay : !isOpen}
+          onClick={checkoutActive ? () => void startCheckout() : undefined}
           variant="outlined"
           size="small"
           sx={{
@@ -926,7 +1067,7 @@ const OPEN_DATA = [
 type IndividualProModalidad = 'hombre' | 'mujer'
 type DoblesProModalidad = 'hombres' | 'mujeres' | 'mixto'
 
-const EMAIL_PATTERN_SIMULACRO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const EMAIL_PATTERN_SIMULACRO = EMAIL_PATTERN
 
 type SimulacroProViewState = 'form' | 'submitting' | 'done' | 'error'
 
