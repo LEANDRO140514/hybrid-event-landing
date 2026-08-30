@@ -49,6 +49,7 @@ import { resolveEtapaComercial } from '../lib/pricingStage'
 import type { EtapaComercial } from '../lib/pricingStage'
 import {
   getSandboxCheckoutProductConfig,
+  isCheckoutActive,
   isSandboxCheckoutActive,
   isSandboxCheckoutProduct,
 } from '../config/checkoutConfig'
@@ -486,8 +487,9 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const precioVigente = getPrecioVigente(producto, etapaVigente)
   const isWorkout = producto.tipo === 'Workout Experience'
   const productConfig = getSandboxCheckoutProductConfig(producto.code)
-  const sandboxCheckout =
-    isSandboxCheckoutActive() && isSandboxCheckoutProduct(producto.code) && productConfig != null
+  const checkoutActive =
+    isCheckoutActive() && isSandboxCheckoutProduct(producto.code) && productConfig != null
+  const showSandboxBadge = checkoutActive && isSandboxCheckoutActive()
   const quantityEditable = productConfig?.quantityMode === 'editable'
   const [quantityInput, setQuantityInput] = useState('1')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -750,20 +752,22 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             </>
           )}
         </Box>
-        {sandboxCheckout && (
+        {checkoutActive && (
           <Stack spacing={1} sx={{ width: '100%', mt: 'auto', mb: 1.25 }}>
-            <Typography
-              variant="caption"
-              sx={{
-                color: accentColor,
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                fontSize: '0.65rem',
-              }}
-            >
-              Entorno de prueba
-            </Typography>
+            {showSandboxBadge && (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: accentColor,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  fontSize: '0.65rem',
+                }}
+              >
+                Entorno de prueba
+              </Typography>
+            )}
             {quantityEditable && (
               <TextField
                 label="Cantidad"
@@ -806,16 +810,16 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
           </Stack>
         )}
         <Button
-          component={sandboxCheckout ? 'button' : isOpen ? 'a' : 'button'}
-          href={!sandboxCheckout && isOpen ? getInscribirUrl(producto.code) : undefined}
-          target={!sandboxCheckout && isOpen ? '_blank' : undefined}
-          rel={!sandboxCheckout && isOpen ? 'noopener noreferrer' : undefined}
-          disabled={sandboxCheckout ? checkoutBusy : !isOpen}
-          onClick={sandboxCheckout ? () => void startSandboxCheckout() : undefined}
+          component={checkoutActive ? 'button' : isOpen ? 'a' : 'button'}
+          href={!checkoutActive && isOpen ? getInscribirUrl(producto.code) : undefined}
+          target={!checkoutActive && isOpen ? '_blank' : undefined}
+          rel={!checkoutActive && isOpen ? 'noopener noreferrer' : undefined}
+          disabled={checkoutActive ? checkoutBusy : !isOpen}
+          onClick={checkoutActive ? () => void startSandboxCheckout() : undefined}
           variant="outlined"
           size="small"
           sx={{
-            mt: sandboxCheckout ? 0 : 'auto',
+            mt: checkoutActive ? 0 : 'auto',
             minHeight: 44,
             fontSize: { xs: '0.68rem', sm: '0.78rem' },
             px: { xs: 1.5, sm: 2 },
@@ -834,7 +838,13 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             },
           }}
         >
-          {sandboxCheckout ? (submitting ? 'Iniciando…' : 'Probar checkout') : buttonLabel}
+          {checkoutActive
+            ? submitting
+              ? 'Iniciando…'
+              : showSandboxBadge
+                ? 'Probar checkout'
+                : 'Pagar'
+            : buttonLabel}
         </Button>
       </CardContent>
     </Card>

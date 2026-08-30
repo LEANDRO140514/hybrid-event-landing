@@ -9,7 +9,7 @@ import {
   type PublicOrderStatus,
 } from '../api/orderStatus'
 import { clearCheckoutAttempt, resolvePublicOrderReference } from '../lib/checkoutSession'
-import { isSandboxCheckoutActive } from '../config/checkoutConfig'
+import { isCheckoutActive, isSandboxCheckoutActive } from '../config/checkoutConfig'
 
 const MAX_AUTO_POLL_MS = 2 * 60 * 1000
 
@@ -49,7 +49,7 @@ export default function CheckoutConfirmPage() {
       setView({ kind: 'offline' })
       return
     }
-    if (!isSandboxCheckoutActive()) {
+    if (!isCheckoutActive()) {
       setView({
         kind: 'error',
         message: 'La confirmación de pago no está disponible en este entorno.',
@@ -131,18 +131,20 @@ export default function CheckoutConfirmPage() {
       />
       <Container maxWidth="sm">
         <Stack spacing={3} sx={{ alignItems: 'center', textAlign: 'center' }}>
-          <Typography
-            component="p"
-            sx={{
-              color: 'secondary.main',
-              fontSize: '0.75rem',
-              fontWeight: 900,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-            }}
-          >
-            Entorno de prueba
-          </Typography>
+          {isSandboxCheckoutActive() && (
+            <Typography
+              component="p"
+              sx={{
+                color: 'secondary.main',
+                fontSize: '0.75rem',
+                fontWeight: 900,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Entorno de prueba
+            </Typography>
+          )}
           <Typography
             component="h1"
             sx={{

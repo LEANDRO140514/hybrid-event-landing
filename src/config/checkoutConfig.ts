@@ -1,4 +1,4 @@
-export type CheckoutMode = 'off' | 'sandbox'
+export type CheckoutMode = 'off' | 'sandbox' | 'production'
 
 export type SandboxCheckoutFamily = 'spectator' | 'press'
 export type SandboxQuantityMode = 'editable' | 'fixed'
@@ -12,7 +12,7 @@ export type SandboxCheckoutProductConfig = {
 
 const PRODUCTION_HOST = 'hybrid-experience.enforma.mx'
 
-/** Explicit sandbox allowlist — no monetary fields. */
+/** Explicit checkout product allowlist — no monetary fields. */
 const SANDBOX_CHECKOUT_PRODUCTS: Record<string, SandboxCheckoutProductConfig> = {
   'PUB-VIE': {
     productCode: 'PUB-VIE',
@@ -73,18 +73,43 @@ function currentHostname(): string {
   return window.location.hostname.toLowerCase()
 }
 
-const modeRaw = (import.meta.env.VITE_CHECKOUT_MODE ?? 'off').trim().toLowerCase()
-const checkoutMode: CheckoutMode = modeRaw === 'sandbox' ? 'sandbox' : 'off'
+function parseCheckoutMode(raw: string | undefined): CheckoutMode {
+  const value = (raw ?? 'off').trim().toLowerCase()
+  if (value === 'sandbox' || value === 'production') return value
+  return 'off'
+}
+
+const checkoutMode: CheckoutMode = parseCheckoutMode(import.meta.env.VITE_CHECKOUT_MODE)
 const checkoutEnabledFlag = readBool(import.meta.env.VITE_CHECKOUT_ENABLED)
 const functionsBase = normalizeFunctionsBase(import.meta.env.VITE_INSFORGE_FUNCTIONS_BASE)
 
-/** Sandbox checkout never initializes on the canonical production host. */
+function hasCheckoutRuntime(): boolean {
+  return checkoutEnabledFlag && functionsBase != null
+}
+
+function isCanonicalProductionHost(): boolean {
+  return currentHostname() === PRODUCTION_HOST
+}
+
+/** Sandbox: never on the canonical production host. */
 export function isSandboxCheckoutActive(): boolean {
   if (checkoutMode !== 'sandbox') return false
-  if (!checkoutEnabledFlag) return false
-  if (!functionsBase) return false
-  if (currentHostname() === PRODUCTION_HOST) return false
+  if (!hasCheckoutRuntime()) return false
+  if (isCanonicalProductionHost()) return false
   return true
+}
+
+/** Production: only on the canonical production host. */
+export function isProductionCheckoutActive(): boolean {
+  if (checkoutMode !== 'production') return false
+  if (!hasCheckoutRuntime()) return false
+  if (!isCanonicalProductionHost()) return false
+  return true
+}
+
+/** UI + confirm page: either allowed mode for this host. */
+export function isCheckoutActive(): boolean {
+  return isSandboxCheckoutActive() || isProductionCheckoutActive()
 }
 
 export function getSandboxCheckoutProductConfig(
@@ -107,7 +132,9 @@ export function getCheckoutConfig() {
     checkoutEnabledFlag,
     functionsBase,
     productionHost: PRODUCTION_HOST,
-    active: isSandboxCheckoutActive(),
+    active: isCheckoutActive(),
+    sandboxActive: isSandboxCheckoutActive(),
+    productionActive: isProductionCheckoutActive(),
   }
 }
 
