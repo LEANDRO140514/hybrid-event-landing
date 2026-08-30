@@ -6,9 +6,11 @@ export type CheckoutPublicErrorCode =
   | 'PRODUCT_NOT_AVAILABLE'
   | 'SALES_NOT_OPEN'
   | 'WAIVER_REQUIRED'
+  | 'CONTACT_REQUIRED'
   | 'SOLD_OUT'
   | 'ORIGIN_NOT_ALLOWED'
   | 'CONFIGURATION_ERROR'
+  | 'UNSUPPORTED_PROVIDER'
   | 'UNKNOWN'
 
 export type CreateCheckoutSuccess = {
@@ -39,9 +41,11 @@ function mapErrorCode(raw: unknown): CheckoutPublicErrorCode {
     case 'PRODUCT_NOT_AVAILABLE':
     case 'SALES_NOT_OPEN':
     case 'WAIVER_REQUIRED':
+    case 'CONTACT_REQUIRED':
     case 'SOLD_OUT':
     case 'ORIGIN_NOT_ALLOWED':
     case 'CONFIGURATION_ERROR':
+    case 'UNSUPPORTED_PROVIDER':
       return code
     default:
       return 'UNKNOWN'
@@ -63,9 +67,12 @@ export function messageForCheckoutError(code: CheckoutPublicErrorCode): string {
     case 'ORIGIN_NOT_ALLOWED':
       return 'No pudimos iniciar el proceso de pago.'
     case 'CONFIGURATION_ERROR':
+    case 'UNSUPPORTED_PROVIDER':
       return 'No pudimos iniciar el pago. Inténtalo más tarde.'
     case 'WAIVER_REQUIRED':
       return 'No pudimos iniciar el proceso de pago.'
+    case 'CONTACT_REQUIRED':
+      return 'Completa tu nombre y correo para continuar.'
     default:
       return 'No pudimos iniciar el proceso de pago.'
   }
