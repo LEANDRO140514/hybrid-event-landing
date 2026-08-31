@@ -223,39 +223,78 @@
   5. All pre-existing items carried from HEX-LAUNCH-01 REV B / HEAD-RECONCILIATION-01 (canonical URL, media subdomain, bucket policy, og:image confirmation, Club Cumbres in JSON-LD, `#formatos` duplication, VITE_MEDIA_BASE_URL centralization) remain unresolved — untouched by this phase.
 - **Next Authorized Phase:** (none yet — awaiting user decision, likely push authorization and/or sales-activation scoping)
 
+## Phase HEX-CHECKOUT-INDIVIDUALS-01 + HEAD-RECONCILIATION-02 (opened and closed 2026-08-31)
+
+- **Authorized by:** user, in-session. Two units, committed separately per explicit instruction (checkout code first, doc housekeeping apart).
+
+### Unit 1 — HEX-CHECKOUT-INDIVIDUALS-01 (commit `e552c42`)
+
+- **Scope:** activate checkout for the 6 individual competition products by adding them to the checkout allowlist. Sports-participation waiver is captured physically at kit pickup — deliberately not in this system.
+- **Changes:**
+  - `src/config/checkoutConfig.ts`: `SandboxCheckoutFamily` gains a 3rd value `'competitor'` (alongside `'spectator'`/`'press'`); 6 new entries in `SANDBOX_CHECKOUT_PRODUCTS` — `IND-H`, `IND-M`, `HALF-IND-H`, `HALF-IND-M`, `WOD-H`, `WOD-M` — all `family: 'competitor'`, `quantityMode: 'fixed'`, `minimumQuantity: 1` (identical pattern to `FOT-*`). `family` is descriptive metadata only — not read by any code path today.
+  - `src/pages/LandingPage.tsx`: COMPITE section subtitle "…que mejor se adapte a ti y a tu equipo." → "…que mejor se adapte a ti." (the section now also covers `IND-H`/`IND-M`, which have no team; the per-card "N integrantes" line still carries the team detail).
+- **No component changes.** Verified read-only beforehand: `ProductCard`, `CheckoutBuyerFields`, `CheckoutConfirmPage`, `checkoutSession`, `submitLock`, `api/checkout`, `api/orderStatus` are all product-code-generic — there is **no `bloque` (COMPITE/EXPERIENCE/ASISTE) gate anywhere** in the checkout path. The only gate in `ProductCard` is `getSandboxCheckoutProductConfig(code) != null && isCheckoutActive()`. The 6 cards already render via `<ProductCard>` in the COMPITE/EXPERIENCE sections; allowlist membership is the whole change.
+- **NOT touched (explicit):** Dobles, Relay, ½ Hybrid Dobles (the 9 team products stay disabled, awaiting a team-roster form — "Pieza 2"); `src/data/catalogo.ts`; `src/config/salesConfig.ts` (`status` stays `coming_soon`, `ventasArrancadas` stays `false`); pricing; components.
+- **Backend dependency (outside this repo, NOT verifiable here):** the 6 codes must also be allowlisted in `ready2hybrid` `mp-create-checkout`, and that repo's pending migrations applied, or a real payment attempt returns `PRODUCT_NOT_FOUND` / `PRODUCT_NOT_AVAILABLE`.
+- **Validation:** `npm run lint` (oxlint, 0), `tsc -b` (0 errors), `npm run build` (vite clean, 752 modules, PWA 13 precache entries). No browser verification — the checkout form only renders when `isCheckoutActive()` is true (needs checkout env vars + non-production host); the only DOM-visible change without a backend is the subtitle.
+
+### Unit 2 — HEAD-RECONCILIATION-02 (commit for this `WORKSPACE_STATUS.md` update)
+
+- **Trigger:** RESUME (controlled-monorepo-workflow) detected HEAD drift — this file documented HEAD `1ead98c` (set by `7339695`), physical HEAD was `a739a82`, **8 undocumented commits ahead**, all already on `origin/main`.
+- **Reconciled commit history (`1ead98c` → `a739a82`, oldest first):**
+  1. `5fc0acb` (2026-08-11, **[Claude Fable 5]**) `feat(landing): relaunch content` — every `9–11 octubre` date replaced with **`13–15 noviembre 2026`** (meta/OG/Twitter, `Event` JSON-LD, hero, footer, countdown target, `DIA_FECHA`, Ubicación); approved competition schedule wired (Vie PM: Dobles Mujeres + Individual Open H/M · Sáb día completo: Dobles H+Mixto + ½ Hybrid + Workout · Dom AM: Relay); **removed `IND-PRO-H`/`IND-PRO-M` and retired Dobles variants from `catalogo.ts` — this is why the catalog is now 23 products, superseding the "28 products" recorded under HEX-REBRAND-CATALOG**; per-day prize section (>$60,000 — Individual $5k/$3k/$2k, Dobles $7k/$5k/$3k; recognition for ½ Hybrid/Workout/Relay); navbar adds PRECIOS/PREMIOS/COMUNIDAD anchors, hamburger up to `lg`; `SHOP · PRONTO` disabled (desktop + mobile); **sales calendar realigned in `pricingStage.ts` — lanzamiento 11–31 ago, preventa 1–30 sep, regular 1 oct – 7 nov 2026, `FECHA_CIERRE_VENTAS = '2026-11-07'`**; `openingDate` field removed from `salesConfig.ts`; Simulacro Pro section ported dormant (`SIMULACRO_PRO_ACTIVE = false`, `src/config/simulacroProConfig.ts`).
+  2. `820e1fa` (2026-08-29, **[Cursor]**) `feat(checkout): add production mode with inverted host gate` — `CheckoutMode` gains `'production'`; `isProductionCheckoutActive()` true only on `hybrid-experience.enforma.mx`, sandbox stays forbidden on that host; `isCheckoutActive()` = sandbox OR production; `ProductCard` + `CheckoutConfirmPage` routed through `isCheckoutActive()`. **Supersedes the HEAD-RECONCILIATION-01 note "no 'production' mode exists in code".**
+  3. `45b669b` (2026-08-29, **[Cursor]**) `feat(checkout): require buyer and MERCADO_PAGO in createCheckout payload` — `CreateCheckoutInput` gains `buyer` + `selectedProvider: 'MERCADO_PAGO'`; POST body snake_case per InsForge contract. Call sites intentionally left broken until the contact form (commit 6).
+  4. `330c858` (2026-08-29, **[Cursor]**) `feat(checkout): allowlist PUB-3D and FOT-3D` — adds the 3-day passes to `SANDBOX_CHECKOUT_PRODUCTS` (`PUB-3D` editable, `FOT-3D` fixed). **Resolves OD-020.** In-commit note: rename of `sandbox_*` identifiers deferred post go-live.
+  5. `f00c7b4` (2026-08-29, **[Cursor]**) `feat(checkout): map CONTACT_REQUIRED and UNSUPPORTED_PROVIDER for buyers` — `CONTACT_REQUIRED` → "Completa tu nombre y correo para continuar."; `UNSUPPORTED_PROVIDER` → generic config-failure copy (no provider details leaked).
+  6. `3e1d828` (2026-08-29, **[Cursor]**) `feat(checkout): collect buyer contact before ASISTE payment` — `CheckoutBuyerFields` rendered inline on `ProductCard` for the 8 allowlisted products; `createCheckout` wired with buyer + `MERCADO_PAGO`; pay CTA gated on contact + quantity validity (+169/−28 in `LandingPage.tsx`).
+  7. `a739a82` (2026-08-30, **[Cursor]**) `chore: ignore local Vercel CLI link` — `.gitignore` only.
+  8. `e552c42` (2026-08-31) — Unit 1 above.
+- Commits 2–7 co-authored `Cursor <cursoragent@cursor.com>`; commit 1 co-authored `Claude Fable 5` — both outside this protocol, no phase entry until this reconciliation.
+- **Checkout — current disposition:** the fail-closed *sandbox* recognized in HEAD-RECONCILIATION-01 is now a **production-capable purchase path** (`820e1fa`) with a **14-product allowlist** (8 ASISTE + 6 individual competitors). InsForge edge functions remain the sole charge authority and the real sales gate (`SALES_NOT_OPEN`/`SOLD_OUT`/`WAIVER_REQUIRED`). The `SANDBOX_CHECKOUT_PRODUCTS` / `SandboxCheckoutFamily` / `isSandboxCheckoutProduct` names are now misnomers (they govern production too) — rename deferred, tracked below.
+- **Scope note:** the user's instruction listed the checkout commits + `a739a82` + `e552c42`. `5fc0acb` was folded in because a partial reconciliation would itself leave a documented-history gap; it is a large content commit (Nov dates, −5 catalog products, sales calendar) that no phase entry covered.
+- **Files touched this unit:** `WORKSPACE_STATUS.md` only. No `src/`, no build/lint run (documentation only).
+- **Git:** committed separately from Unit 1. No push.
+
 ```
 === NEXT_SESSION_BOOTSTRAP ===
 Workspace: C:\vonde\enforma-sys\hybrid-event-landing
 Product/System: The Hybrid Experience (hybrid-event-landing)
 Workspace Type: standalone-repo / external-development-workspace
 Branch: main
-HEAD: 1ead98c (working tree clean)
-Last Commits: 1ead98c feat(landing): staged pricing table, prizes, and community section | 4a8845d feat(pricing): add staged pricing matrix and 3-MSI eligibility | 4010ac4 docs(workspace): reconcile HEAD drift and open HEX-PRICING-STAGES-01 | b4f50c0 feat(checkout): expand public and press sandbox wiring [Cursor] | 9b9cf48 fix(checkout): prevent duplicate checkout submissions [Cursor]
-Completed Phase: HEX-PRICING-STAGES-01 (closed 2026-08-04) — staged pricing (data + UI), prizes, community section
+HEAD: e552c42 (working tree clean) — the HEAD-RECONCILIATION-02 doc commit sits one above this, per the file's established pattern (a doc commit can't name its own future hash)
+Last Commits: e552c42 feat(checkout): allowlist 6 individual competitors for checkout | a739a82 chore: ignore local Vercel CLI link [Cursor] | 3e1d828 feat(checkout): collect buyer contact before ASISTE payment [Cursor] | f00c7b4 feat(checkout): map CONTACT_REQUIRED and UNSUPPORTED_PROVIDER for buyers [Cursor] | 330c858 feat(checkout): allowlist PUB-3D and FOT-3D for spectator/press checkout [Cursor] | 45b669b feat(checkout): require buyer and MERCADO_PAGO in createCheckout payload [Cursor] | 820e1fa feat(checkout): add production mode with inverted host gate [Cursor] | 5fc0acb feat(landing): relaunch content — Nov 13-15 dates, schedule, prizes, -5 catalog products [Claude Fable 5]
+Completed Phase: HEX-CHECKOUT-INDIVIDUALS-01 + HEAD-RECONCILIATION-02 (closed 2026-08-31) — 6 individual competitors added to checkout allowlist; 8 undocumented commits (1ead98c→a739a82) reconciled
 Open Phase (NOT closed): (none)
 Gate: CONTEXT_RECOVERED_READY_FOR_INSTRUCTIONS
+Current invariants: salesConfig.status = 'coming_soon', ventasArrancadas = false. Catalog = 23 products (8 COMPITE + 7 EXPERIENCE + 8 ASISTE) since 5fc0acb. Checkout allowlist = 14 (8 ASISTE + 6 individual competitors); production-capable (820e1fa), InsForge is the sole charge/sales authority. Team products (Dobles ×3, Relay ×3, ½ Hybrid Dobles ×3) still disabled — no roster form yet.
 Known Issues:
-  - Local `main` is 3 commits ahead of `origin/main` (still at `b4f50c0`) — not pushed, awaiting authorization.
-  - OD-020: PUB-3D/FOT-3D absent from the sandbox checkout allowlist — confirm intentional.
-  - `precioUnidad` legacy field now has two source-of-truth layers (static text + dynamic c/u calc) — candidate for consolidation.
+  - Cached `origin/main` is at `a739a82` (no fetch performed this session — cached remote-tracking ref only). Local `main` is 1 commit ahead (`e552c42`), 2 after the pending HEAD-RECONCILIATION-02 doc commit — not pushed, awaiting authorization. (Supersedes the stale "3 ahead of b4f50c0" recorded under HEX-PRICING-STAGES-01: commits `4010ac4`→`a739a82` are already on the cached `origin/main`.)
+  - `ready2hybrid` backend: pending migrations not applied, and the 6 new individual codes must be allowlisted server-side in `mp-create-checkout` — until both, a real payment for those 6 fails. Outside this repo.
+  - `SANDBOX_CHECKOUT_PRODUCTS` / `SandboxCheckoutFamily` / `isSandboxCheckoutProduct` are misnomers since 820e1fa (govern production too) — rename deferred post go-live.
+  - `family` field on checkout allowlist entries is descriptive only — read by no code path.
+  - `WAIVER_REQUIRED` error code is mapped in `api/checkout.ts` but no UI ever sends a waiver field; if the backend returns it, the user sees only the generic failure message.
+  - `precioUnidad` legacy field has two source-of-truth layers (static text + dynamic c/u calc) — candidate for consolidation.
   - FORMATOS/COMPITE content duplication (carried over from HEX-LAUNCH-01 REV B, still not fixed).
   - Hardcoded InsForge hostname still pending centralization via VITE_MEDIA_BASE_URL (carried over, still not fixed).
+  - OG social image still shows Oct dates (per 5fc0acb in-commit note) — pending design regeneration.
 Pending Decisions:
-  1. Push to origin/main.
+  1. Push to origin/main (local `e552c42` + the pending doc commit; cached `origin/main` = `a739a82`).
   2. Sales activation (ventasArrancadas + salesConfig.status flip) — requires backend confirmation first, own authorization.
-  3. OD-020 — PUB-3D/FOT-3D sandbox allowlist gap.
-  4. precioUnidad consolidation (static field vs. dynamic c/u).
-  5. Canonical production URL for the landing.
-  6. Definitive public media subdomain for InsForge Storage.
-  7. Nombre y política del bucket público de HYBRID EXPERIENCE.
-  8. Official 1200×630 social image for og:image (public/og/hybrid-experience-social.jpg exists per commit b39d432 — confirm if approved final asset).
-  9. Whether "Club Cumbres" and its address can be published in JSON-LD.
-  10. Future of the `#formatos` section (merge or remove — duplicates COMPITE).
-  11. When to centralize the current hardcoded InsForge URLs behind VITE_MEDIA_BASE_URL.
+  3. "Pieza 2" — team-roster checkout form for the 9 team products (Dobles/Relay/½ Hybrid Dobles).
+  4. Rename `Sandbox*` checkout identifiers to drop the misleading "sandbox" prefix.
+  5. precioUnidad consolidation (static field vs. dynamic c/u).
+  6. Canonical production URL for the landing.
+  7. Definitive public media subdomain for InsForge Storage.
+  8. Nombre y política del bucket público de HYBRID EXPERIENCE.
+  9. Official 1200×630 social image for og:image (public/og/hybrid-experience-social.jpg exists per commit b39d432 — confirm if approved final asset; still shows Oct dates).
+  10. Whether "Club Cumbres" and its address can be published in JSON-LD.
+  11. Future of the `#formatos` section (merge or remove — duplicates COMPITE).
+  12. When to centralize the current hardcoded InsForge URLs behind VITE_MEDIA_BASE_URL.
 Protected Sources: (none)
 Next Authorized Phase: (none yet — awaiting user decision)
-Files To Read First: WORKSPACE_STATUS.md, src/config/salesConfig.ts, src/data/catalogo.ts, src/lib/pricingStage.ts, src/pages/LandingPage.tsx, src/config/checkoutConfig.ts
-Forbidden Actions: push without express authorization, modifying docs/guiones-origen/*.html, flipping salesConfig to `open` or ventasArrancadas to `true` without explicit authorization, moving images into public/, using signed/expiring URLs for public media, exposing InsForge secrets, enabling sandbox checkout on the production host, expanding the sandbox checkout allowlist without explicit authorization
+Files To Read First: WORKSPACE_STATUS.md, src/config/salesConfig.ts, src/data/catalogo.ts, src/lib/pricingStage.ts, src/pages/LandingPage.tsx, src/config/checkoutConfig.ts, src/api/checkout.ts
+Forbidden Actions: push without express authorization, modifying docs/guiones-origen/*.html, flipping salesConfig to `open` or ventasArrancadas to `true` without explicit authorization, moving images into public/, using signed/expiring URLs for public media, exposing InsForge secrets, enabling sandbox checkout on the production host, expanding the checkout allowlist without explicit authorization
 First Command: scripts/workspace-preflight.ps1
 === END_BOOTSTRAP ===
 ```
