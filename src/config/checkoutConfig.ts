@@ -1,6 +1,6 @@
 export type CheckoutMode = 'off' | 'sandbox' | 'production'
 
-export type SandboxCheckoutFamily = 'spectator' | 'press'
+export type SandboxCheckoutFamily = 'spectator' | 'press' | 'competitor'
 export type SandboxQuantityMode = 'editable' | 'fixed'
 
 export type SandboxCheckoutProductConfig = {
@@ -59,6 +59,45 @@ const SANDBOX_CHECKOUT_PRODUCTS: Record<string, SandboxCheckoutProductConfig> = 
   'FOT-3D': {
     productCode: 'FOT-3D',
     family: 'press',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  // Individual competitors — one athlete slot per purchase, no roster.
+  // Sports-participation waiver is captured physically at kit pickup,
+  // outside this system.
+  'IND-H': {
+    productCode: 'IND-H',
+    family: 'competitor',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'IND-M': {
+    productCode: 'IND-M',
+    family: 'competitor',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'HALF-IND-H': {
+    productCode: 'HALF-IND-H',
+    family: 'competitor',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'HALF-IND-M': {
+    productCode: 'HALF-IND-M',
+    family: 'competitor',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'WOD-H': {
+    productCode: 'WOD-H',
+    family: 'competitor',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'WOD-M': {
+    productCode: 'WOD-M',
+    family: 'competitor',
     quantityMode: 'fixed',
     minimumQuantity: 1,
   },

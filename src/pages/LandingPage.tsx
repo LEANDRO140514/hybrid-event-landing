@@ -3304,7 +3304,7 @@ export default function LandingPage() {
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
-            Elige la categoría que mejor se adapte a ti y a tu equipo.
+            Elige la categoría que mejor se adapte a ti.
           </Typography>
 
           {COMPITE_GROUPS.map((group) => {
