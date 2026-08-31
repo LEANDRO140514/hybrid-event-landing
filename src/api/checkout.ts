@@ -73,6 +73,12 @@ export function messageForCheckoutError(code: CheckoutPublicErrorCode): string {
       return 'No pudimos iniciar el proceso de pago.'
     case 'CONTACT_REQUIRED':
       return 'Completa tu nombre y correo para continuar.'
+    // TODO(ready2hybrid): when the backend confirms the exact error-code
+    // string for a roster-fingerprint conflict (reused idempotencyKey with a
+    // changed roster), map it here to an actionable message + auto-clear the
+    // stored checkout attempt. The frontend already regenerates the key on
+    // roster change (computeRosterFingerprint in checkoutSession.ts), so this
+    // is a belt-and-suspenders safety net, not the primary guard.
     default:
       return 'No pudimos iniciar el proceso de pago.'
   }
@@ -114,6 +120,17 @@ export type CreateCheckoutInput = {
   quantity: number
   idempotencyKey: string
   buyer: CreateCheckoutBuyerInput
+  /**
+   * Team captain's full name. Always sent — equals `buyer.name` (no separate
+   * override in the UI). The backend (checkout_start_tx, migration 0025)
+   * expects it alongside `teammate_names`.
+   */
+  captainName: string
+  /**
+   * Full names of the remaining team members (roster size - 1). Always sent;
+   * an empty array for individual products.
+   */
+  teammateNames: string[]
   /** Fixed to Mercado Pago for go-live; no UI provider selector. */
   selectedProvider: 'MERCADO_PAGO'
 }
@@ -148,6 +165,8 @@ export async function createCheckout(input: CreateCheckoutInput): Promise<Create
       idempotency_key: input.idempotencyKey,
       selected_provider: input.selectedProvider,
       buyer: buyerBody,
+      captain_name: input.captainName,
+      teammate_names: input.teammateNames,
     }),
   })
 

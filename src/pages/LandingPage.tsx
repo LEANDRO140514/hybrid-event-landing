@@ -56,6 +56,7 @@ import {
 } from '../config/checkoutConfig'
 import { createCheckout, messageForCheckoutError, CheckoutApiError } from '../api/checkout'
 import {
+  computeRosterFingerprint,
   getCheckoutAttempt,
   getOrCreateCheckoutAttempt,
   savePublicOrderReference,
@@ -495,6 +496,8 @@ const checkoutFieldSx = (accentColor: string) => ({
 type CheckoutBuyerFieldsProps = {
   accentColor: string
   disabled: boolean
+  /** First field's label. Defaults to "Nombre completo"; team products pass a captain-specific label. */
+  nameLabel?: string
   name: string
   email: string
   phone: string
@@ -508,6 +511,7 @@ type CheckoutBuyerFieldsProps = {
 function CheckoutBuyerFields({
   accentColor,
   disabled,
+  nameLabel = 'Nombre completo',
   name,
   email,
   phone,
@@ -520,7 +524,7 @@ function CheckoutBuyerFields({
   return (
     <Stack spacing={1} sx={{ width: '100%' }}>
       <TextField
-        label="Nombre completo"
+        label={nameLabel}
         value={name}
         onChange={(e) => onNameChange(e.target.value)}
         disabled={disabled}
@@ -584,6 +588,60 @@ function CheckoutBuyerFields({
   )
 }
 
+type TeammateNameFieldsProps = {
+  accentColor: string
+  disabled: boolean
+  /** Current teammate name values. Length must equal (team size - 1). */
+  names: string[]
+  /** Total team size, for the "integrante N de M" labels. */
+  teamSize: number
+  onNameChange: (index: number, value: string) => void
+}
+
+/**
+ * Sibling of CheckoutBuyerFields: collects the full name of each team member
+ * other than the captain (who is the buyer). No email/phone/consent — names
+ * only. Renders nothing when `names` is empty (individual products).
+ */
+function TeammateNameFields({
+  accentColor,
+  disabled,
+  names,
+  teamSize,
+  onNameChange,
+}: TeammateNameFieldsProps) {
+  if (names.length === 0) return null
+  return (
+    <Stack spacing={1} sx={{ width: '100%' }}>
+      <Typography
+        variant="caption"
+        sx={{
+          color: 'rgba(255,255,255,0.7)',
+          fontSize: '0.7rem',
+          lineHeight: 1.35,
+          fontFamily: "'Space Grotesk', sans-serif",
+        }}
+      >
+        Resto del equipo — nombre completo de cada integrante
+      </Typography>
+      {names.map((value, i) => (
+        <TextField
+          key={i}
+          label={`Nombre completo — integrante ${i + 2} de ${teamSize}`}
+          value={value}
+          onChange={(e) => onNameChange(i, e.target.value)}
+          disabled={disabled}
+          required
+          size="small"
+          fullWidth
+          autoComplete="off"
+          sx={checkoutFieldSx(accentColor)}
+        />
+      ))}
+    </Stack>
+  )
+}
+
 function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const imageUrl = PRODUCT_IMAGES[producto.code] || IMG_WORKOUT
   const isOpen = SALES_CONFIG.status === 'open'
@@ -603,6 +661,12 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const [contactConsent, setContactConsent] = useState(false)
   const [quantityInput, setQuantityInput] = useState('1')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  // One field per team member other than the captain (= buyer). Empty array
+  // for individual products; length is fixed since `producto` never changes.
+  const teammateCount = Math.max(0, producto.integrantes - 1)
+  const [teammateNames, setTeammateNames] = useState<string[]>(() =>
+    Array(teammateCount).fill(''),
+  )
   const activeCheckoutProductCode = useSyncExternalStore(
     subscribeActiveCheckoutProductCode,
     getActiveCheckoutProductCode,
@@ -615,6 +679,11 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
     buyerName.trim().length > 1 &&
     EMAIL_PATTERN.test(buyerEmail.trim()) &&
     (buyerPhone.trim() === '' || buyerPhone.trim().length >= 10)
+
+  // Every teammate name filled, same criterion as buyer.name.
+  const teammatesValid =
+    teammateNames.length === teammateCount &&
+    teammateNames.every((n) => n.trim().length > 1)
 
   const parseQuantity = (raw: string): number | null => {
     if (!/^\d+$/.test(raw.trim())) return null
@@ -636,7 +705,8 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
     resolvedQuantity >= productConfig.minimumQuantity &&
     (productConfig.quantityMode !== 'fixed' || resolvedQuantity === 1)
 
-  const canPay = checkoutActive && isContactValid && quantityOk && !checkoutBusy
+  const canPay =
+    checkoutActive && isContactValid && teammatesValid && quantityOk && !checkoutBusy
 
   const startCheckout = async () => {
     if (!productConfig || !canPay || resolvedQuantity == null) return
@@ -655,10 +725,14 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
 
     const quantity = resolvedQuantity
 
+    const captainName = buyerName.trim()
+    const teammateNamesTrimmed = teammateNames.map((n) => n.trim())
+
     try {
       const attempt = getOrCreateCheckoutAttempt({
         productCode: producto.code,
         quantity,
+        rosterFingerprint: computeRosterFingerprint(captainName, teammateNamesTrimmed),
       })
       const phoneTrimmed = buyerPhone.trim()
       const result = await createCheckout({
@@ -668,10 +742,12 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
         selectedProvider: 'MERCADO_PAGO',
         buyer: {
           email: buyerEmail.trim(),
-          name: buyerName.trim(),
+          name: captainName,
           ...(phoneTrimmed ? { phone: phoneTrimmed } : {}),
           contactConsent,
         },
+        captainName,
+        teammateNames: teammateNamesTrimmed,
       })
       savePublicOrderReference(producto.code, result.public_order_reference)
       const stored = getCheckoutAttempt(producto.code)
@@ -896,6 +972,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
             <CheckoutBuyerFields
               accentColor={accentColor}
               disabled={checkoutBusy}
+              nameLabel={teammateCount > 0 ? 'Nombre completo (capitán)' : undefined}
               name={buyerName}
               email={buyerEmail}
               phone={buyerPhone}
@@ -917,6 +994,22 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
                 setErrorMessage(null)
               }}
             />
+            {teammateCount > 0 && (
+              <TeammateNameFields
+                accentColor={accentColor}
+                disabled={checkoutBusy}
+                names={teammateNames}
+                teamSize={producto.integrantes}
+                onNameChange={(i, value) => {
+                  setTeammateNames((prev) => {
+                    const next = [...prev]
+                    next[i] = value
+                    return next
+                  })
+                  setErrorMessage(null)
+                }}
+              />
+            )}
             {quantityEditable && (
               <TextField
                 label="Cantidad"

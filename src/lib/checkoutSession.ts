@@ -6,6 +6,14 @@ export type CheckoutAttempt = {
   productCode: string
   quantity: number
   idempotencyKey: string
+  /**
+   * Stable digest of the roster (captain + teammate names) this attempt's
+   * idempotencyKey was minted for. When it changes, the key must be
+   * regenerated — the backend fingerprints the roster and rejects a reused
+   * key with a different roster. Optional: pre-roster attempts (individuals)
+   * written before this field existed simply have it absent.
+   */
+  rosterFingerprint?: string
   publicOrderReference?: string
   createdAt: string
 }
@@ -14,6 +22,16 @@ const TRACKING_REF_RE = /^trk_[0-9a-f]{32}$/
 
 export function isValidPublicOrderReference(value: string): boolean {
   return TRACKING_REF_RE.test(value)
+}
+
+/**
+ * Deterministic, order-sensitive digest of a checkout roster. Does NOT need
+ * to match the backend's own fingerprint — it only has to change whenever
+ * the roster changes, so a reused idempotencyKey is never sent with a
+ * different roster. For individual products this is just `["Buyer Name"]`.
+ */
+export function computeRosterFingerprint(captainName: string, teammateNames: string[]): string {
+  return JSON.stringify([captainName.trim(), ...teammateNames.map((n) => n.trim())])
 }
 
 function storageKeyForProduct(productCode: string): string {
@@ -29,7 +47,8 @@ function parseAttempt(raw: string | null): CheckoutAttempt | null {
       typeof parsed.productCode !== 'string' ||
       typeof parsed.idempotencyKey !== 'string' ||
       typeof parsed.quantity !== 'number' ||
-      typeof parsed.createdAt !== 'string'
+      typeof parsed.createdAt !== 'string' ||
+      (parsed.rosterFingerprint !== undefined && typeof parsed.rosterFingerprint !== 'string')
     ) {
       return null
     }
@@ -95,18 +114,22 @@ export function getCheckoutAttempt(productCode: string): CheckoutAttempt | null 
 }
 
 /**
- * Reuse pending attempt for same product+quantity; otherwise create a new key.
+ * Reuse pending attempt for same product+quantity+roster; otherwise create a
+ * new key. A changed rosterFingerprint forces a fresh key so the backend
+ * never sees a reused idempotencyKey with a different roster.
  * Legacy PUB-VIE v1 may be migrated into v2 on first touch.
  */
 export function getOrCreateCheckoutAttempt(input: {
   productCode: string
   quantity: number
+  rosterFingerprint: string
 }): CheckoutAttempt {
   const existing = getCheckoutAttempt(input.productCode)
   if (
     existing &&
     existing.productCode === input.productCode &&
     existing.quantity === input.quantity &&
+    existing.rosterFingerprint === input.rosterFingerprint &&
     !existing.publicOrderReference
   ) {
     // Ensure namespaced v2 storage for PUB-VIE legacy retries.
@@ -125,6 +148,7 @@ export function getOrCreateCheckoutAttempt(input: {
     productCode: input.productCode,
     quantity: input.quantity,
     idempotencyKey: crypto.randomUUID(),
+    rosterFingerprint: input.rosterFingerprint,
     createdAt: new Date().toISOString(),
   }
   writeProductRaw(attempt)

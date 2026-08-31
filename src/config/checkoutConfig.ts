@@ -1,6 +1,6 @@
 export type CheckoutMode = 'off' | 'sandbox' | 'production'
 
-export type SandboxCheckoutFamily = 'spectator' | 'press' | 'competitor'
+export type SandboxCheckoutFamily = 'spectator' | 'press' | 'competitor' | 'team'
 export type SandboxQuantityMode = 'editable' | 'fixed'
 
 export type SandboxCheckoutProductConfig = {
@@ -98,6 +98,63 @@ const SANDBOX_CHECKOUT_PRODUCTS: Record<string, SandboxCheckoutProductConfig> = 
   'WOD-M': {
     productCode: 'WOD-M',
     family: 'competitor',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  // Team categories — one team slot per purchase (quantity is teams, not
+  // people). Roster of full names is collected in the card via
+  // TeammateNameFields (integrantes - 1 fields); captain = buyer.
+  'DOB-VIE-MM': {
+    productCode: 'DOB-VIE-MM',
+    family: 'team',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'DOB-SAB-HH': {
+    productCode: 'DOB-SAB-HH',
+    family: 'team',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'DOB-SAB-MH': {
+    productCode: 'DOB-SAB-MH',
+    family: 'team',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'REL-4H': {
+    productCode: 'REL-4H',
+    family: 'team',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'REL-4M': {
+    productCode: 'REL-4M',
+    family: 'team',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'REL-2H2M': {
+    productCode: 'REL-2H2M',
+    family: 'team',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'HALF-DOB-MM': {
+    productCode: 'HALF-DOB-MM',
+    family: 'team',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'HALF-DOB-HH': {
+    productCode: 'HALF-DOB-HH',
+    family: 'team',
+    quantityMode: 'fixed',
+    minimumQuantity: 1,
+  },
+  'HALF-DOB-MH': {
+    productCode: 'HALF-DOB-MH',
+    family: 'team',
     quantityMode: 'fixed',
     minimumQuantity: 1,
   },
