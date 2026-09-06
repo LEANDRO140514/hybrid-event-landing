@@ -2303,30 +2303,6 @@ function PorQuePerteneces() {
   )
 }
 
-// ── Sales status banner (visible while registration isn't open) ──
-function SalesStatusBanner() {
-  if (SALES_CONFIG.status === 'open') return null
-  const text = SALES_CONFIG.status === 'coming_soon' ? SALES_CONFIG.openingLabel : 'Inscripciones cerradas'
-  return (
-    <Box
-      sx={{
-        bgcolor: '#E6F2B1',
-        color: '#000000',
-        textAlign: 'center',
-        py: 1,
-        px: 2,
-        fontFamily: "'Space Grotesk', sans-serif",
-        fontWeight: 800,
-        fontSize: { xs: '0.7rem', sm: '0.8rem' },
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
-      }}
-    >
-      {text}
-    </Box>
-  )
-}
-
 export default function LandingPage() {
   const targetDate = useMemo(() => new Date('2026-11-13T17:00:00'), [])
   const timeLeft = useCountdown(targetDate)
@@ -2352,7 +2328,6 @@ export default function LandingPage() {
   return (
     <Box>
       <Navbar />
-      <SalesStatusBanner />
       {/* ===== HERO SECTION ===== */}
       <Box
         id="hero"
@@ -2388,66 +2363,157 @@ export default function LandingPage() {
           },
         }}
       >
-        <Box component="h1" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 1, m: 0 }}>
-          <Typography
-            variant="h1"
-            component="span"
-            sx={{
-              fontSize: { xs: '3.5rem', sm: '5rem', md: '7rem' },
-              fontWeight: 900,
-              fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
-              fontStyle: 'italic',
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
-              color: '#E6F2B1',
-            }}
-          >
-            HYBRID
-          </Typography>
-          <Box component="span" sx={{ fontSize: 0, lineHeight: 0 }}> </Box>
-          <Typography
-            variant="h1"
-            component="span"
-            sx={{
-              fontSize: { xs: 'calc(2.2rem + 3px)', sm: 'calc(3.6rem + 3px)', md: 'calc(5.2rem + 3px)' },
-              fontWeight: 900,
-              fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
-              fontStyle: 'italic',
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
-              color: '#E6F2B1',
-            }}
-          >
-            EXPERIENCE
-          </Typography>
-        </Box>
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: { xs: '100%', md: 1180 },
+            mr: { md: 'auto' },
+            textAlign: 'left',
+            pl: { xs: 0, sm: 1, md: 2 },
+          }}
+        >
+          {/* Título — logotipo tipográfico HYBRID / EVENT + firma EXPERIENCE */}
+          <Box component="h1" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', m: 0 }}>
+            <Typography
+              variant="h1"
+              component="span"
+              sx={{
+                fontSize: { xs: '3.25rem', sm: '4.75rem', md: '6.5rem' },
+                fontWeight: 700,
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontStyle: 'normal',
+                textTransform: 'uppercase',
+                letterSpacing: '-0.02em',
+                lineHeight: 0.92,
+                color: '#E6F2B1',
+              }}
+            >
+              HYBRID
+            </Typography>
+            <Box component="span" sx={{ fontSize: 0, lineHeight: 0 }}> </Box>
+            <Typography
+              variant="h1"
+              component="span"
+              sx={{
+                fontSize: { xs: '3.25rem', sm: '4.75rem', md: '6.5rem' },
+                fontWeight: 900,
+                fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
+                fontStyle: 'italic',
+                textTransform: 'uppercase',
+                letterSpacing: '-0.02em',
+                lineHeight: 0.92,
+                color: '#E6F2B1',
+              }}
+            >
+              EVENT
+            </Typography>
+            <Box component="span" sx={{ fontSize: 0, lineHeight: 0 }}> </Box>
+            <Typography
+              variant="h1"
+              component="span"
+              sx={{
+                fontSize: { xs: '1rem', sm: '1.35rem', md: '1.8rem' },
+                fontWeight: 500,
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontStyle: 'normal',
+                textTransform: 'uppercase',
+                letterSpacing: '0.2em',
+                lineHeight: 1,
+                color: '#F4F4E9',
+                mt: { xs: 1, md: 1.5 },
+                ml: '0.12em',
+              }}
+            >
+              EXPERIENCE
+            </Typography>
+          </Box>
 
-        <Typography
-          variant="h5"
-          sx={{
-            color: 'text.secondary',
-            fontWeight: 400,
-            mb: 4,
-            maxWidth: 500,
-            fontSize: { xs: '1rem', sm: '1.2rem' },
-          }}
-        >
-          El evento fitness más intenso de México
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.secondary',
-            fontWeight: 600,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            mb: 2,
-            display: 'block',
-            fontSize: '0.7rem',
-          }}
-        >
-          BY ENFORMA sports society
-        </Typography>
+          {/* Fecha + sede — bloque editorial en dos columnas */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'flex-start',
+              columnGap: { xs: 3, sm: 4, md: 6 },
+              rowGap: 1.5,
+              mt: { xs: 3, md: 4 },
+              mb: 4,
+            }}
+          >
+            <Box>
+              <Typography
+                component="span"
+                sx={{
+                  display: 'block',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  lineHeight: 0.95,
+                  letterSpacing: '-0.02em',
+                  fontSize: { xs: '2.3rem', sm: '2.9rem', md: '3.6rem' },
+                }}
+              >
+                13–15
+              </Typography>
+              <Typography
+                component="span"
+                sx={{
+                  display: 'block',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 500,
+                  color: '#E6F2B1',
+                  lineHeight: 1.15,
+                  letterSpacing: '0.02em',
+                  fontSize: { xs: '0.95rem', sm: '1.1rem', md: '1.3rem' },
+                }}
+              >
+                noviembre
+              </Typography>
+              <Typography
+                component="span"
+                sx={{
+                  display: 'block',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  lineHeight: 0.95,
+                  letterSpacing: '-0.02em',
+                  fontSize: { xs: '1.9rem', sm: '2.4rem', md: '3rem' },
+                }}
+              >
+                2026
+              </Typography>
+            </Box>
+            <Box sx={{ alignSelf: 'center' }}>
+              <Typography
+                component="span"
+                sx={{
+                  display: 'block',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 600,
+                  color: '#E6F2B1',
+                  lineHeight: 1.25,
+                  fontSize: { xs: '1.05rem', sm: '1.25rem', md: '1.55rem' },
+                }}
+              >
+                Club Cumbres
+              </Typography>
+              <Typography
+                component="span"
+                sx={{
+                  display: 'block',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 400,
+                  color: '#FFFFFF',
+                  lineHeight: 1.25,
+                  fontSize: { xs: '1.05rem', sm: '1.25rem', md: '1.55rem' },
+                }}
+              >
+                Mérida, Yucatán
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
 
         {/* Countdown */}
         <Stack
@@ -2480,30 +2546,6 @@ export default function LandingPage() {
           </Typography>
           <CountdownUnit value={timeLeft.seconds} label="Seg" />
         </Stack>
-
-        <Button
-          component="a"
-          href="#elige-tu-experiencia"
-          variant="contained"
-          color="primary"
-          size="large"
-          sx={{
-            px: 5,
-            py: 1.5,
-            fontSize: { xs: '1rem', sm: '1.1rem' },
-            mb: 3,
-            '&:focus-visible': { outline: '3px solid #E6F2B1', outlineOffset: 3 },
-          }}
-        >
-          Elige tu experiencia
-        </Button>
-
-        <Typography
-          variant="body2"
-          sx={{ color: 'text.secondary', letterSpacing: '0.15em', textTransform: 'uppercase' }}
-        >
-          13-15 NOVIEMBRE 2026 • MÉRIDA YUCATÁN
-        </Typography>
       </Box>
 
       <EligeTuExperiencia />
