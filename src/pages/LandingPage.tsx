@@ -3794,75 +3794,144 @@ export default function LandingPage() {
             }}
           >
             <Box sx={{ position: 'relative', zIndex: 2, textAlign: 'left' }}>
-              {/* HYBRID EXPERIENCE — big lime institutional (decorative repeat, not a heading: the page H1 lives in the hero) */}
-              <Typography
-                variant="h1"
-                component="p"
-                sx={{
-                  fontWeight: 900,
-                  fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
-                  fontStyle: 'italic',
-                  fontSize: { xs: '2.1rem', sm: '3.6rem', md: '4.8rem' },
-                  lineHeight: 1,
-                  color: '#E6F2B1',
-                  letterSpacing: '-0.03em',
-                  mb: 0.5,
-                  textTransform: 'uppercase',
-                }}
-              >
-                HYBRID EXPERIENCE
-              </Typography>
+              {/* HYBRID EVENT EXPERIENCE — logotipo tipográfico decorativo (mismo tratamiento que el hero; no es heading, el H1 vive en el hero) */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: { xs: 2, md: 3 } }}>
+                <Typography
+                  component="p"
+                  sx={{
+                    m: 0,
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontWeight: 700,
+                    fontStyle: 'normal',
+                    textTransform: 'uppercase',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 0.92,
+                    color: '#E6F2B1',
+                    fontSize: { xs: '2rem', sm: '3.2rem', md: '4.2rem' },
+                  }}
+                >
+                  HYBRID
+                </Typography>
+                <Typography
+                  component="p"
+                  sx={{
+                    m: 0,
+                    fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
+                    fontWeight: 900,
+                    fontStyle: 'italic',
+                    textTransform: 'uppercase',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 0.92,
+                    color: '#E6F2B1',
+                    fontSize: { xs: '2rem', sm: '3.2rem', md: '4.2rem' },
+                  }}
+                >
+                  EVENT
+                </Typography>
+                <Typography
+                  component="p"
+                  sx={{
+                    m: 0,
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontWeight: 500,
+                    fontStyle: 'normal',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.2em',
+                    lineHeight: 1,
+                    color: '#F4F4E9',
+                    fontSize: { xs: '0.72rem', sm: '1rem', md: '1.25rem' },
+                    mt: { xs: 0.75, md: 1 },
+                    ml: '0.1em',
+                  }}
+                >
+                  EXPERIENCE
+                </Typography>
+              </Box>
 
-              {/* Date — pink institutional (stylistic, not a heading) */}
-              <Typography
-                variant="h2"
-                component="p"
+              {/* Fecha + sede — bloque editorial en dos columnas (mismo tratamiento que el hero) */}
+              <Box
                 sx={{
-                  fontWeight: 900,
-                  fontSize: { xs: '2.5rem', sm: '4rem', md: '5rem' },
-                  lineHeight: 1,
-                  color: '#E9C7DF',
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  letterSpacing: '-0.03em',
-                  mb: 2,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'flex-start',
+                  columnGap: { xs: 2.5, sm: 4 },
+                  rowGap: 1.5,
+                  mb: { xs: 3, md: 4 },
                 }}
               >
-                13-15 NOV
-              </Typography>
-
-              {/* Venue name */}
-              <Typography
-                variant="h1"
-                component="h3"
-                sx={{
-                  fontWeight: 900,
-                  fontSize: { xs: '2rem', sm: '3.5rem', md: '4.5rem' },
-                  lineHeight: 1,
-                  color: '#FFFFFF',
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  letterSpacing: '-0.02em',
-                  mb: 0.25,
-                }}
-              >
-                CLUB CUMBRES
-              </Typography>
-
-              {/* City */}
-              <Typography
-                variant="h1"
-                component="p"
-                sx={{
-                  fontWeight: 900,
-                  fontSize: { xs: '2rem', sm: '3.5rem', md: '4.5rem' },
-                  lineHeight: 1,
-                  color: 'rgba(255,255,255,0.7)',
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  letterSpacing: '-0.02em',
-                  mb: 3,
-                }}
-              >
-                MÉRIDA, YUCATÁN
-              </Typography>
+                <Box>
+                  <Typography
+                    component="span"
+                    sx={{
+                      display: 'block',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 700,
+                      color: '#FFFFFF',
+                      lineHeight: 0.95,
+                      letterSpacing: '-0.02em',
+                      fontSize: { xs: '1.9rem', sm: '2.6rem', md: '3.2rem' },
+                    }}
+                  >
+                    13–15
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      display: 'block',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 500,
+                      color: '#E6F2B1',
+                      lineHeight: 1.15,
+                      letterSpacing: '0.02em',
+                      fontSize: { xs: '0.85rem', sm: '1rem', md: '1.2rem' },
+                    }}
+                  >
+                    noviembre
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      display: 'block',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 700,
+                      color: '#FFFFFF',
+                      lineHeight: 0.95,
+                      letterSpacing: '-0.02em',
+                      fontSize: { xs: '1.6rem', sm: '2.1rem', md: '2.6rem' },
+                    }}
+                  >
+                    2026
+                  </Typography>
+                </Box>
+                <Box sx={{ alignSelf: 'center' }}>
+                  <Typography
+                    component="h3"
+                    sx={{
+                      m: 0,
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 600,
+                      color: '#E6F2B1',
+                      lineHeight: 1.25,
+                      fontSize: { xs: '1rem', sm: '1.2rem', md: '1.45rem' },
+                    }}
+                  >
+                    Club Cumbres
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      display: 'block',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 400,
+                      color: '#FFFFFF',
+                      lineHeight: 1.25,
+                      fontSize: { xs: '1rem', sm: '1.2rem', md: '1.45rem' },
+                    }}
+                  >
+                    Mérida, Yucatán
+                  </Typography>
+                </Box>
+              </Box>
 
               {/* Button */}
               <Button
