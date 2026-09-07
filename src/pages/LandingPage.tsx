@@ -778,7 +778,9 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
         border: `1px solid ${accentColor}26`,
         backgroundImage: `url(${imageUrl})`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        // On narrow cards the landscape photo crops to a thin central strip and
+        // cuts the athlete; bias the frame upward on mobile so the torso/head show.
+        backgroundPosition: { xs: 'center 30%', md: 'center' },
         transition: 'transform 0.2s ease, border-color 0.2s ease',
         '&::before': {
           content: '""',
@@ -3781,7 +3783,8 @@ export default function LandingPage() {
                 md: `url(${IMG_VENUE_907})`,
               },
               backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              // Anchor to the top of the aerial shot so the main court/field stays visible.
+              backgroundPosition: 'top',
               '&::before': {
                 content: '""',
                 position: 'absolute',
