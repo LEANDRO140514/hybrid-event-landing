@@ -1359,32 +1359,6 @@ function Navbar() {
               {link.label}
             </Typography>
           ))}
-          {/* Tienda aún no disponible: se muestra a propósito, deshabilitada, para
-              que la audiencia sepa que viene — no navega a DOMAINS.shop todavía. */}
-          <Button
-            disabled
-            aria-label="Tienda — próximamente"
-            sx={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              borderRadius: 0,
-              py: 0.5,
-              px: 1.5,
-              minHeight: 0,
-              minWidth: 0,
-              flexShrink: 0,
-              lineHeight: 1.2,
-              border: '1px solid rgba(230,242,177,0.35)',
-              '&.Mui-disabled': {
-                color: 'rgba(230,242,177,0.6)',
-                bgcolor: 'transparent',
-              },
-            }}
-          >
-            SHOP · PRONTO
-          </Button>
         </Box>
 
         {/* Hamburger */}
@@ -1426,22 +1400,6 @@ function Navbar() {
               {link.label}
             </Box>
           ))}
-          {/* Tienda aún no disponible — misma decisión que en el navbar de escritorio. */}
-          <Box
-            aria-disabled="true"
-            sx={{
-              px: 3,
-              py: 1.5,
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              color: 'rgba(230,242,177,0.6)',
-              cursor: 'default',
-            }}
-          >
-            SHOP · PRONTO
-          </Box>
         </Box>
       )}
     </Box>
