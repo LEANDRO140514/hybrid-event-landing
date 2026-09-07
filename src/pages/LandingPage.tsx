@@ -1320,8 +1320,6 @@ function Navbar() {
         <Typography
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           sx={{
-            fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
-            fontStyle: 'italic',
             color: '#E6F2B1',
             fontSize: { xs: '0.95rem', sm: '1.3rem' },
             lineHeight: 1,
@@ -1330,7 +1328,12 @@ function Navbar() {
             whiteSpace: 'nowrap',
           }}
         >
-          HYBRID EXPERIENCE
+          <Box component="span" sx={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, letterSpacing: '-0.02em' }}>
+            HYBRID
+          </Box>
+          <Box component="span" sx={{ fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif', fontStyle: 'italic', fontWeight: 900, letterSpacing: '-0.02em', ml: '0.28em' }}>
+            EXPERIENCE
+          </Box>
         </Typography>
 
         {/* Desktop links */}
@@ -1460,14 +1463,17 @@ function OrganizerStrip() {
     >
       <Typography
         sx={{
-          fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
-          fontStyle: 'italic',
           color: '#E6F2B1',
           fontSize: { xs: '0.9rem', sm: '1.1rem' },
           mb: 0.5,
         }}
       >
-        HYBRID EXPERIENCE
+        <Box component="span" sx={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, letterSpacing: '-0.02em' }}>
+          HYBRID
+        </Box>
+        <Box component="span" sx={{ fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif', fontStyle: 'italic', fontWeight: 900, letterSpacing: '-0.02em', ml: '0.28em' }}>
+          EXPERIENCE
+        </Box>
       </Typography>
       <Typography
         sx={{
@@ -4392,9 +4398,10 @@ export default function LandingPage() {
             variant="h6"
             component="span"
             sx={{
-              fontWeight: 900,
-              fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
-              fontStyle: 'italic',
+              fontWeight: 700,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontStyle: 'normal',
+              letterSpacing: '-0.02em',
               color: '#E6F2B1',
             }}
           >
@@ -4408,6 +4415,7 @@ export default function LandingPage() {
               fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
               fontStyle: 'italic',
               fontSize: 'calc(1rem + 3px)',
+              letterSpacing: '-0.02em',
               color: '#E6F2B1',
               ml: 0.5,
             }}
@@ -4418,9 +4426,10 @@ export default function LandingPage() {
             variant="h6"
             component="span"
             sx={{
-              fontWeight: 900,
-              fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
-              fontStyle: 'italic',
+              fontWeight: 700,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontStyle: 'normal',
+              letterSpacing: '-0.02em',
               color: '#E6F2B1',
               ml: 0.5,
             }}
