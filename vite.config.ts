@@ -12,7 +12,7 @@ export default defineConfig({
         name: 'The Hybrid Experience',
         short_name: 'Hybrid',
         description:
-          'Vive HYBRID EXPERIENCE del 9 al 11 de octubre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid y Workout Experience, o compra tu acceso como público.',
+          'Vive HYBRID EXPERIENCE del 9 al 11 de octubre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid, o compra tu acceso como público.',
         lang: 'es-MX',
         start_url: '/',
         display: 'standalone',
