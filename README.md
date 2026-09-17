@@ -83,17 +83,6 @@ Para reactivarlas: revertir el commit correspondiente en `LandingPage.tsx`
 (`feat(landing): suspend Workout and Fotógrafo, simplify floating CTA`) o
 volver a agregar sus arrays de productos y bloques de JSX a mano.
 
-## Bug conocido, preexistente (no relacionado con lo anterior)
-
-La fila fusionada de categorías sin precio por etapa (antes: Workout y
-Fotógrafo; ahora: solo Público) dentro de `TABLA_PRECIOS_GRUPOS` /
-`FilaPrecioTabla` (sección "PRECIOS") **nunca se renderiza** — confirmado
-comparando contra el código previo a la suspensión de categorías (vía `git
-stash`) antes de tocar nada. El grupo `ASISTE` completo falta del DOM en esa
-tabla comparativa; el resto del landing (incluidas las cards de Público más
-abajo) funciona bien. Pendiente de diagnóstico — no es efecto de la
-suspensión de Workout/Fotógrafo.
-
 ## Desarrollo
 
 ```bash
@@ -102,6 +91,13 @@ npm run dev       # servidor local, puerto 3000
 npm run build     # tsc -b && vite build
 npm run lint      # oxlint
 ```
+
+`hybrid-registro` corre en el mismo puerto 3000 por defecto. Si vas a tener
+ambos dev servers activos en paralelo (o alternar entre ellos en la misma
+pestaña/navegador), verifica siempre contra `npm run build` o el sitio
+real desplegado antes de reportar un bug — se ha visto al dev server servir
+contenido mezclado/cacheado de forma confusa al saltar de un repo al otro
+sobre el mismo puerto.
 
 ### Variables de entorno (`.env`, no versionado)
 
