@@ -39,13 +39,13 @@ import {
   porBloque,
   getInscribirUrl,
   formatPrecio,
-  getPrecioVigente,
+  getPrecioMostrado,
 } from '../data/catalogo'
 import type { Producto } from '../data/catalogo'
 import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
 import { SIMULACRO_PRO_ACTIVE } from '../config/simulacroProConfig'
-import { resolveEtapaComercial } from '../lib/pricingStage'
+import { clearAffiliateCode, getAffiliateCode, subscribeAffiliate } from '../lib/affiliate'
 import type { EtapaComercial } from '../lib/pricingStage'
 import {
   getSandboxCheckoutProductConfig,
@@ -645,8 +645,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
   const isOpen = SALES_CONFIG.status === 'open'
   const isClosed = SALES_CONFIG.status === 'closed'
   const buttonLabel = isOpen ? 'Inscribirse' : isClosed ? 'Inscripciones cerradas' : SALES_CONFIG.openingLabel
-  const etapaVigente = resolveEtapaComercial() ?? 'lanzamiento'
-  const precioVigente = getPrecioVigente(producto, etapaVigente)
+  const precioVigente = getPrecioMostrado(producto)
   const isWorkout = producto.tipo === 'Workout Experience'
   const productConfig = getSandboxCheckoutProductConfig(producto.code)
   const checkoutActive =
@@ -746,6 +745,8 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
         },
         captainName,
         teammateNames: teammateNamesTrimmed,
+        affiliateCode: getAffiliateCode(),
+        expectedUnitPriceCents: Math.round(precioVigente * 100),
       })
       savePublicOrderReference(producto.code, result.public_order_reference)
       const stored = getCheckoutAttempt(producto.code)
@@ -755,6 +756,9 @@ function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
       // Keep lock held through navigation; do not release on success path.
       window.location.assign(result.checkout_url)
     } catch (err) {
+      if (err instanceof CheckoutApiError && err.code === 'PRICE_CHANGED') {
+        clearAffiliateCode()
+      }
       if (err instanceof CheckoutApiError) {
         setErrorMessage(messageForCheckoutError(err.code))
       } else {
@@ -2260,6 +2264,7 @@ function PorQuePerteneces() {
 }
 
 export default function LandingPage() {
+  useSyncExternalStore(subscribeAffiliate, getAffiliateCode, getAffiliateCode)
   const targetDate = useMemo(() => new Date('2026-11-13T17:00:00'), [])
   const timeLeft = useCountdown(targetDate)
   const [showBackToTop, setShowBackToTop] = useState(false)
@@ -3310,8 +3315,7 @@ export default function LandingPage() {
           </Typography>
 
           {COMPITE_GROUPS.map((group) => {
-            const etapaVigente = resolveEtapaComercial() ?? 'lanzamiento'
-            const precioVigente = getPrecioVigente(group.productos[0], etapaVigente)
+            const precioVigente = getPrecioMostrado(group.productos[0])
             return (
             <Box key={group.key} id={group.id} sx={{ mb: { xs: 5, md: 6 }, scrollMarginTop: '80px' }}>
               <Typography

@@ -8,6 +8,7 @@ export type CheckoutPublicErrorCode =
   | 'WAIVER_REQUIRED'
   | 'CONTACT_REQUIRED'
   | 'SOLD_OUT'
+  | 'PRICE_CHANGED'
   | 'ORIGIN_NOT_ALLOWED'
   | 'CONFIGURATION_ERROR'
   | 'UNSUPPORTED_PROVIDER'
@@ -43,6 +44,7 @@ function mapErrorCode(raw: unknown): CheckoutPublicErrorCode {
     case 'WAIVER_REQUIRED':
     case 'CONTACT_REQUIRED':
     case 'SOLD_OUT':
+    case 'PRICE_CHANGED':
     case 'ORIGIN_NOT_ALLOWED':
     case 'CONFIGURATION_ERROR':
     case 'UNSUPPORTED_PROVIDER':
@@ -64,6 +66,8 @@ export function messageForCheckoutError(code: CheckoutPublicErrorCode): string {
       return 'Las ventas todavía no están disponibles.'
     case 'SOLD_OUT':
       return 'Este acceso está agotado.'
+    case 'PRICE_CHANGED':
+      return 'El precio se actualizó, revisa el monto e inténtalo de nuevo'
     case 'ORIGIN_NOT_ALLOWED':
       return 'No pudimos iniciar el proceso de pago.'
     case 'CONFIGURATION_ERROR':
@@ -131,6 +135,10 @@ export type CreateCheckoutInput = {
    * an empty array for individual products.
    */
   teammateNames: string[]
+  /** Stored partner code, or null when the visitor has none. */
+  affiliateCode: string | null
+  /** Displayed price in MXN cents. The server rejects a mismatch with PRICE_CHANGED. */
+  expectedUnitPriceCents: number
   /** Fixed to Mercado Pago for go-live; no UI provider selector. */
   selectedProvider: 'MERCADO_PAGO'
 }
@@ -167,6 +175,8 @@ export async function createCheckout(input: CreateCheckoutInput): Promise<Create
       buyer: buyerBody,
       captain_name: input.captainName,
       teammate_names: input.teammateNames,
+      affiliate_code: input.affiliateCode,
+      expected_unit_price_cents: input.expectedUnitPriceCents,
     }),
   })
 

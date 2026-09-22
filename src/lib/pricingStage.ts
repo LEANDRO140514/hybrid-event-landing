@@ -1,66 +1,45 @@
-import { SALES_CONFIG } from '../config/salesConfig'
-
 export type EtapaComercial = 'lanzamiento' | 'preventa' | 'regular'
 
-interface EtapaWindow {
-  etapa: EtapaComercial
-  start: Date
-  end: Date
-}
-
 /**
- * America/Merida (Yucatán) is fixed at UTC-6 with no DST — Mexico eliminated
- * seasonal time changes nationwide under the 2022 reform — so a hardcoded
- * offset is safe for the 2026 sales window below.
- */
-const MERIDA_UTC_OFFSET = '-06:00'
-
-function meridaDate(isoLocalDateTime: string): Date {
-  return new Date(`${isoLocalDateTime}${MERIDA_UTC_OFFSET}`)
-}
-
-// Calendario comercial confirmado (11 ago 2026):
-//   lanzamiento: 11 ago – 31 ago 2026
-//   preventa:     1 sep – 30 sep 2026
-//   regular:      1 oct –  7 nov 2026 (cierre de ventas: 7 nov)
-const ETAPA_WINDOWS: EtapaWindow[] = [
-  {
-    etapa: 'lanzamiento',
-    start: meridaDate('2026-08-11T00:00:00'),
-    end: meridaDate('2026-08-31T23:59:59.999'),
-  },
-  {
-    etapa: 'preventa',
-    start: meridaDate('2026-09-01T00:00:00'),
-    end: meridaDate('2026-09-30T23:59:59.999'),
-  },
-  {
-    etapa: 'regular',
-    start: meridaDate('2026-10-01T00:00:00'),
-    end: meridaDate('2026-11-07T23:59:59.999'),
-  },
-]
-
-// Cierre de ventas confirmado (decisión operativa: logística, kits, seguros,
-// chips). Después de esta fecha resolveEtapaComercial() devuelve null; el
-// cierre visible al público se opera cambiando SALES_CONFIG.status a
-// 'closed' ese día.
-export const FECHA_CIERRE_VENTAS = '2026-11-07'
-
-/**
- * Resolves the current commercial stage by date (America/Merida), gated by
- * the manual `ventasArrancadas` switch in salesConfig. Returns null when
- * sales haven't been manually started, or when `now` falls outside every
- * defined window (before lanzamiento or after the 7 nov 23:59 regular close).
+ * Copy of the checkout calendar in ready2hybrid
+ * `insforge/functions/_shared/checkout/staged-pricing.ts`.
+ * Authority is that file. This calendar is a copy so the landing displays
+ * the same stage the server charges.
  *
- * This does NOT open sales by itself — salesConfig.status is the separate,
- * unchanged authority the landing UI currently reads for that.
+ * America/Mérida is fixed at UTC−6 (no DST). Windows are half-open [start, end).
+ *   LAUNCH   2026-08-11 → 2026-09-11
+ *   PRESALE  2026-09-11 → 2026-10-01
+ *   REGULAR  2026-10-01 → 2026-11-08
  */
+
+const MERIDA_OFFSET_MS = -6 * 60 * 60 * 1000
+
+function meridaWallToUtcMs(y: number, m: number, d: number, hh = 0, mm = 0, ss = 0): number {
+  return Date.UTC(y, m - 1, d, hh, mm, ss) - MERIDA_OFFSET_MS
+}
+
+const STAGE_WINDOWS = {
+  lanzamiento: {
+    startMs: meridaWallToUtcMs(2026, 8, 11, 0, 0, 0),
+    endMs: meridaWallToUtcMs(2026, 9, 11, 0, 0, 0),
+  },
+  preventa: {
+    startMs: meridaWallToUtcMs(2026, 9, 11, 0, 0, 0),
+    endMs: meridaWallToUtcMs(2026, 10, 1, 0, 0, 0),
+  },
+  regular: {
+    startMs: meridaWallToUtcMs(2026, 10, 1, 0, 0, 0),
+    endMs: meridaWallToUtcMs(2026, 11, 8, 0, 0, 0),
+  },
+} as const
+
+/** Exclusive end of REGULAR: 8 nov 2026 00:00 America/Mérida. */
+export const FECHA_CIERRE_VENTAS = '2026-11-08'
+
 export function resolveEtapaComercial(now: Date = new Date()): EtapaComercial | null {
-  if (!SALES_CONFIG.ventasArrancadas) return null
   const t = now.getTime()
-  for (const window of ETAPA_WINDOWS) {
-    if (t >= window.start.getTime() && t <= window.end.getTime()) return window.etapa
-  }
-  return null
+  if (t < STAGE_WINDOWS.lanzamiento.startMs || t >= STAGE_WINDOWS.regular.endMs) return null
+  if (t < STAGE_WINDOWS.lanzamiento.endMs) return 'lanzamiento'
+  if (t < STAGE_WINDOWS.preventa.endMs) return 'preventa'
+  return 'regular'
 }

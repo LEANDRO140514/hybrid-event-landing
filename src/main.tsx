@@ -3,9 +3,12 @@ import ReactDOM from 'react-dom/client'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import { SnackbarProvider } from 'notistack'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { captureAffiliateFromUrl } from './lib/affiliate'
 import { theme } from './theme'
 import { routeTree } from './routeTree.gen'
 import NotFoundPage from './pages/NotFoundPage'
+
+captureAffiliateFromUrl()
 
 const router = createRouter({ routeTree, defaultNotFoundComponent: NotFoundPage })
 
