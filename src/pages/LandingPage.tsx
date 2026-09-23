@@ -664,8 +664,12 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
   const precioVigente = getPrecioMostrado(producto)
   const isWorkout = producto.tipo === 'Workout Experience'
   const productConfig = getSandboxCheckoutProductConfig(producto.code)
+  // SALES_CONFIG is the commercial authority: the embedded checkout can only
+  // render once sales are actually open, regardless of the Vercel checkout
+  // env vars — otherwise a configured-but-not-yet-open product would let
+  // visitors start a real Mercado Pago payment during "coming_soon".
   const checkoutActive =
-    isCheckoutActive() && isSandboxCheckoutProduct(producto.code) && productConfig != null
+    isOpen && isCheckoutActive() && isSandboxCheckoutProduct(producto.code) && productConfig != null
   const showSandboxBadge = checkoutActive && isSandboxCheckoutActive()
   const quantityEditable = productConfig?.quantityMode === 'editable'
   const [buyerName, setBuyerName] = useState('')
@@ -1865,6 +1869,7 @@ function EtapasDePrecio() {
       id="precios"
       sx={{
         py: { xs: 7, md: 9 },
+        scrollMarginTop: '80px',
         bgcolor: '#111111',
         borderTop: '1px solid rgba(230,242,177,0.12)',
         borderBottom: '1px solid rgba(230,242,177,0.12)',
@@ -2147,6 +2152,7 @@ function PorQuePerteneces() {
       id="comunidad"
       sx={{
         py: { xs: 7, md: 10 },
+        scrollMarginTop: '80px',
         background: 'linear-gradient(180deg, #000000 0%, rgba(230,242,177,0.04) 50%, #000000 100%)',
       }}
     >
