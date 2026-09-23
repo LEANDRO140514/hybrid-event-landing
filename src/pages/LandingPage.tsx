@@ -145,7 +145,12 @@ const FAQ_DATA: FaqItem[] = [
   {
     question: '¿Qué incluye el precio?',
     answer:
-      'Chip de cronometraje y seguro del atleta, incluidos en todas las categorías de competencia y en el ½ Hybrid. Sin cargos adicionales ni desgloses ocultos.',
+      'Chip de cronometraje, seguro del atleta, medalla de participación y parche conmemorativo de esta edición, incluidos en todas las categorías de competencia y en ½ Hybrid.',
+  },
+  {
+    question: '¿Todos reciben medalla?',
+    answer:
+      'Sí. Todos los participantes de HYBRID EVENT reciben medalla de participación y parche conmemorativo de esta edición, incluyendo quienes participan en ½ Hybrid.',
   },
   {
     question: '¿Qué día compito?',
@@ -154,6 +159,15 @@ const FAQ_DATA: FaqItem[] = [
   {
     question: '¿Puedo ir solo a ver?',
     answer: `Sí. Pases de público por día (${formatPrecio(250)}) o pase de 3 días (${formatPrecio(600)}). Compra el día en que compite tu atleta.`,
+  },
+  {
+    question: '¿Cuándo abren las inscripciones?',
+    answer:
+      SALES_CONFIG.status === 'open'
+        ? 'Las inscripciones ya están abiertas.'
+        : SALES_CONFIG.status === 'closed'
+          ? 'Las inscripciones están cerradas.'
+          : `Las inscripciones estarán disponibles ${SALES_CONFIG.openingLabel.toLowerCase()}.`,
   },
   {
     question: '¿Qué necesito llevar?',
@@ -182,7 +196,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
           display: 'block',
           fontWeight: 900,
           color: 'secondary.main',
-          fontSize: { xs: '2rem', sm: '3rem' },
+          fontSize: { xs: '2.3rem', sm: '3.3rem' },
           lineHeight: 1,
         }}
       >
@@ -476,6 +490,8 @@ function unidadConPrecioVigente(producto: Producto, precioVigente: number): stri
 interface ProductCardProps {
   producto: Producto
   accentColor?: string
+  /** Overrides the button label shown once registration is open (default: "Inscribirse"). */
+  openLabel?: string
 }
 
 /** Shared with SimulacroProSection — buyer/email validation for checkout. */
@@ -640,11 +656,11 @@ function TeammateNameFields({
   )
 }
 
-function ProductCard({ producto, accentColor = '#E6F2B1' }: ProductCardProps) {
+function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribirse' }: ProductCardProps) {
   const imageUrl = PRODUCT_IMAGES[producto.code] || IMG_WORKOUT
   const isOpen = SALES_CONFIG.status === 'open'
   const isClosed = SALES_CONFIG.status === 'closed'
-  const buttonLabel = isOpen ? 'Inscribirse' : isClosed ? 'Inscripciones cerradas' : SALES_CONFIG.openingLabel
+  const buttonLabel = isOpen ? openLabel : isClosed ? 'Inscripciones cerradas' : SALES_CONFIG.openingLabel
   const precioVigente = getPrecioMostrado(producto)
   const isWorkout = producto.tipo === 'Workout Experience'
   const productConfig = getSandboxCheckoutProductConfig(producto.code)
@@ -1318,7 +1334,9 @@ function Navbar() {
     >
       <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1.5, px: 2 }}>
         <Typography
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          component="a"
+          href="#hero"
+          aria-label="Ir al inicio"
           sx={{
             color: '#E6F2B1',
             fontSize: { xs: '0.95rem', sm: '1.3rem' },
@@ -1326,6 +1344,8 @@ function Navbar() {
             cursor: 'pointer',
             userSelect: 'none',
             whiteSpace: 'nowrap',
+            textDecoration: 'none',
+            '&:focus-visible': { outline: '2px solid #E6F2B1', outlineOffset: 2 },
           }}
         >
           <Box component="span" sx={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, letterSpacing: '-0.02em' }}>
@@ -1452,19 +1472,45 @@ function OrganizerStrip() {
 // ── Elige tu experiencia (three conceptual entry points) ─────────
 interface AccesoConceptual {
   titulo: string
-  subtitulo: string
+  frase: string
+  modalidad: string
+  ctaLabel: string
   href: string
   color: string
 }
 
 const ACCESOS: AccesoConceptual[] = [
-  { titulo: 'QUIERO COMPETIR', subtitulo: 'Individual · Dobles · Relay', href: '#compite', color: '#E6F2B1' },
-  { titulo: 'QUIERO EMPEZAR', subtitulo: '½ Hybrid', href: '#experience', color: '#E6F2B1' },
-  { titulo: 'QUIERO ASISTIR', subtitulo: 'Público', href: '#asiste', color: '#E9C7DF' },
+  {
+    titulo: 'QUIERO COMPETIR',
+    frase: 'Acepta el reto completo.',
+    modalidad: 'Individual · Dobles · Relay',
+    ctaLabel: 'VER CATEGORÍAS',
+    href: '#compite',
+    color: '#E6F2B1',
+  },
+  {
+    titulo: 'QUIERO EMPEZAR',
+    frase: 'Tu primer paso dentro de HYBRID.',
+    modalidad: '½ Hybrid',
+    ctaLabel: 'CONOCER ½ HYBRID',
+    href: '#experience',
+    color: '#E6F2B1',
+  },
+  {
+    titulo: 'QUIERO ASISTIR',
+    frase: 'Vive la energía del evento.',
+    modalidad: 'Público',
+    ctaLabel: 'VER BOLETOS',
+    href: '#asiste',
+    color: '#E9C7DF',
+  },
 ]
 
 function EligeTuExperiencia() {
   return (
+    // El id vive en el contenedor de la sección (no en una tarjeta), así el
+    // anchor del botón flotante nunca deja una tarjeta con apariencia de
+    // seleccionada/enfocada al aterrizar aquí.
     <Box
       id="elige-tu-experiencia"
       component="section"
@@ -1476,7 +1522,7 @@ function EligeTuExperiencia() {
           component="h2"
           sx={{
             textAlign: 'center',
-            mb: { xs: 5, md: 6 },
+            mb: 1.5,
             fontWeight: 900,
             fontSize: { xs: '1.6rem', sm: '2.1rem', md: '2.4rem' },
             textTransform: 'uppercase',
@@ -1487,22 +1533,54 @@ function EligeTuExperiencia() {
         >
           Elige cómo vivir la experiencia
         </Typography>
+        <Typography
+          component="p"
+          sx={{
+            textAlign: 'center',
+            maxWidth: 520,
+            mx: 'auto',
+            mb: { xs: 5, md: 6 },
+            color: 'text.secondary',
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 400,
+            fontSize: { xs: '0.9rem', sm: '1rem' },
+            lineHeight: 1.6,
+          }}
+        >
+          Encuentra la opción ideal para ti y descubre categorías, precios y disponibilidad.
+        </Typography>
         <Grid container spacing={3}>
           {ACCESOS.map((acceso) => (
-            <Grid size={{ xs: 12, sm: 4 }} key={acceso.href}>
+            <Grid size={{ xs: 12, sm: 4 }} key={acceso.href} sx={{ display: 'flex' }}>
               <Box
                 component="a"
                 href={acceso.href}
                 sx={{
-                  display: 'block',
+                  display: 'flex',
+                  flexDirection: 'column',
                   textAlign: 'center',
-                  height: '100%',
-                  p: { xs: 3.5, sm: 4 },
+                  width: '100%',
+                  p: { xs: 3, sm: 4 },
                   border: '2px solid',
                   borderColor: `${acceso.color}4D`,
                   textDecoration: 'none',
-                  transition: 'border-color 0.15s ease, transform 0.15s ease',
-                  '&:hover': { borderColor: acceso.color, transform: 'translateY(-3px)' },
+                  cursor: 'pointer',
+                  WebkitTapHighlightColor: 'transparent',
+                  transition: 'border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease',
+                  // Hover sólo en dispositivos con puntero real: evita que un
+                  // tap en móvil deje una tarjeta con estilo "hover" pegado.
+                  '@media (hover: hover) and (pointer: fine)': {
+                    '&:hover': {
+                      borderColor: acceso.color,
+                      transform: 'translateY(-3px)',
+                      boxShadow: `0 10px 28px ${acceso.color}26`,
+                    },
+                    '&:hover .acceso-cta-arrow': { transform: 'translateX(3px)' },
+                  },
+                  '&:active': {
+                    borderColor: acceso.color,
+                    transform: 'translateY(-1px) scale(0.99)',
+                  },
                   '&:focus-visible': { outline: `3px solid ${acceso.color}`, outlineOffset: 3 },
                 }}
               >
@@ -1513,7 +1591,7 @@ function EligeTuExperiencia() {
                     color: acceso.color,
                     fontFamily: "'Space Grotesk', sans-serif",
                     letterSpacing: '0.03em',
-                    fontSize: { xs: '1.15rem', sm: '1.3rem' },
+                    fontSize: { xs: '1.2rem', sm: '1.35rem' },
                     textTransform: 'uppercase',
                     mb: 1,
                   }}
@@ -1522,10 +1600,56 @@ function EligeTuExperiencia() {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: 'text.secondary', fontFamily: "'Space Grotesk', sans-serif" }}
+                  sx={{
+                    color: '#F4F4E9',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    lineHeight: 1.5,
+                    mb: 1.5,
+                  }}
                 >
-                  {acceso.subtitulo}
+                  {acceso.frase}
                 </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontWeight: 600,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                    fontSize: '0.75rem',
+                    mb: { xs: 2.5, sm: 3 },
+                  }}
+                >
+                  {acceso.modalidad}
+                </Typography>
+                <Box
+                  sx={{
+                    mt: 'auto',
+                    pt: { xs: 2, sm: 2.25 },
+                    borderTop: '1px solid rgba(255,255,255,0.12)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 0.75,
+                    color: acceso.color,
+                    fontWeight: 900,
+                    fontSize: { xs: '0.8rem', sm: '0.85rem' },
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                  }}
+                >
+                  {acceso.ctaLabel}
+                  <Box
+                    component="span"
+                    aria-hidden
+                    className="acceso-cta-arrow"
+                    sx={{ display: 'inline-block', transition: 'transform 0.15s ease' }}
+                  >
+                    →
+                  </Box>
+                </Box>
               </Box>
             </Grid>
           ))}
@@ -1875,7 +1999,7 @@ function EtapasDePrecio() {
         <Box sx={{ textAlign: 'center' }}>
           <Button
             component="a"
-            href="#experience"
+            href="#elige-tu-experiencia"
             variant="outlined"
             sx={{
               borderRadius: 0,
@@ -1963,7 +2087,13 @@ function PrizeTable({ title, rows, accentColor = '#E6F2B1' }: { title: string; r
   )
 }
 
-function ReconocimientoLine({ align = 'center' }: { align?: 'left' | 'center' }) {
+function ReconocimientoLine({
+  align = 'center',
+  text = 'Reconocimiento y premios a los mejores tiempos por categoría.',
+}: {
+  align?: 'left' | 'center'
+  text?: string
+}) {
   return (
     <Typography
       sx={{
@@ -1976,7 +2106,7 @@ function ReconocimientoLine({ align = 'center' }: { align?: 'left' | 'center' })
         fontFamily: "'Space Grotesk', sans-serif",
       }}
     >
-      Reconocimiento y premios a los mejores tiempos por categoría.
+      {text}
     </Typography>
   )
 }
@@ -2001,20 +2131,14 @@ const BENEFICIOS: Beneficio[] = [
 ]
 
 const MANIFIESTO_INTRO = [
-  'El deporte híbrido está transformando la forma de entrenar, competir y conectar.',
-  'HYBRID EXPERIENCE reúne a quienes ya viven este deporte, a quienes sueñan con competir por primera vez y a quienes entienden que el verdadero reto siempre es convertirse en una mejor versión de sí mismos.',
-  'Aquí no importa si buscas tu mejor marca, tu primera meta o simplemente vivir una experiencia diferente.',
+  'El deporte híbrido está cambiando la forma de entrenar, competir y conectar.',
+  'HYBRID EXPERIENCE reúne a quienes ya viven este deporte, a quienes están por competir por primera vez y a quienes simplemente quieren descubrir hasta dónde pueden llegar.',
+  'No importa si vienes por tu mejor marca, por tu primera meta o por vivir algo diferente.',
 ]
-const MANIFIESTO_NO_IMPORTA = ['No importa tu edad.', 'No importa tu experiencia.']
-const MANIFIESTO_DESTACADO = 'No importa de dónde vienes. Lo importante es que hoy perteneces.'
-const MANIFIESTO_CIERRE = [
-  'Cada entrenamiento suma.',
-  'Cada meta inspira.',
-  'Cada historia fortalece esta comunidad.',
-  'Porque HYBRID EXPERIENCE no es solo un evento.',
-  'Es un movimiento que crece con cada persona que decide aceptar el reto.',
-]
-const MANIFIESTO_CTA_LINE = 'Únete a la comunidad HYBRID EXPERIENCE.'
+const MANIFIESTO_CIERRE = ['Cada entrenamiento suma.', 'Cada meta inspira.', 'Cada historia fortalece la comunidad.']
+const MANIFIESTO_PUENTE = 'Porque HYBRID EXPERIENCE no es solo un evento.'
+const MANIFIESTO_DESTACADO = 'Es un movimiento que crece con cada persona que acepta el reto.'
+const MANIFIESTO_CIERRE_FINAL = 'El reto es individual. La experiencia es de todos.'
 
 function PorQuePerteneces() {
   return (
@@ -2022,7 +2146,7 @@ function PorQuePerteneces() {
       component="section"
       id="comunidad"
       sx={{
-        py: { xs: 8, md: 12 },
+        py: { xs: 7, md: 10 },
         background: 'linear-gradient(180deg, #000000 0%, rgba(230,242,177,0.04) 50%, #000000 100%)',
       }}
     >
@@ -2051,7 +2175,7 @@ function PorQuePerteneces() {
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             fontSize: { xs: '0.8rem', sm: '0.9rem' },
-            mb: { xs: 6, md: 8 },
+            mb: { xs: 5, md: 6 },
             fontFamily: "'Space Grotesk', sans-serif",
           }}
         >
@@ -2066,7 +2190,7 @@ function PorQuePerteneces() {
             color: 'text.secondary',
             maxWidth: 640,
             mx: 'auto',
-            mb: 4,
+            mb: 3,
             fontFamily: "'Space Grotesk', sans-serif",
             fontSize: { xs: '0.95rem', sm: '1.05rem' },
             lineHeight: 1.7,
@@ -2074,7 +2198,7 @@ function PorQuePerteneces() {
         >
           Tu inscripción incluye todo lo necesario para que vivas HYBRID EXPERIENCE al máximo:
         </Typography>
-        <Grid container spacing={2.5} sx={{ mb: { xs: 6, md: 8 } }}>
+        <Grid container spacing={2.5} sx={{ mb: { xs: 5, md: 6 } }}>
           {BENEFICIOS.map((b) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={b.texto}>
               <Box
@@ -2108,7 +2232,7 @@ function PorQuePerteneces() {
         </Grid>
 
         {/* Puente */}
-        <Stack spacing={0.5} sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
+        <Stack spacing={0.75} sx={{ textAlign: 'center', mb: { xs: 5, md: 6 } }}>
           <Typography
             sx={{
               color: '#E6F2B1',
@@ -2138,16 +2262,17 @@ function PorQuePerteneces() {
             fontWeight: 900,
             color: '#ffffff',
             textTransform: 'uppercase',
-            letterSpacing: '0.03em',
-            fontSize: { xs: '1.1rem', sm: '1.4rem' },
-            mb: 3,
+            letterSpacing: '0.02em',
+            fontSize: { xs: '1.35rem', sm: '1.75rem', md: '2.1rem' },
+            lineHeight: 1.15,
+            mb: 2.5,
             fontFamily: "'Space Grotesk', sans-serif",
           }}
         >
           Más que una competencia. Una comunidad.
         </Typography>
 
-        <Stack spacing={1.75} sx={{ maxWidth: 680, mx: 'auto', mb: 4 }}>
+        <Stack spacing={1.5} sx={{ maxWidth: 760, mx: 'auto', mb: 3 }}>
           {MANIFIESTO_INTRO.map((line) => (
             <Typography
               key={line}
@@ -2164,8 +2289,8 @@ function PorQuePerteneces() {
           ))}
         </Stack>
 
-        <Stack spacing={0.5} sx={{ textAlign: 'center', mb: 4 }}>
-          {MANIFIESTO_NO_IMPORTA.map((line) => (
+        <Stack spacing={0.4} sx={{ textAlign: 'center', mb: 3 }}>
+          {MANIFIESTO_CIERRE.map((line) => (
             <Typography
               key={line}
               sx={{
@@ -2180,12 +2305,27 @@ function PorQuePerteneces() {
           ))}
         </Stack>
 
+        <Typography
+          sx={{
+            textAlign: 'center',
+            color: 'text.secondary',
+            maxWidth: 680,
+            mx: 'auto',
+            mb: 2.5,
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontSize: { xs: '0.9rem', sm: '1rem' },
+            lineHeight: 1.7,
+          }}
+        >
+          {MANIFIESTO_PUENTE}
+        </Typography>
+
         <Box
           sx={{
             maxWidth: 680,
             mx: 'auto',
-            mb: 4,
-            py: { xs: 2.5, sm: 3 },
+            mb: 3,
+            py: { xs: 2.25, sm: 2.75 },
             px: { xs: 2.5, sm: 4 },
             borderLeft: { xs: '4px solid #E6F2B1', sm: 'none' },
             borderTop: { sm: '2px solid #E6F2B1' },
@@ -2197,9 +2337,10 @@ function PorQuePerteneces() {
             sx={{
               color: '#E6F2B1',
               fontWeight: 900,
+              textTransform: 'uppercase',
               fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: { xs: '1.15rem', sm: '1.5rem', md: '1.7rem' },
-              lineHeight: 1.4,
+              fontSize: { xs: '1.1rem', sm: '1.35rem', md: '1.5rem' },
+              lineHeight: 1.35,
               letterSpacing: '0.01em',
             }}
           >
@@ -2207,42 +2348,24 @@ function PorQuePerteneces() {
           </Typography>
         </Box>
 
-        <Stack spacing={1.75} sx={{ maxWidth: 680, mx: 'auto', mb: 3 }}>
-          {MANIFIESTO_CIERRE.map((line) => (
-            <Typography
-              key={line}
-              sx={{
-                textAlign: 'center',
-                color: 'text.secondary',
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: { xs: '0.9rem', sm: '1rem' },
-                lineHeight: 1.7,
-              }}
-            >
-              {line}
-            </Typography>
-          ))}
-        </Stack>
-
         <Typography
           sx={{
             textAlign: 'center',
             color: '#ffffff',
-            fontWeight: 900,
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
+            fontWeight: 800,
             fontSize: { xs: '1rem', sm: '1.2rem' },
-            mb: { xs: 5, md: 6 },
+            lineHeight: 1.4,
+            mb: { xs: 4, md: 5 },
             fontFamily: "'Space Grotesk', sans-serif",
           }}
         >
-          {MANIFIESTO_CTA_LINE}
+          {MANIFIESTO_CIERRE_FINAL}
         </Typography>
 
-        <Box sx={{ textAlign: 'center' }}>
+        <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 0 } }}>
           <Button
             component="a"
-            href="#experience"
+            href="#elige-tu-experiencia"
             variant="outlined"
             sx={{
               borderRadius: 0,
@@ -2251,11 +2374,15 @@ function PorQuePerteneces() {
               color: '#E6F2B1',
               fontWeight: 700,
               minHeight: 44,
+              width: { xs: '100%', sm: 'auto' },
+              maxWidth: { xs: 420, sm: 'none' },
+              transition: 'background-color 0.15s ease, transform 0.15s ease',
               '&:hover': { borderWidth: 2, borderColor: '#E6F2B1', bgcolor: '#E6F2B11A' },
+              '&:active': { borderWidth: 2, bgcolor: '#E6F2B133', transform: 'scale(0.98)' },
               '&:focus-visible': { outline: '3px solid #E6F2B1', outlineOffset: 2 },
             }}
           >
-            Ver categorías
+            Elige tu experiencia
           </Button>
         </Box>
       </Container>
@@ -2411,7 +2538,7 @@ export default function LandingPage() {
                   color: '#FFFFFF',
                   lineHeight: 0.95,
                   letterSpacing: '-0.02em',
-                  fontSize: { xs: '2.3rem', sm: '2.9rem', md: '3.6rem' },
+                  fontSize: { xs: '2.6rem', sm: '3.2rem', md: '3.9rem' },
                 }}
               >
                 13–15
@@ -2439,7 +2566,7 @@ export default function LandingPage() {
                   color: '#FFFFFF',
                   lineHeight: 0.95,
                   letterSpacing: '-0.02em',
-                  fontSize: { xs: '1.9rem', sm: '2.4rem', md: '3rem' },
+                  fontSize: { xs: '2.1rem', sm: '2.6rem', md: '3.2rem' },
                 }}
               >
                 2026
@@ -2632,11 +2759,28 @@ export default function LandingPage() {
         id="experience"
         sx={{
           py: { xs: 8, md: 12 },
+          scrollMarginTop: '80px',
           background: 'linear-gradient(180deg, #000000 0%, rgba(230,242,177,0.05) 50%, #000000 100%)',
         }}
       >
         <Container maxWidth="lg">
-          <SectionHeading label="EXPERIENCE" />
+          <SectionHeading label="½ Hybrid" />
+          <Typography
+            component="p"
+            sx={{
+              textAlign: 'center',
+              fontWeight: 900,
+              color: '#ffffff',
+              textTransform: 'uppercase',
+              letterSpacing: '0.02em',
+              fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.7rem' },
+              lineHeight: 1.2,
+              mb: 1.5,
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Tu primer paso dentro de HYBRID
+          </Typography>
           <Typography
             variant="body1"
             sx={{
@@ -2648,8 +2792,8 @@ export default function LandingPage() {
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
-            La puerta de entrada al deporte híbrido. Para quien nunca ha competido — y para
-            quien quiere hacerlo de verdad, en volumen accesible.
+            Para quien nunca ha competido — y para quien quiere hacerlo de verdad, en volumen
+            accesible.
           </Typography>
 
           {/* ½ Hybrid */}
@@ -2698,11 +2842,14 @@ export default function LandingPage() {
             >
               {FORMATO_DESCRIPCIONES['½ Hybrid Individual']}
             </Typography>
-            <ReconocimientoLine />
+            <ReconocimientoLine text="Todos los participantes recibirán una medalla de participación y un parche conmemorativo de esta edición de HYBRID EVENT." />
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
               {HALF_HYBRID_PRODUCTS.map((producto) => (
                 <Grid size={{ xs: 6, sm: 4 }} key={producto.code}>
-                  <ProductCard producto={producto} />
+                  <ProductCard
+                    producto={producto}
+                    openLabel={producto.integrantes > 1 ? 'Inscribir a mi equipo' : 'Inscribirme'}
+                  />
                 </Grid>
               ))}
             </Grid>
@@ -3294,6 +3441,7 @@ export default function LandingPage() {
         id="compite"
         sx={{
           py: { xs: 8, md: 12 },
+          scrollMarginTop: '80px',
           background:
             'linear-gradient(180deg, rgba(230,242,177,0.04) 0%, #000000 100%)',
         }}
@@ -3301,17 +3449,33 @@ export default function LandingPage() {
         <Container maxWidth="lg">
           <SectionHeading label="COMPITE" />
           <Typography
+            component="p"
+            sx={{
+              textAlign: 'center',
+              fontWeight: 900,
+              color: '#ffffff',
+              textTransform: 'uppercase',
+              letterSpacing: '0.02em',
+              fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.7rem' },
+              lineHeight: 1.2,
+              mb: 1.5,
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Elige cómo quieres competir
+          </Typography>
+          <Typography
             variant="body1"
             sx={{
               textAlign: 'center',
               color: 'text.secondary',
               mb: 6,
-              maxWidth: 500,
+              maxWidth: 560,
               mx: 'auto',
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
-            Elige la categoría que mejor se adapte a ti.
+            Individual, Dobles o Relay. Encuentra tu categoría y asegura tu lugar en HYBRID EXPERIENCE.
           </Typography>
 
           {COMPITE_GROUPS.map((group) => {
@@ -3354,7 +3518,10 @@ export default function LandingPage() {
               <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 {group.productos.map((producto) => (
                   <Grid size={{ xs: 6, sm: 4, md: 3 }} key={producto.code}>
-                    <ProductCard producto={producto} />
+                    <ProductCard
+                      producto={producto}
+                      openLabel={producto.integrantes > 1 ? 'Inscribir a mi equipo' : 'Inscribirme'}
+                    />
                   </Grid>
                 ))}
               </Grid>
@@ -3443,7 +3610,12 @@ export default function LandingPage() {
           >
             Sábado 14 — Día completo
           </Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4} sx={{ mb: 3 }}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={4}
+            useFlexGap
+            sx={{ mb: 3, flexWrap: 'wrap', justifyContent: 'center' }}
+          >
             <PrizeTable title="DOBLES MUJERES OPEN" rows={DOBLES_PRIZES} />
             <PrizeTable title="DOBLES HOMBRES OPEN" rows={DOBLES_PRIZES} />
             <PrizeTable title="DOBLES MIXTOS OPEN" rows={DOBLES_PRIZES} />
@@ -3460,7 +3632,7 @@ export default function LandingPage() {
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
-            ½ Hybrid: reconocimiento y kit para todos los participantes.
+            ½ Hybrid: medalla de participación, parche conmemorativo y kit del evento para todos los participantes.
           </Typography>
 
           {/* DOMINGO */}
@@ -3490,7 +3662,7 @@ export default function LandingPage() {
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
-            Relay: reconocimiento y premios a los mejores tiempos por categoría.
+            Relay: reconocimiento a los mejores tiempos por categoría.
           </Typography>
         </Container>
       </Box>
@@ -3498,7 +3670,7 @@ export default function LandingPage() {
       {SIMULACRO_PRO_ACTIVE && <SimulacroProSection />}
 
       {/* ===== ASISTE SECTION ===== */}
-      <Box id="asiste" sx={{ py: { xs: 8, md: 12 }, bgcolor: '#111111' }}>
+      <Box id="asiste" sx={{ py: { xs: 8, md: 12 }, scrollMarginTop: '80px', bgcolor: '#111111' }}>
         <Container maxWidth="lg">
           <SectionHeading label="ASISTE" color="#E9C7DF" />
           <Typography
@@ -3547,7 +3719,7 @@ export default function LandingPage() {
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
               {PUBLICO_PRODUCTS.map((producto) => (
                 <Grid size={{ xs: 6, sm: 3 }} key={producto.code}>
-                  <ProductCard producto={producto} accentColor="#E9C7DF" />
+                  <ProductCard producto={producto} accentColor="#E9C7DF" openLabel="Comprar boleto" />
                 </Grid>
               ))}
             </Grid>
@@ -4302,7 +4474,7 @@ export default function LandingPage() {
           aria-label="Volver arriba"
           sx={{
             position: 'fixed',
-            bottom: 24,
+            bottom: { xs: 92, sm: 24 },
             left: 24,
             zIndex: 1200,
             width: 48,
@@ -4313,7 +4485,7 @@ export default function LandingPage() {
             bgcolor: '#000000',
             border: '2px solid #E6F2B1',
             boxShadow: '0 0 16px rgba(0,0,0,0.6)',
-            transition: 'transform 150ms, background-color 150ms',
+            transition: 'transform 150ms, background-color 150ms, bottom 150ms',
             '&:hover': { bgcolor: '#111111', transform: 'translateY(-2px)' },
             '&:focus-visible': { outline: '3px solid #E6F2B1', outlineOffset: 3 },
           }}
@@ -4322,7 +4494,7 @@ export default function LandingPage() {
         </Box>
       )}
 
-      {/* Floating CTA - Elige tu experiencia */}
+      {/* Floating CTA - Elige tu experiencia (desktop: badge horizontal en esquina inferior derecha) */}
       <Box
         component="a"
         href="#elige-tu-experiencia"
@@ -4331,15 +4503,13 @@ export default function LandingPage() {
           bottom: 16,
           right: 16,
           zIndex: 1200,
+          display: { xs: 'none', sm: 'flex' },
+          alignItems: 'center',
+          gap: 1.25,
           bgcolor: '#E6F2B1',
           color: '#000000',
-          fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
-          fontSize: '0.65rem',
-          lineHeight: 1.3,
-          letterSpacing: '0.01em',
-          px: 1.5,
-          py: 1,
-          maxWidth: 150,
+          px: 2.25,
+          py: 1.25,
           cursor: 'pointer',
           textDecoration: 'none',
           border: '2px solid #E6F2B1',
@@ -4361,18 +4531,103 @@ export default function LandingPage() {
             outline: '3px solid #FFFFFF',
             outlineOffset: 3,
           },
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 0.75,
-          textTransform: 'uppercase',
         }}
       >
-        <Box sx={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0, mt: 0.1 }}>🏆</Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.15 }}>
-          <Box>Selecciona tu nivel:</Box>
-          <Box>· ½ Hybrid</Box>
-          <Box>· Open</Box>
-          <Box>· Asiste</Box>
+        <Box sx={{ fontSize: '1.15rem', lineHeight: 1, flexShrink: 0 }}>🏆</Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.1 }}>
+          <Box
+            sx={{
+              fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
+              fontSize: '0.8rem',
+              lineHeight: 1.2,
+              letterSpacing: '0.01em',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Elige tu experiencia
+          </Box>
+          <Box
+            sx={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 600,
+              fontSize: '0.65rem',
+              lineHeight: 1.2,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+              opacity: 0.75,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Compite · ½ Hybrid · Asiste
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Floating CTA - Elige tu experiencia (mobile: barra sticky inferior) */}
+      <Box
+        component="a"
+        href="#elige-tu-experiencia"
+        sx={{
+          position: 'fixed',
+          left: 12,
+          right: 12,
+          bottom: 'calc(12px + env(safe-area-inset-bottom))',
+          zIndex: 1200,
+          display: { xs: 'flex', sm: 'none' },
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 0.25,
+          bgcolor: '#E6F2B1',
+          color: '#000000',
+          py: 1.5,
+          px: 2,
+          cursor: 'pointer',
+          textDecoration: 'none',
+          border: '2px solid #E6F2B1',
+          boxShadow: '0 0 24px rgba(230,242,177,0.35)',
+          transition: 'box-shadow 200ms, transform 200ms',
+          animation: 'pulseGlowMobile 2s ease-in-out infinite',
+          '@keyframes pulseGlowMobile': {
+            '0%, 100%': { boxShadow: '0 0 24px rgba(230,242,177,0.35)' },
+            '50%': { boxShadow: '0 0 36px rgba(230,242,177,0.6)' },
+          },
+          '@media (prefers-reduced-motion: reduce)': {
+            animation: 'none',
+          },
+          '&:active': {
+            transform: 'scale(0.98)',
+          },
+          '&:focus-visible': {
+            outline: '3px solid #FFFFFF',
+            outlineOffset: 3,
+          },
+        }}
+      >
+        <Box
+          sx={{
+            fontFamily: 'tt-norms-pro-extra-black-italic, sans-serif',
+            fontSize: '0.9rem',
+            lineHeight: 1.2,
+            letterSpacing: '0.01em',
+            textTransform: 'uppercase',
+          }}
+        >
+          Elige tu experiencia
+        </Box>
+        <Box
+          sx={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 600,
+            fontSize: '0.65rem',
+            lineHeight: 1.2,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase',
+            opacity: 0.75,
+          }}
+        >
+          Compite · ½ Hybrid · Asiste
         </Box>
       </Box>
     </Box>
