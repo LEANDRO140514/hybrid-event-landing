@@ -1,5 +1,6 @@
 import { DOMAINS } from '../config'
 import { getAffiliateCode } from '../lib/affiliate'
+import { appendAttributionParams } from '../lib/attribution'
 import { resolveEtapaComercial, type EtapaComercial } from '../lib/pricingStage'
 
 export type ProductoBloque = 'COMPITE' | 'EXPERIENCE' | 'ASISTE'
@@ -76,8 +77,17 @@ export const CATALOGO: Producto[] = [
   { code: 'FOT-3D', kind: 'press', nombre: 'Fotógrafo — Pase 3 Días', bloque: 'ASISTE', tipo: 'Fotógrafo', integrantes: 1, dia: 'Vie-Dom', sesion: 'AM', precio: 800, precioPorEtapa: null, msi: false, precioUnidad: 'pase 3 días', incluyeChip: false },
 ]
 
+/**
+ * Registration URL for a product, carrying the `cat` code plus last-touch
+ * UTM params (when present) so campaign attribution survives the hop to
+ * registro.enforma.mx. Built with URL/URLSearchParams — never string
+ * concatenation — so existing/appended params are never duplicated or
+ * malformed. fbclid/gclid are intentionally not appended here; see
+ * lib/attribution.ts.
+ */
 export function getInscribirUrl(code: string): string {
-  return `https://${DOMAINS.registration}/inscribir?cat=${code}`
+  const base = `https://${DOMAINS.registration}/inscribir?cat=${encodeURIComponent(code)}`
+  return appendAttributionParams(base)
 }
 
 export function formatPrecio(precio: number): string {

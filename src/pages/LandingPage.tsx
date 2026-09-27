@@ -61,6 +61,12 @@ import {
   savePublicOrderReference,
 } from '../lib/checkoutSession'
 import {
+  trackSelectExperience,
+  trackSelectCategory,
+  trackBeginCheckout,
+  type SelectExperienceValue,
+} from '../lib/analytics'
+import {
   getActiveCheckoutProductCode,
   getSandboxCheckoutPageLock,
   setActiveCheckoutProductCode,
@@ -656,8 +662,15 @@ function TeammateNameFields({
   )
 }
 
+const CTA_LOCATION_BY_BLOQUE: Record<Producto['bloque'], string> = {
+  COMPITE: 'compite',
+  EXPERIENCE: 'half_hybrid',
+  ASISTE: 'asiste',
+}
+
 function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribirse' }: ProductCardProps) {
   const imageUrl = PRODUCT_IMAGES[producto.code] || IMG_WORKOUT
+  const ctaLocation = CTA_LOCATION_BY_BLOQUE[producto.bloque]
   const isOpen = SALES_CONFIG.status === 'open'
   const isClosed = SALES_CONFIG.status === 'closed'
   const buttonLabel = isOpen ? openLabel : isClosed ? 'Inscripciones cerradas' : SALES_CONFIG.openingLabel
@@ -746,10 +759,12 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
     const teammateNamesTrimmed = teammateNames.map((n) => n.trim())
 
     try {
+      const unitPriceCents = Math.round(precioVigente * 100)
       const attempt = getOrCreateCheckoutAttempt({
         productCode: producto.code,
         quantity,
         rosterFingerprint: computeRosterFingerprint(captainName, teammateNamesTrimmed),
+        expectedUnitPriceCents: unitPriceCents,
       })
       const phoneTrimmed = buyerPhone.trim()
       const result = await createCheckout({
@@ -766,13 +781,36 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
         captainName,
         teammateNames: teammateNamesTrimmed,
         affiliateCode: getAffiliateCode(),
-        expectedUnitPriceCents: Math.round(precioVigente * 100),
+        expectedUnitPriceCents: unitPriceCents,
       })
       savePublicOrderReference(producto.code, result.public_order_reference)
       const stored = getCheckoutAttempt(producto.code)
       if (stored?.publicOrderReference !== result.public_order_reference) {
         throw new Error('Checkout attempt was not persisted')
       }
+      // Real, backend-confirmed checkout session — the correct moment for
+      // select_category/begin_checkout (never on typing/render, and never
+      // if createCheckout rejected the request).
+      const categoryPayload = {
+        category_code: producto.code,
+        category_name: producto.nombre,
+        format: producto.tipo,
+      }
+      trackSelectCategory({
+        ...categoryPayload,
+        integrantes: producto.integrantes,
+        day: producto.dia,
+        session: producto.sesion,
+        price: precioVigente,
+        cta_location: ctaLocation,
+      })
+      trackBeginCheckout({
+        ...categoryPayload,
+        value: precioVigente * quantity,
+        quantity,
+        checkout_type: 'embedded',
+        cta_location: ctaLocation,
+      })
       // Keep lock held through navigation; do not release on success path.
       window.location.assign(result.checkout_url)
     } catch (err) {
@@ -1073,7 +1111,37 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
           target={!checkoutActive && isOpen ? '_blank' : undefined}
           rel={!checkoutActive && isOpen ? 'noopener noreferrer' : undefined}
           disabled={checkoutActive ? !canPay : !isOpen}
-          onClick={checkoutActive ? () => void startCheckout() : undefined}
+          onClick={
+            checkoutActive
+              ? () => void startCheckout()
+              : isOpen
+                ? () => {
+                    // External registration link: fire-and-let-navigate —
+                    // never wired while the button is disabled/Próximamente
+                    // (there's no onClick at all in that branch below).
+                    const categoryPayload = {
+                      category_code: producto.code,
+                      category_name: producto.nombre,
+                      format: producto.tipo,
+                    }
+                    trackSelectCategory({
+                      ...categoryPayload,
+                      integrantes: producto.integrantes,
+                      day: producto.dia,
+                      session: producto.sesion,
+                      price: precioVigente,
+                      cta_location: ctaLocation,
+                    })
+                    trackBeginCheckout({
+                      ...categoryPayload,
+                      value: precioVigente,
+                      quantity: 1,
+                      checkout_type: 'external',
+                      cta_location: ctaLocation,
+                    })
+                  }
+                : undefined
+          }
           variant="outlined"
           size="small"
           sx={{
@@ -1481,6 +1549,7 @@ interface AccesoConceptual {
   ctaLabel: string
   href: string
   color: string
+  experience: SelectExperienceValue
 }
 
 const ACCESOS: AccesoConceptual[] = [
@@ -1491,6 +1560,7 @@ const ACCESOS: AccesoConceptual[] = [
     ctaLabel: 'VER CATEGORÍAS',
     href: '#compite',
     color: '#E6F2B1',
+    experience: 'compite',
   },
   {
     titulo: 'QUIERO EMPEZAR',
@@ -1499,6 +1569,7 @@ const ACCESOS: AccesoConceptual[] = [
     ctaLabel: 'CONOCER ½ HYBRID',
     href: '#experience',
     color: '#E6F2B1',
+    experience: 'half_hybrid',
   },
   {
     titulo: 'QUIERO ASISTIR',
@@ -1507,6 +1578,7 @@ const ACCESOS: AccesoConceptual[] = [
     ctaLabel: 'VER BOLETOS',
     href: '#asiste',
     color: '#E9C7DF',
+    experience: 'asiste',
   },
 ]
 
@@ -1559,6 +1631,9 @@ function EligeTuExperiencia() {
               <Box
                 component="a"
                 href={acceso.href}
+                onClick={() =>
+                  trackSelectExperience({ experience: acceso.experience, cta_location: 'elige_tu_experiencia' })
+                }
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -2713,13 +2788,29 @@ export default function LandingPage() {
           </Typography>
           <Grid container spacing={2}>
             {[
-              { label: '½ Hybrid', desc: 'Competir de verdad, volumen accesible.', href: '#experience' },
-              { label: 'Hybrid completo', desc: 'El reto real. Individual, Dobles o Relay.', href: '#compite' },
+              {
+                label: '½ Hybrid',
+                desc: 'Competir de verdad, volumen accesible.',
+                href: '#experience',
+                experience: 'half_hybrid' as const,
+              },
+              {
+                label: 'Hybrid completo',
+                desc: 'El reto real. Individual, Dobles o Relay.',
+                href: '#compite',
+                experience: 'compite' as const,
+              },
             ].map((nivel) => (
               <Grid size={{ xs: 12, sm: 6 }} key={nivel.label}>
                 <Box
                   component="a"
                   href={nivel.href}
+                  onClick={() =>
+                    trackSelectExperience({
+                      experience: nivel.experience,
+                      cta_location: 'que_es_deporte_hibrido',
+                    })
+                  }
                   sx={{
                     display: 'block',
                     textAlign: 'center',
