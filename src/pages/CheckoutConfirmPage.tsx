@@ -8,10 +8,66 @@ import {
   labelForOrderStatus,
   type PublicOrderStatus,
 } from '../api/orderStatus'
-import { clearCheckoutAttempt, resolvePublicOrderReference } from '../lib/checkoutSession'
+import {
+  clearCheckoutAttempt,
+  getAttemptByReference,
+  resolvePublicOrderReference,
+} from '../lib/checkoutSession'
 import { isCheckoutActive, isSandboxCheckoutActive } from '../config/checkoutConfig'
+import { CATALOGO } from '../data/catalogo'
+import { trackPurchase } from '../lib/analytics'
 
 const MAX_AUTO_POLL_MS = 2 * 60 * 1000
+
+// Purchase must be idempotent: a refresh of this page after APPROVED (or a
+// second poll landing on the same terminal result) must not re-fire it.
+// Keyed by the public order reference, kept in localStorage — unlike the
+// checkout attempt itself (sessionStorage, cleared once terminal), this
+// small "already tracked" marker needs to outlive a full page reload.
+const PURCHASE_TRACKED_KEY_PREFIX = 'hybrid_purchase_tracked:'
+
+function hasTrackedPurchase(reference: string): boolean {
+  try {
+    return localStorage.getItem(PURCHASE_TRACKED_KEY_PREFIX + reference) === '1'
+  } catch {
+    return false
+  }
+}
+
+function markPurchaseTracked(reference: string): void {
+  try {
+    localStorage.setItem(PURCHASE_TRACKED_KEY_PREFIX + reference, '1')
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Builds the Purchase payload from data this browser already has locally —
+ * never invents a value. Returns null (and fires nothing) if the checkout
+ * attempt that created this reference isn't in this browser's
+ * sessionStorage (e.g. the payment was resumed on another device/tab), since
+ * there is then no reliable local source for the product/value.
+ */
+function buildPurchasePayload(reference: string) {
+  const attempt = getAttemptByReference(reference)
+  if (!attempt || attempt.expectedUnitPriceCents == null) return null
+  const producto = CATALOGO.find((p) => p.code === attempt.productCode)
+  if (!producto) return null
+  return {
+    transaction_id: reference,
+    // Guaranteed to equal what was actually charged: the backend rejects
+    // (PRICE_CHANGED) a mismatch between this and the real amount at
+    // checkout creation, so a successful, APPROVED order can only exist if
+    // they matched.
+    value: (attempt.expectedUnitPriceCents / 100) * attempt.quantity,
+    currency: 'MXN' as const,
+    category_code: producto.code,
+    category_name: producto.nombre,
+    format: producto.tipo,
+    quantity: attempt.quantity,
+  }
+}
 
 type ViewState =
   | { kind: 'missing_ref' }
@@ -60,6 +116,16 @@ export default function CheckoutConfirmPage() {
     try {
       const result = await getOrderStatus(reference)
       setView({ kind: 'status', status: result.status, terminal: result.terminal })
+      if (result.status === 'APPROVED' && !hasTrackedPurchase(reference)) {
+        // Backend-confirmed payment — the only signal in this repo reliable
+        // enough to fire Purchase. Read the local attempt BEFORE it gets
+        // cleared below. Mark-as-tracked happens regardless of whether a
+        // payload could be built, so a browser missing the local attempt
+        // (e.g. payment resumed on another device) doesn't retry forever.
+        const payload = buildPurchasePayload(reference)
+        if (payload) trackPurchase(payload)
+        markPurchaseTracked(reference)
+      }
       if (result.terminal) {
         clearCheckoutAttempt(reference)
         clearTimer()

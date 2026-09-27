@@ -1,4 +1,5 @@
 import { checkoutEndpoint } from '../config/checkoutConfig'
+import { buildMarketingContext } from '../lib/marketingContext'
 
 export type CheckoutPublicErrorCode =
   | 'INVALID_REQUEST'
@@ -164,6 +165,13 @@ export async function createCheckout(input: CreateCheckoutInput): Promise<Create
     buyerBody.contact_consent = input.buyer.contactConsent
   }
 
+  let marketingContext: ReturnType<typeof buildMarketingContext> | undefined
+  try {
+    marketingContext = buildMarketingContext()
+  } catch {
+    marketingContext = undefined
+  }
+
   const response = await fetch(checkoutEndpoint('mp-create-checkout'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -177,6 +185,7 @@ export async function createCheckout(input: CreateCheckoutInput): Promise<Create
       teammate_names: input.teammateNames,
       affiliate_code: input.affiliateCode,
       expected_unit_price_cents: input.expectedUnitPriceCents,
+      marketing_context: marketingContext,
     }),
   })
 

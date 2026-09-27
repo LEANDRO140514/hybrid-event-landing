@@ -321,3 +321,12 @@ Forbidden Actions: push without express authorization, modifying docs/guiones-or
 First Command: scripts/workspace-preflight.ps1 (NOTE: does not exist yet — see Known Issues above; fall back to manual `git status`/`git log` evidence gathering as this session did)
 === END_BOOTSTRAP ===
 ```
+
+## Phase LANDING-PRICING-CALENDAR-KB (opened 2026-09-23 — branch `landing-pricing-calendar-kb`, not merged)
+
+Approved stage calendar (Preventa 25 sep – 16 oct, Regular 17 oct – 12 nov, America/Merida), spectator event-day sales, pricing-table dates, cupos notice, legal footer, tracking commit, WhatsApp agent docs, `.vercelignore`, and Meta/GA4 dedup ids (`eventID` / `transaction_id` = `public_order_reference`; the CAPI CSV must use `orders.tracking_ref` as `event_id`).
+
+### Pending
+- **`registro.enforma.mx` does not exist (DNS NXDOMAIN, checked 2026-09-27).** It is `DOMAINS.registration`, the target of `getInscribirUrl()` — the "Inscribirme" link whenever the embedded checkout is not active (e.g. every Vercel preview today). Production is unaffected while all products use the embedded checkout.
+- Checkout in Vercel previews: not configured. Would need Preview env `VITE_CHECKOUT_MODE=sandbox`, `VITE_CHECKOUT_ENABLED=true`, `VITE_INSFORGE_FUNCTIONS_BASE` = ready2hybrid-sandbox base, plus `CHECKOUT_CORS_ORIGIN` on the sandbox set to a stable preview alias (single exact origin).
+- ready2hybrid `mp-create-checkout` with spectator event-day sales is committed nowhere and not deployed; must ship before 13 nov.

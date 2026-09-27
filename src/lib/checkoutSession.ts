@@ -16,6 +16,17 @@ export type CheckoutAttempt = {
   rosterFingerprint?: string
   publicOrderReference?: string
   createdAt: string
+  /**
+   * The unit price (MXN cents) sent to the backend as
+   * `expected_unit_price_cents` when this attempt's checkout was created.
+   * The backend rejects a mismatch with PRICE_CHANGED, so if a checkout
+   * succeeds this is guaranteed to equal what was actually charged — used
+   * to build an accurate Purchase `value` at /checkout/confirmando without
+   * re-deriving it from catalogo.ts's (possibly since-changed) current
+   * price stage. Optional: attempts written before this field existed
+   * simply have it absent.
+   */
+  expectedUnitPriceCents?: number
 }
 
 const TRACKING_REF_RE = /^trk_[0-9a-f]{32}$/
@@ -48,7 +59,8 @@ function parseAttempt(raw: string | null): CheckoutAttempt | null {
       typeof parsed.idempotencyKey !== 'string' ||
       typeof parsed.quantity !== 'number' ||
       typeof parsed.createdAt !== 'string' ||
-      (parsed.rosterFingerprint !== undefined && typeof parsed.rosterFingerprint !== 'string')
+      (parsed.rosterFingerprint !== undefined && typeof parsed.rosterFingerprint !== 'string') ||
+      (parsed.expectedUnitPriceCents !== undefined && typeof parsed.expectedUnitPriceCents !== 'number')
     ) {
       return null
     }
@@ -123,6 +135,8 @@ export function getOrCreateCheckoutAttempt(input: {
   productCode: string
   quantity: number
   rosterFingerprint: string
+  /** Unit price (MXN cents) about to be sent as expected_unit_price_cents — stored for an accurate Purchase value later. Optional so existing call sites keep compiling. */
+  expectedUnitPriceCents?: number
 }): CheckoutAttempt {
   const existing = getCheckoutAttempt(input.productCode)
   if (
@@ -132,8 +146,13 @@ export function getOrCreateCheckoutAttempt(input: {
     existing.rosterFingerprint === input.rosterFingerprint &&
     !existing.publicOrderReference
   ) {
-    // Ensure namespaced v2 storage for PUB-VIE legacy retries.
-    writeProductRaw(existing)
+    // Refresh the price in case it moved between renders (staged pricing);
+    // the value actually sent to the backend on this click always wins.
+    const refreshed: CheckoutAttempt =
+      input.expectedUnitPriceCents != null
+        ? { ...existing, expectedUnitPriceCents: input.expectedUnitPriceCents }
+        : existing
+    writeProductRaw(refreshed)
     if (input.productCode === 'PUB-VIE') {
       try {
         sessionStorage.removeItem(LEGACY_STORAGE_KEY)
@@ -141,7 +160,7 @@ export function getOrCreateCheckoutAttempt(input: {
         /* ignore */
       }
     }
-    return existing
+    return refreshed
   }
 
   const attempt: CheckoutAttempt = {
@@ -150,6 +169,7 @@ export function getOrCreateCheckoutAttempt(input: {
     idempotencyKey: crypto.randomUUID(),
     rosterFingerprint: input.rosterFingerprint,
     createdAt: new Date().toISOString(),
+    ...(input.expectedUnitPriceCents != null ? { expectedUnitPriceCents: input.expectedUnitPriceCents } : {}),
   }
   writeProductRaw(attempt)
   if (input.productCode === 'PUB-VIE') {
@@ -249,6 +269,31 @@ export function resolvePublicOrderReference(searchRef: string | null | undefined
   if (legacy?.publicOrderReference && isValidPublicOrderReference(legacy.publicOrderReference)) {
     return legacy.publicOrderReference
   }
+  return null
+}
+
+/**
+ * Reverse lookup used by CheckoutConfirmPage to build a Purchase payload:
+ * given the public order reference (from the URL or the last-ref cache),
+ * find the full locally-stored attempt (productCode, quantity,
+ * expectedUnitPriceCents) that created it. Returns null if the attempt
+ * isn't in this browser's sessionStorage (e.g. a different device/tab) —
+ * callers must handle that by not firing Purchase rather than guessing.
+ */
+export function getAttemptByReference(reference: string): CheckoutAttempt | null {
+  if (!isValidPublicOrderReference(reference)) return null
+  try {
+    for (let i = 0; i < sessionStorage.length; i += 1) {
+      const key = sessionStorage.key(i)
+      if (!key || !key.startsWith(STORAGE_KEY_PREFIX)) continue
+      const attempt = parseAttempt(sessionStorage.getItem(key))
+      if (attempt?.publicOrderReference === reference) return attempt
+    }
+  } catch {
+    /* ignore */
+  }
+  const legacy = readLegacyPubVie()
+  if (legacy?.publicOrderReference === reference) return legacy
   return null
 }
 
