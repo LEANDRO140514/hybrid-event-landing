@@ -151,6 +151,12 @@ export type BeginCheckoutPayload = CategoryPayloadBase & {
   quantity: number
   checkout_type: CheckoutType
   cta_location: string
+  /**
+   * public_order_reference of the order just created — sent as Meta eventID
+   * and GA4 transaction_id. The CAPI CSV must use the same value (orders.tracking_ref)
+   * as event_id so Meta deduplicates browser and server events.
+   */
+  event_id?: string
 }
 
 export type PurchasePayload = CategoryPayloadBase & {
@@ -232,14 +238,20 @@ export function trackSelectCategory(payload: SelectCategoryPayload): void {
 export function trackBeginCheckout(payload: BeginCheckoutPayload): void {
   devLog('begin_checkout', payload)
   if (ensureMetaPixel()) {
-    window.fbq!('track', 'InitiateCheckout', {
-      ...metaContentParams(payload),
-      checkout_type: payload.checkout_type,
-      cta_location: payload.cta_location,
-    })
+    window.fbq!(
+      'track',
+      'InitiateCheckout',
+      {
+        ...metaContentParams(payload),
+        checkout_type: payload.checkout_type,
+        cta_location: payload.cta_location,
+      },
+      ...(payload.event_id ? [{ eventID: payload.event_id }] : []),
+    )
   }
   if (ensureGa4()) {
     window.gtag!('event', 'begin_checkout', {
+      ...(payload.event_id ? { transaction_id: payload.event_id } : {}),
       currency: 'MXN',
       value: payload.value,
       checkout_type: payload.checkout_type,
@@ -258,7 +270,8 @@ export function trackBeginCheckout(payload: BeginCheckoutPayload): void {
 export function trackPurchase(payload: PurchasePayload): void {
   devLog('purchase', payload)
   if (ensureMetaPixel()) {
-    window.fbq!('track', 'Purchase', metaContentParams(payload))
+    // eventID = public_order_reference, same as the CAPI CSV event_id (orders.tracking_ref).
+    window.fbq!('track', 'Purchase', metaContentParams(payload), { eventID: payload.transaction_id })
   }
   if (ensureGa4()) {
     window.gtag!('event', 'purchase', {

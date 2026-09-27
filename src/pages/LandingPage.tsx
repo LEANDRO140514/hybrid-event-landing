@@ -811,6 +811,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
         quantity,
         checkout_type: 'embedded',
         cta_location: ctaLocation,
+        event_id: result.public_order_reference,
       })
       // Keep lock held through navigation; do not release on success path.
       window.location.assign(result.checkout_url)
