@@ -67,3 +67,11 @@ test-results
 .insforge/
 .vercel
 .env*
+
+# InsForge & AI agent skills
+.insforge
+.agent
+.claude
+.cline
+.github/copilot*
+.windsurf

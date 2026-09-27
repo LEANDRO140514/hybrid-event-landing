@@ -63,8 +63,8 @@ const SANDBOX_CHECKOUT_PRODUCTS: Record<string, SandboxCheckoutProductConfig> = 
     minimumQuantity: 1,
   },
   // Individual competitors — one athlete slot per purchase, no roster.
-  // Sports-participation waiver is captured physically at kit pickup,
-  // outside this system.
+  // SPORTS WAIVER: collected physically at kit pickup/check-in.
+  // There is no digital waiver document, checkbox, or version in this checkout.
   'IND-H': {
     productCode: 'IND-H',
     family: 'competitor',
