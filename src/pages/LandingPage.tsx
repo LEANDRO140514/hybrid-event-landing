@@ -46,7 +46,7 @@ import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
 import { SIMULACRO_PRO_ACTIVE } from '../config/simulacroProConfig'
 import { clearAffiliateCode, getAffiliateCode, subscribeAffiliate } from '../lib/affiliate'
-import type { EtapaComercial } from '../lib/pricingStage'
+import { ETAPA_RANGO_LABEL, isVentaAbierta, type EtapaComercial } from '../lib/pricingStage'
 import {
   getSandboxCheckoutProductConfig,
   isCheckoutActive,
@@ -671,8 +671,9 @@ const CTA_LOCATION_BY_BLOQUE: Record<Producto['bloque'], string> = {
 function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribirse' }: ProductCardProps) {
   const imageUrl = PRODUCT_IMAGES[producto.code] || IMG_WORKOUT
   const ctaLocation = CTA_LOCATION_BY_BLOQUE[producto.bloque]
-  const isOpen = SALES_CONFIG.status === 'open'
-  const isClosed = SALES_CONFIG.status === 'closed'
+  const ventaAbierta = isVentaAbierta(producto.code)
+  const isOpen = SALES_CONFIG.status === 'open' && ventaAbierta
+  const isClosed = SALES_CONFIG.status === 'closed' || (SALES_CONFIG.status === 'open' && !ventaAbierta)
   const buttonLabel = isOpen ? openLabel : isClosed ? 'Inscripciones cerradas' : SALES_CONFIG.openingLabel
   const precioVigente = getPrecioMostrado(producto)
   const isWorkout = producto.tipo === 'Workout Experience'
@@ -1733,6 +1734,41 @@ function EligeTuExperiencia() {
             </Grid>
           ))}
         </Grid>
+        {/* Cupo real por categoría = heats habilitados; sin cifra pública a propósito. */}
+        <Box sx={{ mt: { xs: 4, md: 5 }, textAlign: 'center' }}>
+          <Typography
+            component="p"
+            sx={{
+              display: 'inline-block',
+              px: 2,
+              py: 0.75,
+              border: '1px solid rgba(230,242,177,0.45)',
+              color: '#E6F2B1',
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 900,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              fontSize: { xs: '0.78rem', sm: '0.85rem' },
+            }}
+          >
+            ⚡ Cupos limitados por categoría
+          </Typography>
+          <Typography
+            component="p"
+            sx={{
+              maxWidth: 560,
+              mx: 'auto',
+              mt: 1.5,
+              color: 'text.secondary',
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: { xs: '0.85rem', sm: '0.95rem' },
+              lineHeight: 1.6,
+            }}
+          >
+            Cada categoría tiene un cupo definido por sus heats y se cierra al alcanzarlo. Asegura tu
+            lugar antes de que se llene.
+          </Typography>
+        </Box>
       </Container>
     </Box>
   )
@@ -1896,7 +1932,7 @@ function FilaPrecioTabla({ fila }: { fila: FilaTablaPrecio }) {
               gap: 1,
               borderRight: { sm: '1px solid rgba(230,242,177,0.06)' },
               '&::before': {
-                content: { xs: `"${ETAPA_LABEL[etapa]}: "`, sm: '""' },
+                content: { xs: `"${ETAPA_LABEL[etapa]} (${ETAPA_RANGO_LABEL[etapa]}): "`, sm: '""' },
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 400,
                 color: 'rgba(255,255,255,0.4)',
@@ -2000,7 +2036,11 @@ function EtapasDePrecio() {
               bgcolor: 'rgba(230,242,177,0.05)',
             }}
           >
-            {['Categoría', 'Lanzamiento', 'Preventa', 'Regular', 'MSI'].map((h) => (
+            {[
+              { h: 'Categoría', rango: null },
+              ...ETAPA_ORDEN.map((etapa) => ({ h: ETAPA_LABEL[etapa], rango: ETAPA_RANGO_LABEL[etapa] })),
+              { h: 'MSI', rango: null },
+            ].map(({ h, rango }) => (
               <Box
                 key={h}
                 sx={{
@@ -2015,6 +2055,22 @@ function EtapasDePrecio() {
                 }}
               >
                 {h}
+                {rango && (
+                  <Box
+                    component="span"
+                    sx={{
+                      display: 'block',
+                      mt: 0.4,
+                      fontSize: '0.68rem',
+                      fontWeight: 500,
+                      color: 'rgba(255,255,255,0.55)',
+                      textTransform: 'none',
+                      letterSpacing: '0.02em',
+                    }}
+                  >
+                    {rango}
+                  </Box>
+                )}
               </Box>
             ))}
           </Box>
@@ -2067,9 +2123,9 @@ function EtapasDePrecio() {
           sx={{
             display: 'block',
             textAlign: 'center',
-            color: 'rgba(255,255,255,0.5)',
+            color: 'rgba(255,255,255,0.65)',
             mb: 4,
-            fontSize: '0.72rem',
+            fontSize: { xs: '0.85rem', sm: '0.92rem' },
             fontFamily: "'Space Grotesk', sans-serif",
           }}
         >
@@ -4560,6 +4616,27 @@ export default function LandingPage() {
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           © 2026 EnForma Sports Society. Todos los derechos reservados.
+        </Typography>
+
+        <Typography
+          component="p"
+          sx={{
+            maxWidth: 720,
+            mx: 'auto',
+            mt: 2,
+            color: 'rgba(255,255,255,0.4)',
+            fontSize: '0.68rem',
+            lineHeight: 1.6,
+          }}
+        >
+          <Box component="strong" sx={{ fontWeight: 700 }}>
+            Aviso de Propiedad Industrial y Deslinde Legal:
+          </Box>{' '}
+          HYBRID EVENT EXPERIENCE es un evento deportivo operado y producido de forma independiente
+          bajo la marca registrada ENFORMA®. El formato de competencia corresponde a la disciplina
+          abierta del acondicionamiento físico funcional e híbrido. Este evento no guarda relación
+          comercial, afiliación, patrocinio ni vínculo jurídico alguno con Upsolut Sports GmbH ni con
+          la marca HYROX®.
         </Typography>
       </Box>
 
