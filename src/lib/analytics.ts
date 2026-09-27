@@ -13,6 +13,7 @@
 //    upon instead of manually re-sending `page_view` — see initAnalytics().
 
 import { captureFirstParty } from './firstPartyCapture'
+import { installGtag } from './gtagShim'
 
 const isDev = import.meta.env.DEV
 
@@ -88,18 +89,15 @@ function ensureGa4(): boolean {
   if (ga4Loaded) return true
   if (typeof window === 'undefined') return false
 
-  window.dataLayer ??= []
-  window.gtag ??= function gtag(...args: unknown[]) {
-    window.dataLayer!.push(args)
-  }
+  const gtag = installGtag(window)
 
   const script = document.createElement('script')
   script.async = true
   script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ga4MeasurementId)}`
   document.head.appendChild(script)
 
-  window.gtag('js', new Date())
-  window.gtag('config', ga4MeasurementId)
+  gtag('js', new Date())
+  gtag('config', ga4MeasurementId)
   ga4Loaded = true
   return true
 }

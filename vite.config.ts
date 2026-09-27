@@ -27,8 +27,19 @@ export default defineConfig({
         categories: ['fitness', 'sports', 'health'],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // index.html is not precached: navigations go network-first (below), so
+        // every visit after a deploy loads the new HTML → new hashed bundle
+        // without a forced reload. The cached copy is only an offline fallback.
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        navigateFallback: null,
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: { cacheName: 'pages', expiration: { maxEntries: 10 } },
+          },
+        ],
       },
     }),
   ],
