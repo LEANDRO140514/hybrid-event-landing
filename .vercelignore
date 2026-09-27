@@ -1,0 +1,7 @@
+# Keep local tooling, credentials and internal docs out of `vercel deploy`
+# uploads (the CLI reads this file, not .deployignore or .gitignore).
+/.insforge
+/.claude
+/AGENTS.md
+/docs
+.env*
