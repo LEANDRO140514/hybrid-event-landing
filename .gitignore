@@ -75,3 +75,6 @@ test-results
 .cline
 .github/copilot*
 .windsurf
+
+# InsForge-generated agent instructions (local only)
+AGENTS.md
