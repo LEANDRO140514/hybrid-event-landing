@@ -1,7 +1,7 @@
 import { DOMAINS } from '../config'
-import { getAffiliateCode } from '../lib/affiliate'
+import { isLaunchBenefitActive } from '../lib/affiliate'
 import { appendAttributionParams } from '../lib/attribution'
-import { resolveEtapaComercial, type EtapaComercial } from '../lib/pricingStage'
+import { priceForVisit, resolveEtapaComercial, type EtapaComercial } from '../lib/pricingStage'
 
 export type ProductoBloque = 'COMPITE' | 'EXPERIENCE' | 'ASISTE'
 export type ProductoDia = 'Viernes' | 'Sábado' | 'Domingo' | 'Vie-Dom'
@@ -16,7 +16,7 @@ export interface PrecioPorEtapa {
 
 export interface Producto {
   code: string
-  /** Mirrors products.kind. Competitor codes lock to launch price when an affiliate is stored. */
+  /** Mirrors products.kind. Competitor codes use launch price only during a QR or link visit. */
   kind: ProductoKind
   nombre: string
   bloque: ProductoBloque
@@ -112,12 +112,18 @@ export function getPrecioVigente(producto: Producto, etapa: EtapaComercial | nul
 
 /**
  * Price shown on the card and sent as expected_unit_price_cents.
- * An active affiliate code locks competitor products to launch; everything
- * else uses the calendar stage.
+ * Launch price applies only during a QR or partner-link visit.
+ * A code recovered from localStorage does not. Pass `launchBenefit` in tests.
  */
-export function getPrecioMostrado(producto: Producto, now: Date = new Date()): number {
-  if (getAffiliateCode() && producto.kind === 'competitor' && producto.precioPorEtapa) {
-    return producto.precioPorEtapa.lanzamiento
-  }
-  return getPrecioVigente(producto, resolveEtapaComercial(now))
+export function getPrecioMostrado(
+  producto: Producto,
+  now: Date = new Date(),
+  launchBenefit: boolean = isLaunchBenefitActive(),
+): number {
+  return priceForVisit({
+    calendarPrice: getPrecioVigente(producto, resolveEtapaComercial(now)),
+    launchPrice: producto.precioPorEtapa?.lanzamiento,
+    benefitActive: launchBenefit,
+    competitor: producto.kind === 'competitor',
+  })
 }

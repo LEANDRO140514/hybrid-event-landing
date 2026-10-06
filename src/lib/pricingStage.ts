@@ -62,6 +62,23 @@ export function isVentaAbierta(code: string, now: Date = new Date()): boolean {
   return hasta != null && t >= STAGE_WINDOWS.regular.endMs && t < hasta
 }
 
+/**
+ * Launch price only while a QR or partner-link visit is active and the
+ * product is a competitor with a staged launch amount. Otherwise the
+ * calendar price.
+ */
+export function priceForVisit(input: {
+  calendarPrice: number
+  launchPrice: number | undefined
+  benefitActive: boolean
+  competitor: boolean
+}): number {
+  if (input.benefitActive && input.competitor && input.launchPrice != null) {
+    return input.launchPrice
+  }
+  return input.calendarPrice
+}
+
 export function resolveEtapaComercial(now: Date = new Date()): EtapaComercial | null {
   const t = now.getTime()
   if (t < STAGE_WINDOWS.lanzamiento.startMs || t >= STAGE_WINDOWS.regular.endMs) return null

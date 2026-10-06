@@ -10,6 +10,7 @@ export type CheckoutPublicErrorCode =
   | 'CONTACT_REQUIRED'
   | 'SOLD_OUT'
   | 'PRICE_CHANGED'
+  | 'RESERVATION_EXPIRED'
   | 'ORIGIN_NOT_ALLOWED'
   | 'CONFIGURATION_ERROR'
   | 'UNSUPPORTED_PROVIDER'
@@ -24,12 +25,15 @@ export type CreateCheckoutSuccess = {
 export class CheckoutApiError extends Error {
   readonly code: CheckoutPublicErrorCode
   readonly httpStatus: number
+  /** Server price in MXN cents when the displayed amount was rejected. */
+  readonly unitPriceCents: number | null
 
-  constructor(code: CheckoutPublicErrorCode, httpStatus: number) {
+  constructor(code: CheckoutPublicErrorCode, httpStatus: number, unitPriceCents: number | null = null) {
     super(code)
     this.name = 'CheckoutApiError'
     this.code = code
     this.httpStatus = httpStatus
+    this.unitPriceCents = unitPriceCents
   }
 }
 
@@ -46,6 +50,7 @@ function mapErrorCode(raw: unknown): CheckoutPublicErrorCode {
     case 'CONTACT_REQUIRED':
     case 'SOLD_OUT':
     case 'PRICE_CHANGED':
+    case 'RESERVATION_EXPIRED':
     case 'ORIGIN_NOT_ALLOWED':
     case 'CONFIGURATION_ERROR':
     case 'UNSUPPORTED_PROVIDER':
@@ -68,7 +73,9 @@ export function messageForCheckoutError(code: CheckoutPublicErrorCode): string {
     case 'SOLD_OUT':
       return 'Este acceso está agotado.'
     case 'PRICE_CHANGED':
-      return 'El precio se actualizó, revisa el monto e inténtalo de nuevo'
+      return 'El precio se actualizó. Revisa el monto y confírmalo para continuar.'
+    case 'RESERVATION_EXPIRED':
+      return 'Ese intento de pago ya venció. Revisa el precio actual y confirma de nuevo.'
     case 'ORIGIN_NOT_ALLOWED':
       return 'No pudimos iniciar el proceso de pago.'
     case 'CONFIGURATION_ERROR':
@@ -138,6 +145,11 @@ export type CreateCheckoutInput = {
   teammateNames: string[]
   /** Stored partner code, or null when the visitor has none. */
   affiliateCode: string | null
+  /**
+   * LINK while this tab's visit started from a QR or partner URL.
+   * STORED when the code is only attribution.
+   */
+  affiliateEntry: 'LINK' | 'STORED'
   /** Displayed price in MXN cents. The server rejects a mismatch with PRICE_CHANGED. */
   expectedUnitPriceCents: number
   /** Fixed to Mercado Pago for go-live; no UI provider selector. */
@@ -184,6 +196,7 @@ export async function createCheckout(input: CreateCheckoutInput): Promise<Create
       captain_name: input.captainName,
       teammate_names: input.teammateNames,
       affiliate_code: input.affiliateCode,
+      affiliate_entry: input.affiliateEntry,
       expected_unit_price_cents: input.expectedUnitPriceCents,
       marketing_context: marketingContext,
     }),
@@ -197,12 +210,14 @@ export async function createCheckout(input: CreateCheckoutInput): Promise<Create
   }
 
   if (!response.ok) {
-    const code = mapErrorCode(
+    const errorBody =
       json && typeof json === 'object'
-        ? (json as { error?: { code?: unknown } }).error?.code
-        : undefined,
-    )
-    throw new CheckoutApiError(code, response.status)
+        ? (json as { error?: { code?: unknown; unit_price_cents?: unknown } }).error
+        : undefined
+    const code = mapErrorCode(errorBody?.code)
+    const cents = errorBody?.unit_price_cents
+    const unitPriceCents = typeof cents === 'number' && Number.isInteger(cents) && cents >= 0 ? cents : null
+    throw new CheckoutApiError(code, response.status, unitPriceCents)
   }
 
   return assertSuccessShape(json)

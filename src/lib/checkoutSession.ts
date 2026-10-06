@@ -202,6 +202,15 @@ export function savePublicOrderReference(productCode: string, reference: string)
   }
 }
 
+/** Drops the pending attempt for one product so the next confirmation mints a new key. */
+export function clearProductCheckoutAttempt(productCode: string): void {
+  try {
+    sessionStorage.removeItem(storageKeyForProduct(productCode))
+  } catch {
+    /* ignore */
+  }
+}
+
 export function clearCheckoutAttempt(reference?: string): void {
   const target = reference?.trim().toLowerCase() || readLastPublicRef()?.reference || null
 

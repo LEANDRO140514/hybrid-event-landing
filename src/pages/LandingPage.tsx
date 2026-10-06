@@ -45,7 +45,7 @@ import type { Producto } from '../data/catalogo'
 import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
 import { SIMULACRO_PRO_ACTIVE } from '../config/simulacroProConfig'
-import { clearAffiliateCode, getAffiliateCode, subscribeAffiliate } from '../lib/affiliate'
+import { getAffiliateCode, isLaunchBenefitActive, subscribeAffiliate } from '../lib/affiliate'
 import { ETAPA_RANGO_LABEL, isVentaAbierta, type EtapaComercial } from '../lib/pricingStage'
 import {
   getSandboxCheckoutProductConfig,
@@ -55,6 +55,7 @@ import {
 } from '../config/checkoutConfig'
 import { createCheckout, messageForCheckoutError, CheckoutApiError } from '../api/checkout'
 import {
+  clearProductCheckoutAttempt,
   computeRosterFingerprint,
   getCheckoutAttempt,
   getOrCreateCheckoutAttempt,
@@ -675,7 +676,23 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
   const isOpen = SALES_CONFIG.status === 'open' && ventaAbierta
   const isClosed = SALES_CONFIG.status === 'closed' || (SALES_CONFIG.status === 'open' && !ventaAbierta)
   const buttonLabel = isOpen ? openLabel : isClosed ? 'Inscripciones cerradas' : SALES_CONFIG.openingLabel
-  const precioVigente = getPrecioMostrado(producto)
+  const [quotedPesos, setQuotedPesos] = useState<number | null>(null)
+  const [offerGeneration, setOfferGeneration] = useState(0)
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'hidden') return
+      setQuotedPesos(null)
+      setOfferGeneration((n) => n + 1)
+    }
+    document.addEventListener('visibilitychange', refresh)
+    window.addEventListener('pageshow', refresh)
+    return () => {
+      document.removeEventListener('visibilitychange', refresh)
+      window.removeEventListener('pageshow', refresh)
+    }
+  }, [])
+  const precioVigente = quotedPesos ?? getPrecioMostrado(producto)
+  void offerGeneration
   const isWorkout = producto.tipo === 'Workout Experience'
   const productConfig = getSandboxCheckoutProductConfig(producto.code)
   // SALES_CONFIG is the commercial authority: the embedded checkout can only
@@ -782,6 +799,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
         captainName,
         teammateNames: teammateNamesTrimmed,
         affiliateCode: getAffiliateCode(),
+        affiliateEntry: isLaunchBenefitActive() ? 'LINK' : 'STORED',
         expectedUnitPriceCents: unitPriceCents,
       })
       savePublicOrderReference(producto.code, result.public_order_reference)
@@ -816,8 +834,14 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
       // Keep lock held through navigation; do not release on success path.
       window.location.assign(result.checkout_url)
     } catch (err) {
-      if (err instanceof CheckoutApiError && err.code === 'PRICE_CHANGED') {
-        clearAffiliateCode()
+      if (
+        err instanceof CheckoutApiError &&
+        (err.code === 'PRICE_CHANGED' || err.code === 'RESERVATION_EXPIRED')
+      ) {
+        clearProductCheckoutAttempt(producto.code)
+        if (err.code === 'PRICE_CHANGED' && err.unitPriceCents != null) {
+          setQuotedPesos(err.unitPriceCents / 100)
+        }
       }
       if (err instanceof CheckoutApiError) {
         setErrorMessage(messageForCheckoutError(err.code))
