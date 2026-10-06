@@ -20,6 +20,10 @@ const isDev = import.meta.env.DEV
 const metaPixelId = (import.meta.env.VITE_META_PIXEL_ID as string | undefined)?.trim() || null
 const ga4MeasurementId = (import.meta.env.VITE_GA4_MEASUREMENT_ID as string | undefined)?.trim() || null
 
+const admiraApiKey = (import.meta.env.VITE_ADMIRA_API_KEY as string | undefined)?.trim() || null
+const admiraScriptSrc =
+  (import.meta.env.VITE_ADMIRA_SCRIPT_SRC as string | undefined)?.trim() || 'https://dev.getadmira.com/static/js/admira.js'
+
 function devLog(...args: unknown[]): void {
   if (isDev) console.debug('[analytics]', ...args)
 }
@@ -40,6 +44,7 @@ declare global {
     _fbq?: FbqFunction
     dataLayer?: unknown[]
     gtag?: (...args: unknown[]) => void
+    admira?: { init: (apiKey: string) => void }
   }
 }
 
@@ -102,6 +107,30 @@ function ensureGa4(): boolean {
   return true
 }
 
+// ── Admira SDK ───────────────────────────────────────────────────
+let admiraLoaded = false
+
+/** Loads Admira's SDK once and calls `admira.init(apiKey)` as soon as the script is ready. */
+function ensureAdmira(): boolean {
+  if (!admiraApiKey) return false
+  if (admiraLoaded) return true
+  if (typeof window === 'undefined') return false
+
+  const script = document.createElement('script')
+  script.async = true
+  script.src = admiraScriptSrc
+  script.onload = () => {
+    try {
+      window.admira?.init(admiraApiKey)
+    } catch (err) {
+      devLog('admira.init failed (non-fatal):', err)
+    }
+  }
+  document.head.appendChild(script)
+  admiraLoaded = true
+  return true
+}
+
 /**
  * Boots whichever adapters have an ID configured. Safe to call once at app
  * start even if neither VITE_META_PIXEL_ID nor VITE_GA4_MEASUREMENT_ID is
@@ -111,6 +140,8 @@ export function initAnalytics(): void {
   try {
     const metaOn = ensureMetaPixel()
     const ga4On = ensureGa4()
+    const admiraOn = ensureAdmira()
+    if (!admiraOn && !admiraApiKey) devLog('Admira not configured (VITE_ADMIRA_API_KEY unset) — no-op')
     if (!metaOn && !metaPixelId) devLog('Meta Pixel not configured (VITE_META_PIXEL_ID unset) — no-op')
     if (!ga4On && !ga4MeasurementId) devLog('GA4 not configured (VITE_GA4_MEASUREMENT_ID unset) — no-op')
   } catch (err) {
