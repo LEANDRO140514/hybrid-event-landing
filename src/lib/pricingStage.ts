@@ -46,12 +46,13 @@ export const ETAPA_RANGO_LABEL: Record<EtapaComercial, string> = {
 /**
  * Copy of ready2hybrid EVENT_DAY_SALES_CLOSE_MS: spectator passes stay on
  * sale during the event, each until the end of its first valid day.
+ * PUB-3D and PUB-DOM were cancelled by the Oct 2026 calendar change (Sunday 15
+ * is "por anunciar", public is sold per day only), so they are no longer here;
+ * keep this map in sync with the server.
  */
 const VENTA_EN_EVENTO_HASTA_MS: Record<string, number> = {
   'PUB-VIE': meridaWallToUtcMs(2026, 11, 14, 0, 0, 0),
-  'PUB-3D': meridaWallToUtcMs(2026, 11, 14, 0, 0, 0),
   'PUB-SAB': meridaWallToUtcMs(2026, 11, 15, 0, 0, 0),
-  'PUB-DOM': meridaWallToUtcMs(2026, 11, 16, 0, 0, 0),
 }
 
 /** Whether the calendar still allows buying this product (same rule the server charges by). */
