@@ -26,18 +26,7 @@ const SANDBOX_CHECKOUT_PRODUCTS: Record<string, SandboxCheckoutProductConfig> = 
     quantityMode: 'editable',
     minimumQuantity: 1,
   },
-  'PUB-DOM': {
-    productCode: 'PUB-DOM',
-    family: 'spectator',
-    quantityMode: 'editable',
-    minimumQuantity: 1,
-  },
-  'PUB-3D': {
-    productCode: 'PUB-3D',
-    family: 'spectator',
-    quantityMode: 'editable',
-    minimumQuantity: 1,
-  },
+  // PUB-DOM y PUB-3D cancelados: el evento cierra el sábado y no hay pase de 3 días.
   'FOT-VIE': {
     productCode: 'FOT-VIE',
     family: 'press',

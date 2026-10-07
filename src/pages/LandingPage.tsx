@@ -79,10 +79,10 @@ const EVENT_JSON_LD = {
   '@type': 'Event',
   name: eventConfig.name,
   description:
-    'Vive HYBRID EXPERIENCE del 13 al 15 de noviembre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid, o compra tu acceso como público.',
+    'Vive HYBRID EXPERIENCE del 13 al 14 de noviembre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid, o compra tu acceso como público.',
   url: 'https://hybrid-experience.enforma.mx/',
   startDate: '2026-11-13T17:00:00-06:00',
-  endDate: '2026-11-15',
+  endDate: '2026-11-14',
   eventStatus: 'https://schema.org/EventScheduled',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   location: {
@@ -104,7 +104,7 @@ const DIA_COMPITO_ROWS = [
   { formato: 'Dobles', cuando: 'Viernes Vespertino (Mujeres) · Sábado Día completo (Hombres y Mixto)' },
   { formato: 'Individual (Open)', cuando: 'Viernes Vespertino' },
   { formato: '½ Hybrid', cuando: 'Sábado Día completo' },
-  { formato: 'Relay', cuando: 'Domingo Matutino' },
+  { formato: 'Relay', cuando: 'Sábado Día completo' },
 ]
 
 function DiaCompitoTable() {
@@ -165,7 +165,7 @@ const FAQ_DATA: FaqItem[] = [
   },
   {
     question: '¿Puedo ir solo a ver?',
-    answer: `Sí. Pases de público por día (${formatPrecio(250)}) o pase de 3 días (${formatPrecio(600)}). Compra el día en que compite tu atleta.`,
+    answer: `Sí. Pases de público por día (${formatPrecio(250)}), para el viernes o el sábado. Compra el día en que compite tu atleta.`,
   },
   {
     question: '¿Cuándo abren las inscripciones?',
@@ -438,7 +438,7 @@ const FORMATO_DESCRIPCIONES: Record<string, string> = {
     'El formato completo, tú solo, de principio a fin. Categoría Open — la apertura del evento el viernes por la tarde.',
 }
 
-interface TresDiasItem {
+interface DiaEventoItem {
   fecha: string
   sesion: string
   titulo: string
@@ -446,7 +446,7 @@ interface TresDiasItem {
   links: { label: string; href: string }[]
 }
 
-const TRES_DIAS: TresDiasItem[] = [
+const DOS_DIAS: DiaEventoItem[] = [
   {
     fecha: 'VIERNES 13',
     sesion: 'Vespertino',
@@ -462,18 +462,12 @@ const TRES_DIAS: TresDiasItem[] = [
     sesion: 'Día completo',
     titulo: 'El día más abierto',
     texto:
-      'Dobles Hombres y Mixto, y debuta el ½ Hybrid. Día completo, abierto a todos los niveles.',
+      'Dobles Hombres y Mixto, debuta el ½ Hybrid y cierra el evento el Relay: cuatro atletas, un solo tiempo, el formato más social. Día completo, abierto a todos los niveles.',
     links: [
       { label: 'Ver Dobles', href: '#compite-sab-dia-dobles' },
+      { label: 'Ver Relay', href: '#compite-sab-dia-relay' },
       { label: 'Ver ½ Hybrid', href: '#experience' },
     ],
-  },
-  {
-    fecha: 'DOMINGO 15',
-    sesion: 'Matutino',
-    titulo: 'Relay',
-    texto: 'Cuatro atletas, un solo tiempo. El cierre del evento con el formato más social y de mayor ambiente.',
-    links: [{ label: 'Ver Relay', href: '#compite-dom-am-relay' }],
   },
 ]
 
@@ -1561,7 +1555,7 @@ function OrganizerStrip() {
           textTransform: 'uppercase',
         }}
       >
-        Organizado por ENFORMA Sports Society · Mérida, Yucatán · 13, 14 y 15 de noviembre de 2026
+        Organizado por ENFORMA Sports Society · Mérida, Yucatán · 13 y 14 de noviembre de 2026
       </Typography>
     </Box>
   )
@@ -1855,7 +1849,7 @@ const TABLA_PRECIOS_GRUPOS: GrupoTablaPrecio[] = [
       {
         categoria: 'Público',
         producto: null,
-        singleCelda: `${formatMonto(productoPorCode('PUB-VIE').precio)} por día · ${formatMonto(productoPorCode('PUB-3D').precio)} pase 3 días`,
+        singleCelda: `${formatMonto(productoPorCode('PUB-VIE').precio)} por día (viernes o sábado)`,
       },
     ],
   },
@@ -2703,7 +2697,7 @@ export default function LandingPage() {
                   fontSize: { xs: '2.6rem', sm: '3.2rem', md: '3.9rem' },
                 }}
               >
-                13–15
+                13–14
               </Typography>
               <Typography
                 component="span"
@@ -3500,7 +3494,7 @@ export default function LandingPage() {
         </Container>
       </Box>
 
-      {/* ===== TRES DÍAS (TIMELINE) ===== */}
+      {/* ===== DOS DÍAS (TIMELINE) ===== */}
       <Box
         sx={{
           py: { xs: 8, md: 12 },
@@ -3508,7 +3502,7 @@ export default function LandingPage() {
         }}
       >
         <Container maxWidth="md">
-          <SectionHeading label="TRES DÍAS" />
+          <SectionHeading label="DOS DÍAS" />
           <Typography
             variant="body1"
             sx={{
@@ -3524,7 +3518,7 @@ export default function LandingPage() {
           </Typography>
 
           <Stack spacing={0}>
-            {TRES_DIAS.map((dia, i) => (
+            {DOS_DIAS.map((dia, i) => (
               <Box
                 key={dia.titulo}
                 sx={{
@@ -3806,28 +3800,11 @@ export default function LandingPage() {
               fontSize: '0.85rem',
               maxWidth: 480,
               mx: 'auto',
-              mb: 6,
+              mb: 1,
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
             ½ Hybrid: medalla de participación, parche conmemorativo y kit del evento para todos los participantes.
-          </Typography>
-
-          {/* DOMINGO */}
-          <Typography
-            variant="overline"
-            sx={{
-              display: 'block',
-              textAlign: 'center',
-              color: 'text.secondary',
-              fontWeight: 700,
-              letterSpacing: '0.15em',
-              fontSize: '0.7rem',
-              mb: 1.5,
-              fontFamily: "'Space Grotesk', sans-serif",
-            }}
-          >
-            Domingo 15 — Matutino
           </Typography>
           <Typography
             variant="body2"
@@ -4056,7 +4033,7 @@ export default function LandingPage() {
                       fontSize: { xs: '1.9rem', sm: '2.6rem', md: '3.2rem' },
                     }}
                   >
-                    13–15
+                    13–14
                   </Typography>
                   <Typography
                     component="span"
