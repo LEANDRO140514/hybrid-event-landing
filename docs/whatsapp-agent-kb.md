@@ -41,7 +41,7 @@ Cómo respondes:
 | Fechas | Viernes 13, sábado 14 y domingo 15 de noviembre de 2026 |
 | Sede | Club Cumbres, Mérida, Yucatán |
 | Cómo llegar (Google Maps) | https://maps.app.goo.gl/HBjqkCu1o8FMVw3P6 |
-| Inscripciones y boletos | https://hybrid-experience.enforma.mx/ |
+| Inscripciones y boletos | https://hybrid-experience.enforma.mx/?utm_source=whatsapp&utm_medium=agente&utm_campaign=hybrid2026 |
 | Instagram | https://www.instagram.com/enforma.sports_/ |
 
 **¿Qué es?** Una competencia de fitness híbrido: corres 1 km, entras a una estación de trabajo funcional y vuelves a correr, hasta completar las 8 estaciones. Gana el menor tiempo total. Exige resistencia cardiovascular, fuerza funcional y estrategia.
@@ -65,7 +65,7 @@ Cómo respondes:
 
 ## 4. Estado comercial y calendario de precios
 
-- Inscripciones abiertas en https://hybrid-experience.enforma.mx/
+- Inscripciones abiertas en https://hybrid-experience.enforma.mx/?utm_source=whatsapp&utm_medium=agente&utm_campaign=hybrid2026
 
 | Etapa | Desde | Hasta |
 |---|---|---|
@@ -215,7 +215,17 @@ Los horarios exactos se publican más adelante (sección 16).
 - Cualquier persona puede asistir solo a ver.
 - Opciones: un día (viernes, sábado o domingo) o pase 3 días (sección 7).
 - Recomendación: comprar el día en que compite tu atleta (sección 11).
-- Los accesos de público también se venden durante el evento, sujetos a disponibilidad: Público Viernes y el Pase 3 días hasta el viernes 13 de noviembre; desde el sábado 14 ya no hay venta del Pase 3 días, solo accesos por día (Público Sábado hasta el sábado 14, Público Domingo hasta el domingo 15).
+- Los accesos de público también se venden durante el evento, en línea y sujetos a disponibilidad:
+
+| Pase | Precio | Se vende hasta (hora de Mérida) |
+|---|---|---|
+| Público Viernes | $250 MXN | Viernes 13 de noviembre, 23:59 |
+| Pase 3 días | $600 MXN | Viernes 13 de noviembre, 23:59. Desde el sábado 14 ya no se vende |
+| Público Sábado | $250 MXN | Sábado 14 de noviembre, 23:59 |
+| Público Domingo | $250 MXN | Domingo 15 de noviembre, 23:59 |
+
+- El precio es el mismo antes y durante el evento; los accesos de público no tienen meses sin intereses.
+- Durante el evento no se venden inscripciones de competencia (esa venta cierra el 12 de noviembre a las 23:59).
 
 ---
 
@@ -270,7 +280,7 @@ Horarios, ubicación exacta de las mesas y puntos de entrega todavía no están 
 
 **Cómo funciona**
 
-1. La persona elige su categoría en https://hybrid-experience.enforma.mx/ y llena sus datos (y los de su pareja o equipo si aplica).
+1. La persona elige su categoría en https://hybrid-experience.enforma.mx/?utm_source=whatsapp&utm_medium=agente&utm_campaign=hybrid2026 y llena sus datos (y los de su pareja o equipo si aplica).
 2. Paga con Mercado Pago.
 3. Al aprobarse el pago, la página muestra "Pago confirmado" y la persona recibe su **boleto con código QR por correo**.
 
