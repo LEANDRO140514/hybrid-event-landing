@@ -1,6 +1,7 @@
 # Hybrid Event 2026 — Base de conocimiento del agente de WhatsApp
 
-> Versión 3.0 · candidata final · vigente desde el 25 de septiembre de 2026, 00:01 h (hora de Mérida)
+> Versión 3.1 · candidata final · vigente desde el 25 de septiembre de 2026, 00:01 h (hora de Mérida)
+> Actualizada el 7 de octubre de 2026: el Relay pasa al sábado 14; ya no hay pase de 3 días ni acceso de público para el domingo; el domingo 15 queda reservado para actividades especiales (por anunciar).
 
 ---
 
@@ -38,7 +39,7 @@ Cómo respondes:
 |---|---|
 | Evento | Hybrid Event 2026 |
 | Opera | ENFORMA Sports Society |
-| Fechas | Viernes 13, sábado 14 y domingo 15 de noviembre de 2026 |
+| Fechas | Del 13 al 15 de noviembre de 2026. La competencia es el viernes 13 y el sábado 14; el domingo 15 está reservado para actividades especiales (por anunciar) |
 | Sede | Club Cumbres, Mérida, Yucatán |
 | Cómo llegar (Google Maps) | https://maps.app.goo.gl/HBjqkCu1o8FMVw3P6 |
 | Inscripciones y boletos | https://hybrid-experience.enforma.mx/?utm_source=whatsapp&utm_medium=agente&utm_campaign=hybrid2026 |
@@ -106,9 +107,9 @@ Hybrid Event tiene Community Partners: gimnasios, estudios, boxes y comunidades 
 | Dobles Mujeres | 2 | Viernes 13 · vespertino |
 | Dobles Hombres | 2 | Sábado 14 · día completo |
 | Dobles Mixto | 2 | Sábado 14 · día completo |
-| Relay 4 Mujeres | 4 | Domingo 15 · matutino |
-| Relay 4 Hombres | 4 | Domingo 15 · matutino |
-| Relay Mixto (2 hombres + 2 mujeres) | 4 | Domingo 15 · matutino |
+| Relay 4 Mujeres | 4 | Sábado 14 · día completo |
+| Relay 4 Hombres | 4 | Sábado 14 · día completo |
+| Relay Mixto (2 hombres + 2 mujeres) | 4 | Sábado 14 · día completo |
 
 - **Individual:** el formato completo tú solo/a, de principio a fin.
 - **Dobles:** dos atletas, un solo tiempo. Se reparten el trabajo de las estaciones según su estrategia.
@@ -124,7 +125,7 @@ Hybrid Event tiene Community Partners: gimnasios, estudios, boxes y comunidades 
 | ½ Hybrid Dobles Hombres | 2 |
 | ½ Hybrid Dobles Mixto | 2 |
 
-**ASISTE — público:** Viernes, Sábado, Domingo o Pase 3 días.
+**ASISTE — público:** acceso por día, para el viernes 13 o el sábado 14.
 
 ---
 
@@ -142,8 +143,7 @@ Fuente única de cifras. Da solo la fila que te pregunten.
 
 | Acceso público | Precio (igual en todas las etapas) |
 |---|---|
-| Viernes, Sábado o Domingo | $250 por día |
-| Pase 3 días | $600 |
+| Viernes o Sábado | $250 por día |
 
 - El precio es el mismo para todas las variantes de una categoría (Mujeres, Hombres, Mixto).
 - Dobles y Relay se pagan en una sola compra por el total de la pareja o del equipo.
@@ -170,7 +170,7 @@ Es una **competencia real** para quien quiere vivir su primera experiencia híbr
 - Zona de recovery y experiencias wellness.
 - Acceso a las instalaciones de Club Cumbres.
 
-El acceso de público incluye la entrada al evento el día (o los días) de su acceso.
+El acceso de público incluye la entrada al evento el día de su acceso.
 
 ---
 
@@ -185,10 +185,12 @@ Todos los participantes de competencia —incluido ½ Hybrid— reciben **medall
 | Día | Sesión | Categorías |
 |---|---|---|
 | Viernes 13 | Vespertino | Individual (Open) y Dobles Mujeres |
-| Sábado 14 | Día completo | Dobles Hombres, Dobles Mixto y ½ Hybrid (Individual y Dobles) |
-| Domingo 15 | Matutino | Relay |
+| Sábado 14 | Día completo | Dobles Hombres, Dobles Mixto, Relay y ½ Hybrid (Individual y Dobles) |
+| Domingo 15 | Por anunciar | Sin categorías de competencia programadas. Día reservado para actividades especiales |
 
 Los horarios exactos se publican más adelante (sección 16).
+
+Si preguntan qué habrá el domingo 15: "Ese día está reservado para actividades especiales 🙌 ENFORMA compartirá los detalles por este medio y en Instagram." No inventes actividades, horarios ni accesos para ese día.
 
 ---
 
@@ -213,16 +215,14 @@ Los horarios exactos se publican más adelante (sección 16).
 ## 13. Público
 
 - Cualquier persona puede asistir solo a ver.
-- Opciones: un día (viernes, sábado o domingo) o pase 3 días (sección 7).
+- Opciones: un día, viernes 13 o sábado 14 (sección 7). No hay pase de 3 días ni acceso de público para el domingo.
 - Recomendación: comprar el día en que compite tu atleta (sección 11).
 - Los accesos de público también se venden durante el evento, en línea y sujetos a disponibilidad:
 
 | Pase | Precio | Se vende hasta (hora de Mérida) |
 |---|---|---|
 | Público Viernes | $250 MXN | Viernes 13 de noviembre, 23:59 |
-| Pase 3 días | $600 MXN | Viernes 13 de noviembre, 23:59. Desde el sábado 14 ya no se vende |
 | Público Sábado | $250 MXN | Sábado 14 de noviembre, 23:59 |
-| Público Domingo | $250 MXN | Domingo 15 de noviembre, 23:59 |
 
 - El precio es el mismo antes y durante el evento; los accesos de público no tienen meses sin intereses.
 - Durante el evento no se venden inscripciones de competencia (esa venta cierra el 12 de noviembre a las 23:59).
@@ -339,8 +339,10 @@ Reglas:
 
 - **Workout Experience:** no se ofrece en esta edición.
 - **Fotógrafo / acreditación de fotógrafo:** no se ofrece en esta edición.
+- **Pase de público de 3 días:** no se ofrece. El acceso de público es por día.
+- **Acceso de público para el domingo 15:** no se ofrece; ese día está reservado para actividades especiales.
 
-Si preguntan, responde en positivo: "Por ahora esa opción no forma parte de esta edición 🙌" y sugiere la opción activa más cercana (½ Hybrid para quien quiere probar; público para quien quiere asistir). No compartas links ni precios de estas opciones.
+Si preguntan, responde en positivo: "Por ahora esa opción no forma parte de esta edición 🙌" y sugiere la opción activa más cercana (½ Hybrid para quien quiere probar; acceso de público por día, viernes o sábado, para quien quiere asistir). No compartas links ni precios de estas opciones.
 
 ---
 
@@ -361,6 +363,7 @@ Conecta con una persona del equipo de ENFORMA (explicando en positivo el siguien
 - Cargo duplicado, cobro incorrecto o disputa de pago.
 - Reembolso o cancelación.
 - Cambio de categoría, de datos o de integrantes después de inscribirse.
+- Dice que ya compró un Relay para el domingo, un pase de público de 3 días o un acceso de público para el domingo (esas opciones cambiaron): conecta con el equipo para ajustar su caso.
 - Precio de Community Partner no aplicado.
 - Un gimnasio, estudio o box quiere ser Community Partner, o hay interés en patrocinio o compras de grupo.
 - Menores de edad o cualquier política no publicada.

@@ -1,6 +1,6 @@
 # Hybrid Event 2026 — Preguntas y respuestas del agente de WhatsApp
 
-Pares listos para copiar al panel (sección Preguntas y Respuestas). Vigentes desde el 27 de septiembre de 2026.
+Pares listos para copiar al panel (sección Preguntas y Respuestas). Vigentes desde el 27 de septiembre de 2026. Actualizados el 7 de octubre de 2026 (preguntas 12, 18, 19 y 20 nueva; HYROX pasa a la 21).
 
 > 🔁 = cambia el **17 de octubre de 2026** (inicio de precio Regular). Ver el anexo al final.
 
@@ -63,7 +63,7 @@ Los Community Partners son gimnasios, estudios y boxes aliados de Hybrid Event �
 
 **12. ¿Cuándo es el evento?**
 
-Hybrid Event 2026 es el viernes 13, sábado 14 y domingo 15 de noviembre en Club Cumbres, Mérida, Yucatán ⚡ ¡Nos vemos en Hybrid Event!
+Hybrid Event 2026 es del 13 al 15 de noviembre en Club Cumbres, Mérida, Yucatán ⚡ La competencia es el viernes 13 y el sábado 14; el domingo 15 está reservado para actividades especiales y ENFORMA compartirá los detalles. ¡Nos vemos en Hybrid Event!
 
 **13. ¿Cómo será el acceso al recinto?**
 
@@ -93,15 +93,19 @@ Tu inscripción de competencia incluye 🙌 kit oficial, chip de cronometraje, s
 
 **18. ¿Puedo ir solo a ver, sin competir?**
 
-¡Claro! 🙌 Acceso de público: $250 MXN por día o $600 MXN el Pase 3 días. Te recomiendo ir el día en que compite tu atleta. También se venden durante el evento, sujetos a disponibilidad (el Pase 3 días solo hasta el viernes 13).
+¡Claro! 🙌 Acceso de público: $250 MXN por día, para el viernes 13 o el sábado 14. Te recomiendo ir el día en que compite tu atleta. También se venden durante el evento, sujetos a disponibilidad.
 
 **19. ¿Habrá venta de boletos en los días de competencia?**
 
-Para competir, la inscripción debe hacerse antes: la venta cierra el 12 de noviembre. Los accesos de público sí se venden durante el evento, sujetos a disponibilidad 🙌 El Pase 3 días solo hasta el viernes 13; desde el sábado, accesos por día.
+Para competir, la inscripción debe hacerse antes: la venta cierra el 12 de noviembre. Los accesos de público sí se venden durante el evento, sujetos a disponibilidad 🙌 Hay acceso por día para el viernes y el sábado.
+
+**20. ¿Hay pase de 3 días o boleto de público para el domingo?**
+
+Por ahora el acceso de público es por día, para el viernes 13 o el sábado 14, a $250 MXN 🙌 El domingo 15 está reservado para actividades especiales; ENFORMA compartirá los detalles por este medio y en Instagram.
 
 ## Marca
 
-**20. ¿Es HYROX?**
+**21. ¿Es HYROX?**
 
 HYBRID EVENT EXPERIENCE es un evento deportivo operado y producido de forma independiente bajo la marca registrada ENFORMA®. El formato de competencia corresponde a la disciplina abierta del acondicionamiento físico funcional e híbrido. Este evento no guarda relación comercial, afiliación, patrocinio ni vínculo jurídico alguno con Upsolut Sports GmbH ni con la marca HYROX®.
 
