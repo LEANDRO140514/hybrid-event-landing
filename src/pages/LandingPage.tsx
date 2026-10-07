@@ -79,10 +79,10 @@ const EVENT_JSON_LD = {
   '@type': 'Event',
   name: eventConfig.name,
   description:
-    'Vive HYBRID EXPERIENCE del 13 al 14 de noviembre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid, o compra tu acceso como público.',
+    'Vive HYBRID EXPERIENCE del 13 al 15 de noviembre de 2026 en Mérida. Compite en Individual, Dobles o Relay, empieza con ½ Hybrid, o compra tu acceso como público.',
   url: 'https://hybrid-experience.enforma.mx/',
   startDate: '2026-11-13T17:00:00-06:00',
-  endDate: '2026-11-14',
+  endDate: '2026-11-15',
   eventStatus: 'https://schema.org/EventScheduled',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   location: {
@@ -446,7 +446,7 @@ interface DiaEventoItem {
   links: { label: string; href: string }[]
 }
 
-const DOS_DIAS: DiaEventoItem[] = [
+const DIAS_EVENTO: DiaEventoItem[] = [
   {
     fecha: 'VIERNES 13',
     sesion: 'Vespertino',
@@ -468,6 +468,13 @@ const DOS_DIAS: DiaEventoItem[] = [
       { label: 'Ver Relay', href: '#compite-sab-dia-relay' },
       { label: 'Ver ½ Hybrid', href: '#experience' },
     ],
+  },
+  {
+    fecha: 'DOMINGO 15',
+    sesion: 'Por anunciar',
+    titulo: 'Por anunciar',
+    texto: 'Día reservado para actividades especiales. Los detalles se anunciarán en este sitio.',
+    links: [],
   },
 ]
 
@@ -1555,7 +1562,7 @@ function OrganizerStrip() {
           textTransform: 'uppercase',
         }}
       >
-        Organizado por ENFORMA Sports Society · Mérida, Yucatán · 13 y 14 de noviembre de 2026
+        Organizado por ENFORMA Sports Society · Mérida, Yucatán · 13, 14 y 15 de noviembre de 2026
       </Typography>
     </Box>
   )
@@ -2697,7 +2704,7 @@ export default function LandingPage() {
                   fontSize: { xs: '2.6rem', sm: '3.2rem', md: '3.9rem' },
                 }}
               >
-                13–14
+                13–15
               </Typography>
               <Typography
                 component="span"
@@ -3494,7 +3501,7 @@ export default function LandingPage() {
         </Container>
       </Box>
 
-      {/* ===== DOS DÍAS (TIMELINE) ===== */}
+      {/* ===== LOS DÍAS (TIMELINE) ===== */}
       <Box
         sx={{
           py: { xs: 8, md: 12 },
@@ -3502,7 +3509,7 @@ export default function LandingPage() {
         }}
       >
         <Container maxWidth="md">
-          <SectionHeading label="DOS DÍAS" />
+          <SectionHeading label="LOS DÍAS" />
           <Typography
             variant="body1"
             sx={{
@@ -3518,7 +3525,7 @@ export default function LandingPage() {
           </Typography>
 
           <Stack spacing={0}>
-            {DOS_DIAS.map((dia, i) => (
+            {DIAS_EVENTO.map((dia, i) => (
               <Box
                 key={dia.titulo}
                 sx={{
@@ -4033,7 +4040,7 @@ export default function LandingPage() {
                       fontSize: { xs: '1.9rem', sm: '2.6rem', md: '3.2rem' },
                     }}
                   >
-                    13–14
+                    13–15
                   </Typography>
                   <Typography
                     component="span"
