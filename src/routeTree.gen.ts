@@ -2,6 +2,7 @@ import { createRootRoute, createRoute } from '@tanstack/react-router'
 import App from './App'
 import LandingPage from './pages/LandingPage'
 import CheckoutConfirmPage from './pages/CheckoutConfirmPage'
+import OpenpayReturnPage from './pages/OpenpayReturnPage'
 
 // ---- Root ----
 const rootRoute = createRootRoute({ component: App })
@@ -18,7 +19,14 @@ const checkoutConfirmRoute = createRoute({
   component: CheckoutConfirmPage,
 })
 
+const openpayReturnRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/checkout/openpay',
+  component: OpenpayReturnPage,
+})
+
 export const routeTree = rootRoute.addChildren([
   landingRoute,
   checkoutConfirmRoute,
+  openpayReturnRoute,
 ])
