@@ -44,6 +44,8 @@ import {
 import type { Producto } from '../data/catalogo'
 import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
+import { Link } from '@tanstack/react-router'
+import { LEGAL_ENTITY, PRIVACY_PATH, TERMS_PATH } from '../config/legalConfig'
 import { SIMULACRO_PRO_ACTIVE } from '../config/simulacroProConfig'
 import { getAffiliateCode, isLaunchBenefitActive, subscribeAffiliate } from '../lib/affiliate'
 import { ETAPA_RANGO_LABEL, isVentaAbierta, type EtapaComercial } from '../lib/pricingStage'
@@ -4625,6 +4627,49 @@ export default function LandingPage() {
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           © 2026 EnForma Sports Society. Todos los derechos reservados.
+        </Typography>
+
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{ mt: 1.5, justifyContent: 'center', flexWrap: 'wrap', rowGap: 0.5 }}
+        >
+          <Box
+            component={Link}
+            to={TERMS_PATH}
+            sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', textDecoration: 'underline' }}
+          >
+            Términos y Condiciones
+          </Box>
+          <Box
+            component={Link}
+            to={PRIVACY_PATH}
+            sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', textDecoration: 'underline' }}
+          >
+            Aviso de Privacidad
+          </Box>
+        </Stack>
+
+        <Typography
+          component="p"
+          sx={{
+            maxWidth: 720,
+            mx: 'auto',
+            mt: 1.5,
+            color: 'rgba(255,255,255,0.4)',
+            fontSize: '0.68rem',
+            lineHeight: 1.6,
+          }}
+        >
+          {LEGAL_ENTITY.razonSocial} · RFC {LEGAL_ENTITY.rfc} · {LEGAL_ENTITY.domicilio}. Soporte:{' '}
+          <Box
+            component="a"
+            href={`mailto:${LEGAL_ENTITY.supportEmail}`}
+            sx={{ color: 'inherit', textDecoration: 'underline' }}
+          >
+            {LEGAL_ENTITY.supportEmail}
+          </Box>
+          . Pagos procesados mediante Openpay y Mercado Pago.
         </Typography>
 
         <Typography

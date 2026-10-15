@@ -3,6 +3,9 @@ import App from './App'
 import LandingPage from './pages/LandingPage'
 import CheckoutConfirmPage from './pages/CheckoutConfirmPage'
 import OpenpayReturnPage from './pages/OpenpayReturnPage'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
+import { PRIVACY_PATH, TERMS_PATH } from './config/legalConfig'
 
 // ---- Root ----
 const rootRoute = createRootRoute({ component: App })
@@ -25,8 +28,22 @@ const openpayReturnRoute = createRoute({
   component: OpenpayReturnPage,
 })
 
+const termsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: TERMS_PATH,
+  component: TermsPage,
+})
+
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: PRIVACY_PATH,
+  component: PrivacyPage,
+})
+
 export const routeTree = rootRoute.addChildren([
   landingRoute,
   checkoutConfirmRoute,
   openpayReturnRoute,
+  termsRoute,
+  privacyRoute,
 ])
