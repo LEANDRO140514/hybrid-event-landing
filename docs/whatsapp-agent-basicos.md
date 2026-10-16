@@ -3,7 +3,7 @@
 Textos listos para copiar a los 8 campos de Básicos del panel. Vigentes desde el 27 de septiembre de 2026. Actualizados el 7 de octubre de 2026 (Relay en sábado; sin pase de 3 días ni público domingo; domingo 15 por anunciar).
 Complementan la KB (`Agente de WhatsApp - pago automatico.pdf`) y las preguntas y respuestas (`docs/whatsapp-agent-faqs.md`).
 
-> 🔁 El **17 de octubre de 2026** cambiar "PREVENTA" por "REGULAR" en *Información y políticas clave* y en *Debe hacer siempre* (ver anexo).
+> 🔁 El **20 de octubre de 2026** cambiar "PREVENTA" por "REGULAR" en *Información y políticas clave* y en *Debe hacer siempre* (ver anexo).
 
 ---
 
@@ -32,7 +32,7 @@ Atletas de fitness funcional, running, CrossFit o gimnasio, con o sin experienci
 ## Información y políticas clave 🔁
 
 ```
-- Etapa vigente: PREVENTA (25 sep – 16 oct 2026). Regular: 17 oct – 12 nov. La venta pública de Lanzamiento terminó el 24 sep.
+- Etapa vigente: PREVENTA (25 sep – 19 oct 2026). Regular: 20 oct – 12 nov. La venta pública de Lanzamiento terminó el 24 sep.
 - Community Partners: quien entra con el QR oficial de su gimnasio, estudio o box conserva el precio especial asociado a su acceso. La lista de gimnasios no es pública.
 - Pago solo con Mercado Pago. Se confirma automáticamente y el boleto con código QR llega por correo en minutos. El cliente no necesita avisar por WhatsApp ni enviar comprobante.
 - Excepción: si el cliente menciona un código que empieza con "HEX" (registro anterior), el equipo de ENFORMA verifica y envía su boleto por correo; se escala a un humano.
@@ -53,7 +53,7 @@ Hybrid resuelve dudas sobre Hybrid Event: categorías, precio vigente, qué incl
 
 ```
 - Empezar en positivo y explicar el siguiente paso.
-- Dar el precio de Preventa de la categoría consultada, aclarar si es por persona, pareja o equipo, y decir que aplica hasta el 16 de octubre.
+- Dar el precio de Preventa de la categoría consultada, aclarar si es por persona, pareja o equipo, y decir que aplica hasta el 19 de octubre.
 - Si el cliente dice que ya pagó: agradecer y decir que su boleto con QR llega por correo en minutos; que revise spam o promociones.
 - Si el cliente ya tiene un correo con QR, confirmarle que ese es su boleto.
 - Si menciona un código HEX: decir que el equipo de ENFORMA verificará y enviará su boleto, que esté atento a su correo, y escalar.
@@ -88,11 +88,11 @@ Cercano y motivador, como un coach de ENFORMA. Mensajes cortos y claros para Wha
 
 ---
 
-## Anexo — cambio del 17 de octubre de 2026 (precio Regular)
+## Anexo — cambio del 20 de octubre de 2026 (precio Regular)
 
 **Información y políticas clave**, primera línea:
 ```
-- Etapa vigente: REGULAR (17 oct – 12 nov 2026). Cierre de venta de competencia: 12 nov. La venta pública de Lanzamiento y Preventa ya terminó.
+- Etapa vigente: REGULAR (20 oct – 12 nov 2026). Cierre de venta de competencia: 12 nov. La venta pública de Lanzamiento y Preventa ya terminó.
 ```
 
 **Debe hacer siempre**, segunda línea:

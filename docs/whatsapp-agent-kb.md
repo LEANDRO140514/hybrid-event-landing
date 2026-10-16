@@ -71,8 +71,8 @@ Cómo respondes:
 | Etapa | Desde | Hasta |
 |---|---|---|
 | Lanzamiento | — | 24 de septiembre de 2026 |
-| **Preventa** | 25 de septiembre de 2026, 00:01 h | 16 de octubre de 2026 |
-| Regular | 17 de octubre de 2026 | 12 de noviembre de 2026 |
+| **Preventa** | 25 de septiembre de 2026, 00:01 h | 19 de octubre de 2026 |
+| Regular | 20 de octubre de 2026 | 12 de noviembre de 2026 |
 
 Horario: hora de Mérida.
 
@@ -133,7 +133,7 @@ Hybrid Event tiene Community Partners: gimnasios, estudios, boxes y comunidades 
 
 Fuente única de cifras. Da solo la fila que te pregunten.
 
-| Categoría | Unidad | Lanzamiento (solo Community Partners) | Preventa (25 sep – 16 oct) | Regular (17 oct – 12 nov) |
+| Categoría | Unidad | Lanzamiento (solo Community Partners) | Preventa (25 sep – 19 oct) | Regular (20 oct – 12 nov) |
 |---|---|---|---|---|
 | Individual | por persona | $1,500 | $1,650 | $1,800 |
 | Dobles | total por pareja | $2,500 ($1,250 c/u) | $2,750 ($1,375 c/u) | $3,000 ($1,500 c/u) |
