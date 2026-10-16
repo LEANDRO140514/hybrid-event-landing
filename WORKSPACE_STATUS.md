@@ -330,3 +330,14 @@ Approved stage calendar (Preventa 25 sep – 16 oct, Regular 17 oct – 12 nov, 
 - **`registro.enforma.mx` does not exist (DNS NXDOMAIN, checked 2026-09-27).** It is `DOMAINS.registration`, the target of `getInscribirUrl()` — the "Inscribirme" link whenever the embedded checkout is not active (e.g. every Vercel preview today). Production is unaffected while all products use the embedded checkout.
 - Checkout in Vercel previews: not configured. Would need Preview env `VITE_CHECKOUT_MODE=sandbox`, `VITE_CHECKOUT_ENABLED=true`, `VITE_INSFORGE_FUNCTIONS_BASE` = ready2hybrid-sandbox base, plus `CHECKOUT_CORS_ORIGIN` on the sandbox set to a stable preview alias (single exact origin).
 - ready2hybrid `mp-create-checkout` with spectator event-day sales is committed nowhere and not deployed; must ship before 13 nov.
+
+## Phase PREVENTA-PRORROGA-19OCT (opened and closed 2026-10-16)
+
+CEO-requested extension of the Presale. **Current stage calendar (America/Merida, UTC-6, no DST): Lanzamiento through 24 sep; Preventa 25 sep - 19 oct inclusive; Regular 20 oct - 12 nov inclusive; competition sales close 13 nov 00:00.** This supersedes "Preventa 25 sep - 16 oct, Regular 17 oct - 12 nov" in the LANDING-PRICING-CALENDAR-KB phase above. Regular starts at `2026-10-20T06:00:00Z`.
+
+- Server authority (ready2hybrid): `insforge/functions/_shared/checkout/staged-pricing.ts` (`STAGE_WINDOWS`), commit `25af44b` on `origin/main`. Only the `mp-create-checkout` edge function embeds it (bundled in `insforge/functions/mp-create-checkout/handler.deploy.js`); every other deployed function reads the amount from the order. Redeployed 2026-10-16 to project `ready2hybrid` (appkey `4bg9ufz2`); the deployed bundle was verified identical to `origin/main`.
+- Landing mirror (this repo): only `src/lib/pricingStage.ts` (windows + `ETAPA_RANGO_LABEL`). Landing and server must change together; if they disagree the server answers `PRICE_CHANGED` and the card re-quotes at pay time.
+- Vercel deploys Production from pushes to `main` (GitHub deployments created by `vercel[bot]`); no `vercel --prod` needed.
+- **Do not** redeploy `mp-create-checkout` from any ready2hybrid branch/worktree that still has `17` in `STAGE_WINDOWS`: that would put Regular back on 17 oct. Check `PRESALE.endMs` is `2026, 10, 20` first.
+- WhatsApp agent (OpenLivery agent "Hybrid"): KB PDF, Basicos and Q&A already say 19 oct / 20 oct. The scheduled task that switches the agent to Regular must run on **20 oct 00:01**, not 17 oct.
+- Pending (owner): SPEC-030 tables (lines ~253-254, ready2hybrid) still show 16/17 oct; `tests/affiliate-access.test.ts` runs on `node:test`, not vitest.
