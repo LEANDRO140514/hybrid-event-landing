@@ -2,7 +2,7 @@
 
 Pares listos para copiar al panel (sección Preguntas y Respuestas). Vigentes desde el 27 de septiembre de 2026. Actualizados el 7 de octubre de 2026 (preguntas 12, 18, 19 y 20 nueva; HYROX pasa a la 21).
 
-> 🔁 = cambia el **17 de octubre de 2026** (inicio de precio Regular). Ver el anexo al final.
+> 🔁 = cambia el **20 de octubre de 2026** (inicio de precio Regular). Ver el anexo al final.
 
 ---
 
@@ -10,7 +10,7 @@ Pares listos para copiar al panel (sección Preguntas y Respuestas). Vigentes de
 
 **1. 🔁 ¿Ya puedo inscribirme?**
 
-¡Sí! 🙌 Las inscripciones para Hybrid Event están abiertas en https://hybrid-experience.enforma.mx. Estamos en precio de Preventa hasta el 16 de octubre. ¿Qué te interesa: Individual, Dobles, Relay, ½ Hybrid o público? Te paso el precio exacto.
+¡Sí! 🙌 Las inscripciones para Hybrid Event están abiertas en https://hybrid-experience.enforma.mx. Estamos en precio de Preventa hasta el 19 de octubre. ¿Qué te interesa: Individual, Dobles, Relay, ½ Hybrid o público? Te paso el precio exacto.
 
 **2. 🔁 ¿Cómo puedo reservar mi lugar?**
 
@@ -19,7 +19,7 @@ Pares listos para copiar al panel (sección Preguntas y Respuestas). Vigentes de
 2. Llena tus datos (y los de tu pareja o equipo, si aplica).
 3. Paga con Mercado Pago (3 meses sin intereses en categorías de competencia).
 
-Tu boleto con código QR te llega por correo ⚡ Estamos en Preventa hasta el 16 de octubre. ¿Qué categoría te interesa?
+Tu boleto con código QR te llega por correo ⚡ Estamos en Preventa hasta el 19 de octubre. ¿Qué categoría te interesa?
 
 **3. ¿Cómo pago?**
 
@@ -43,7 +43,7 @@ Te ayudamos a ubicarlo 🙌 Revisa también spam o promociones. Si no aparece, e
 
 **8. 🔁 ¿Cuándo sube el precio?**
 
-Estamos en precio de Preventa hasta el 16 de octubre. Del 17 de octubre al 12 de noviembre aplica el precio Regular, así que te conviene asegurar tu lugar antes ⚡
+Estamos en precio de Preventa hasta el 19 de octubre. Del 20 de octubre al 12 de noviembre aplica el precio Regular, así que te conviene asegurar tu lugar antes ⚡
 
 **9. ¿Hay reembolsos si no puedo ir?**
 
@@ -111,7 +111,7 @@ HYBRID EVENT EXPERIENCE es un evento deportivo operado y producido de forma inde
 
 ---
 
-## Anexo — cambio del 17 de octubre de 2026 (precio Regular)
+## Anexo — cambio del 20 de octubre de 2026 (precio Regular)
 
 Reemplazar las respuestas marcadas con 🔁:
 
