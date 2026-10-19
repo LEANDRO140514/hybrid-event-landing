@@ -2976,6 +2976,29 @@ export default function LandingPage() {
             Para quien nunca ha competido — y para quien quiere hacerlo de verdad, en volumen
             accesible.
           </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              textAlign: 'center',
+              color: '#E6F2B1',
+              mb: { xs: 5, md: 7 },
+              maxWidth: 640,
+              mx: 'auto',
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Competidores: preséntate en mesas al menos 3 horas antes de tu competencia y escríbenos al{' '}
+            <Box
+              component="a"
+              href="https://wa.me/529902302378"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ color: '#E6F2B1', fontWeight: 700, textDecoration: 'underline' }}
+            >
+              WhatsApp oficial 990 230 2378
+            </Box>
+            {' '}para la entrega de tu kit.
+          </Typography>
 
           {/* ½ Hybrid */}
           <Box>
@@ -3657,6 +3680,29 @@ export default function LandingPage() {
             }}
           >
             Individual, Dobles o Relay. Encuentra tu categoría y asegura tu lugar en HYBRID EXPERIENCE.
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              textAlign: 'center',
+              color: '#E6F2B1',
+              mb: 6,
+              maxWidth: 640,
+              mx: 'auto',
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Competidores: preséntate en mesas al menos 3 horas antes de tu competencia y escríbenos al{' '}
+            <Box
+              component="a"
+              href="https://wa.me/529902302378"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ color: '#E6F2B1', fontWeight: 700, textDecoration: 'underline' }}
+            >
+              WhatsApp oficial 990 230 2378
+            </Box>
+            {' '}para la entrega de tu kit.
           </Typography>
 
           {COMPITE_GROUPS.map((group) => {
