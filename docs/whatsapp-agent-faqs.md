@@ -68,7 +68,7 @@ Hybrid Event 2026 es del 13 al 15 de noviembre en Club Cumbres, Mérida, Yucatá
 **13. ¿Cómo será el acceso al recinto?**
 
 ENFORMA te avisará los puntos y horarios de registro 🙌
-- Competidores: se escanea tu código QR, se valida tu identidad y recibes tu kit, tu número y la pulsera de tu categoría (una por cada categoría en la que compitas). Debes presentarte en mesas al menos 3 horas antes de tu competencia y escribir al WhatsApp oficial 990 230 2378 para la entrega de tu kit.
+- Competidores: se escanea tu código QR, se valida tu identidad y recibes tu kit, tu número y la pulsera de tu categoría (una por cada categoría en la que compitas). La entrega de kits es en Club Cumbres, desde el jueves 12 de noviembre (horario por definir) hasta el viernes 13 a las 12:00 h; ENFORMA avisará el horario por redes, correo y WhatsApp. Si te inscribes de última hora (viernes 13, hasta las 11:00), recoge tu kit al menos 3 horas antes de tu competencia y escribe al WhatsApp oficial 990 230 2378.
 - Público: recoges tu pulsera en las mesas de registro el día de tu acceso, o antes cuando se anuncien los horarios.
 
 **14. ¿Hay cupos limitados?**

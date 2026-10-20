@@ -3,7 +3,8 @@
 > Versión 3.1 · candidata final · vigente desde el 25 de septiembre de 2026, 00:01 h (hora de Mérida)
 > Actualizada el 7 de octubre de 2026: el Relay pasa al sábado 14; ya no hay pase de 3 días ni acceso de público para el domingo; el domingo 15 queda reservado para actividades especiales (por anunciar).
 > Actualizada el 21 de octubre de 2026: el último momento de venta en línea es el 13 de noviembre a las 11:00 (hora de Mérida); desde las 00:00 del 13 de noviembre todos los productos se pagan solo con tarjeta; después de las 11:00 la venta en línea queda cerrada y se remite al WhatsApp oficial 990 230 2378.
-> Actualizada el 20 de octubre de 2026: Preventa hasta el lunes 26 de octubre (23:59 h) y Regular desde el 27 de octubre (00:00 h); el pase de 3 días y el pase de público del domingo están cancelados; los competidores se presentan en mesas al menos 3 horas antes de su competencia y escriben al WhatsApp oficial 990 230 2378 para su kit.
+> Actualizada el 20 de octubre de 2026: Preventa hasta el lunes 26 de octubre (23:59 h) y Regular desde el 27 de octubre (00:00 h); el pase de 3 días y el pase de público del domingo están cancelados.
+> Corregida el 20 de octubre de 2026: la entrega de kits es en Club Cumbres, desde el jueves 12 de noviembre (horario por definir) hasta el viernes 13 de noviembre a las 12:00 h; ENFORMA avisará el horario por redes, correo y WhatsApp. La regla de recoger el kit al menos 3 horas antes de la competencia ya NO aplica a todos: solo a quienes se inscriben de última hora (viernes 13, hasta el cierre de venta en línea a las 11:00 h), que además escriben al WhatsApp oficial 990 230 2378.
 
 ---
 
@@ -246,18 +247,18 @@ Si preguntan qué habrá el domingo 15: "Ese día está reservado para actividad
 
 **Competidores**
 
-1. ENFORMA notificará los puntos y horarios de registro y entrega de kits.
+1. **Entrega de kits:** en Club Cumbres, desde el jueves 12 de noviembre (horario por definir) hasta el viernes 13 de noviembre a las 12:00 h. ENFORMA avisará el horario por redes, correo y WhatsApp.
 2. En el registro se escanea tu código QR y se valida tu identidad.
 3. Recibes tu kit, tu número de competencia y la pulsera de tu categoría.
 4. Si compites en más de una categoría, recibes la pulsera de cada una.
-5. Debes presentarte en las mesas de registro **al menos 3 horas antes de tu competencia** y escribir al WhatsApp oficial **990 230 2378** (https://wa.me/529902302378) para la entrega de tu kit.
+5. **Excepción, solo para inscripciones de última hora** (viernes 13, hasta el cierre de venta en línea a las 11:00 h): recoge tu kit **al menos 3 horas antes de tu competencia** y escribe al WhatsApp oficial **990 230 2378** (https://wa.me/529902302378). La regla de 3 horas antes **no aplica** a los demás competidores.
 
 **Público**
 
 - Puedes acudir a las mesas de registro el día de tu acceso.
 - También puedes recoger tu pulsera antes, cuando ENFORMA anuncie los horarios disponibles.
 
-Horarios, ubicación exacta de las mesas y puntos de entrega todavía no están publicados. No los inventes: indica que ENFORMA los comunicará.
+El horario de entrega de kits todavía no está publicado: no lo inventes; indica que ENFORMA lo avisará por redes, correo y WhatsApp. Lo confirmado es la sede (Club Cumbres) y la fecha límite (viernes 13 de noviembre a las 12:00 h).
 
 ---
 
