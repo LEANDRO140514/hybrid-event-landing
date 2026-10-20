@@ -48,7 +48,9 @@ import { Link } from '@tanstack/react-router'
 import { LEGAL_ENTITY, PRIVACY_PATH, TERMS_PATH } from '../config/legalConfig'
 import { SIMULACRO_PRO_ACTIVE } from '../config/simulacroProConfig'
 import { getAffiliateCode, isLaunchBenefitActive, subscribeAffiliate } from '../lib/affiliate'
-import { ETAPA_RANGO_LABEL, isVentaAbierta, type EtapaComercial } from '../lib/pricingStage'
+import { ETAPA_RANGO_LABEL, esSoloTarjeta, isVentaAbierta, type EtapaComercial } from '../lib/pricingStage'
+import { WHATSAPP_OFICIAL_LABEL, WHATSAPP_OFICIAL_URL } from '../config/contactConfig'
+import { TELEFONO_ERROR, TELEFONO_PLACEHOLDER, normalizePhoneMx } from '../lib/phone'
 import {
   getSandboxCheckoutProductConfig,
   isCheckoutActive,
@@ -545,6 +547,8 @@ function CheckoutBuyerFields({
   onPhoneChange,
   onConsentChange,
 }: CheckoutBuyerFieldsProps) {
+  const [phoneTouched, setPhoneTouched] = useState(false)
+  const phoneInvalid = phoneTouched && normalizePhoneMx(phone) === null
   return (
     <Stack spacing={1} sx={{ width: '100%' }}>
       <TextField
@@ -572,9 +576,15 @@ function CheckoutBuyerFields({
       />
       <TextField
         label="Teléfono / WhatsApp (opcional)"
+        type="tel"
+        placeholder={TELEFONO_PLACEHOLDER}
         value={phone}
         onChange={(e) => onPhoneChange(e.target.value)}
+        onBlur={() => setPhoneTouched(true)}
         disabled={disabled}
+        error={phoneInvalid}
+        helperText={phoneInvalid ? TELEFONO_ERROR : undefined}
+        slotProps={{ inputLabel: { shrink: true }, htmlInput: { inputMode: 'tel' } }}
         size="small"
         fullWidth
         autoComplete="tel"
@@ -729,7 +739,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
   const isContactValid =
     buyerName.trim().length > 1 &&
     EMAIL_PATTERN.test(buyerEmail.trim()) &&
-    (buyerPhone.trim() === '' || buyerPhone.trim().length >= 10)
+    normalizePhoneMx(buyerPhone) !== null
 
   // Every teammate name filled, same criterion as buyer.name.
   const teammatesValid =
@@ -787,7 +797,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
         rosterFingerprint: computeRosterFingerprint(captainName, teammateNamesTrimmed),
         expectedUnitPriceCents: unitPriceCents,
       })
-      const phoneTrimmed = buyerPhone.trim()
+      const phoneNormalized = normalizePhoneMx(buyerPhone)
       const result = await createCheckout({
         productCode: attempt.productCode,
         quantity: attempt.quantity,
@@ -796,7 +806,7 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
         buyer: {
           email: buyerEmail.trim(),
           name: captainName,
-          ...(phoneTrimmed ? { phone: phoneTrimmed } : {}),
+          ...(phoneNormalized ? { phone: phoneNormalized } : {}),
           contactConsent,
         },
         captainName,
@@ -1123,6 +1133,14 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
                 sx={checkoutFieldSx(accentColor)}
               />
             )}
+            {esSoloTarjeta() && (
+              <Typography
+                variant="caption"
+                sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.72rem', textAlign: 'left' }}
+              >
+                Desde el 13 de noviembre solo se acepta pago con tarjeta.
+              </Typography>
+            )}
             {errorMessage && (
               <Typography
                 role="alert"
@@ -1134,6 +1152,9 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
             )}
           </Stack>
         )}
+        {isClosed ? (
+          <VentaCerradaAviso accentColor={accentColor} />
+        ) : (
         <Button
           component={checkoutActive ? 'button' : isOpen ? 'a' : 'button'}
           href={!checkoutActive && isOpen ? getInscribirUrl(producto.code) : undefined}
@@ -1201,8 +1222,43 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
                 : 'Pagar'
             : buttonLabel}
         </Button>
+        )}
       </CardContent>
     </Card>
+  )
+}
+
+function VentaCerradaAviso({ accentColor }: { accentColor: string }) {
+  return (
+    <Stack spacing={0.75} sx={{ mt: 'auto', textAlign: 'center' }}>
+      <Typography
+        sx={{
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          fontSize: { xs: '0.72rem', sm: '0.78rem' },
+          color: accentColor,
+          fontFamily: "'Space Grotesk', sans-serif",
+        }}
+      >
+        Venta en línea cerrada
+      </Typography>
+      <Typography
+        component="a"
+        href={WHATSAPP_OFICIAL_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        sx={{
+          color: 'rgba(255,255,255,0.8)',
+          fontSize: '0.72rem',
+          textDecoration: 'underline',
+          fontFamily: "'Space Grotesk', sans-serif",
+          '&:focus-visible': { outline: `3px solid ${accentColor}`, outlineOffset: 2 },
+        }}
+      >
+        WhatsApp oficial {WHATSAPP_OFICIAL_LABEL}
+      </Typography>
+    </Stack>
   )
 }
 
@@ -1997,6 +2053,97 @@ function FilaPrecioTabla({ fila }: { fila: FilaTablaPrecio }) {
       >
         {msi ? '✓ 3 MSI' : '—'}
       </Box>
+    </Box>
+  )
+}
+
+const CALENDARIO_FILAS: { etiqueta: string; detalle: React.ReactNode }[] = [
+  { etiqueta: 'Preventa', detalle: 'Hasta el 26 de octubre.' },
+  {
+    etiqueta: 'Regular',
+    detalle: 'Del 27 de octubre al 13 de noviembre a las 11:00 (hora de Mérida), último momento de venta en línea.',
+  },
+  { etiqueta: 'Competencias', detalle: '13 y 14 de noviembre, Club Cumbres, Mérida.' },
+  {
+    etiqueta: 'Entrega de kit',
+    detalle: (
+      <>
+        Preséntate en las mesas al menos 3 horas antes de tu competencia y escribe al WhatsApp oficial{' '}
+        <Box
+          component="a"
+          href={WHATSAPP_OFICIAL_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ color: '#E6F2B1', fontWeight: 700 }}
+        >
+          {WHATSAPP_OFICIAL_LABEL}
+        </Box>
+        .
+      </>
+    ),
+  },
+]
+
+function CalendarioVenta() {
+  return (
+    <Box
+      component="section"
+      id="calendario"
+      sx={{ py: { xs: 7, md: 9 }, scrollMarginTop: '80px', bgcolor: '#000000' }}
+    >
+      <Container maxWidth="md">
+        <Typography
+          variant="h2"
+          component="h2"
+          sx={{
+            textAlign: 'center',
+            mb: { xs: 4, md: 5 },
+            fontWeight: 900,
+            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.3rem' },
+            textTransform: 'uppercase',
+            letterSpacing: '0.02em',
+            fontFamily: "'Space Grotesk', sans-serif",
+            color: '#E6F2B1',
+          }}
+        >
+          Calendario
+        </Typography>
+        <Box component="dl" sx={{ m: 0, border: '1px solid rgba(230,242,177,0.2)' }}>
+          {CALENDARIO_FILAS.map((fila, i) => (
+            <Box
+              key={fila.etiqueta}
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: '200px 1fr' },
+                gap: { xs: 0.5, sm: 3 },
+                px: { xs: 2, sm: 3 },
+                py: { xs: 1.75, sm: 2.25 },
+                borderTop: i === 0 ? 'none' : '1px solid rgba(230,242,177,0.12)',
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              <Box
+                component="dt"
+                sx={{
+                  fontWeight: 800,
+                  color: '#E6F2B1',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  fontSize: { xs: '0.78rem', sm: '0.85rem' },
+                }}
+              >
+                {fila.etiqueta}
+              </Box>
+              <Box
+                component="dd"
+                sx={{ m: 0, color: '#ffffff', fontSize: { xs: '0.95rem', sm: '1rem' }, lineHeight: 1.6 }}
+              >
+                {fila.detalle}
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </Container>
     </Box>
   )
 }
@@ -2933,6 +3080,7 @@ export default function LandingPage() {
       </Box>
 
       <EtapasDePrecio />
+      <CalendarioVenta />
       <PorQuePerteneces />
 
       {/* ===== EXPERIENCE SECTION ===== */}

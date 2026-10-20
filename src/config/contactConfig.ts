@@ -1,0 +1,2 @@
+export const WHATSAPP_OFICIAL_LABEL = '990 230 2378'
+export const WHATSAPP_OFICIAL_URL = 'https://wa.me/529902302378'
