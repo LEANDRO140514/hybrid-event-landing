@@ -2,7 +2,7 @@
 
 Pares listos para copiar al panel (sección Preguntas y Respuestas). Vigentes desde el 27 de septiembre de 2026. Actualizados el 7 de octubre de 2026 (preguntas 12, 18, 19 y 20 nueva; HYROX pasa a la 21).
 
-> 🔁 = cambia el **20 de octubre de 2026** (inicio de precio Regular). Ver el anexo al final.
+> 🔁 = cambia el **27 de octubre de 2026** (inicio de precio Regular). Ver el anexo al final.
 
 ---
 
@@ -10,7 +10,7 @@ Pares listos para copiar al panel (sección Preguntas y Respuestas). Vigentes de
 
 **1. 🔁 ¿Ya puedo inscribirme?**
 
-¡Sí! 🙌 Las inscripciones para Hybrid Event están abiertas en https://hybrid-experience.enforma.mx. Estamos en precio de Preventa hasta el 19 de octubre. ¿Qué te interesa: Individual, Dobles, Relay, ½ Hybrid o público? Te paso el precio exacto.
+¡Sí! 🙌 Las inscripciones para Hybrid Event están abiertas en https://hybrid-experience.enforma.mx. Estamos en precio de Preventa hasta el 26 de octubre. ¿Qué te interesa: Individual, Dobles, Relay, ½ Hybrid o público? Te paso el precio exacto.
 
 **2. 🔁 ¿Cómo puedo reservar mi lugar?**
 
@@ -19,7 +19,7 @@ Pares listos para copiar al panel (sección Preguntas y Respuestas). Vigentes de
 2. Llena tus datos (y los de tu pareja o equipo, si aplica).
 3. Paga con Mercado Pago (3 meses sin intereses en categorías de competencia).
 
-Tu boleto con código QR te llega por correo ⚡ Estamos en Preventa hasta el 19 de octubre. ¿Qué categoría te interesa?
+Tu boleto con código QR te llega por correo ⚡ Estamos en Preventa hasta el 26 de octubre. ¿Qué categoría te interesa?
 
 **3. ¿Cómo pago?**
 
@@ -43,7 +43,7 @@ Te ayudamos a ubicarlo 🙌 Revisa también spam o promociones. Si no aparece, e
 
 **8. 🔁 ¿Cuándo sube el precio?**
 
-Estamos en precio de Preventa hasta el 19 de octubre. Del 20 de octubre al 12 de noviembre aplica el precio Regular, así que te conviene asegurar tu lugar antes ⚡
+Estamos en precio de Preventa hasta el 26 de octubre. Del 27 de octubre al 12 de noviembre aplica el precio Regular, así que te conviene asegurar tu lugar antes ⚡
 
 **9. ¿Hay reembolsos si no puedo ir?**
 
@@ -68,7 +68,7 @@ Hybrid Event 2026 es del 13 al 15 de noviembre en Club Cumbres, Mérida, Yucatá
 **13. ¿Cómo será el acceso al recinto?**
 
 ENFORMA te avisará los puntos y horarios de registro 🙌
-- Competidores: se escanea tu código QR, se valida tu identidad y recibes tu kit, tu número y la pulsera de tu categoría (una por cada categoría en la que compitas). Debes registrarte al menos 24 horas antes de tu heat.
+- Competidores: se escanea tu código QR, se valida tu identidad y recibes tu kit, tu número y la pulsera de tu categoría (una por cada categoría en la que compitas). Debes presentarte en mesas al menos 3 horas antes de tu competencia y escribir al WhatsApp oficial 990 230 2378 para la entrega de tu kit.
 - Público: recoges tu pulsera en las mesas de registro el día de tu acceso, o antes cuando se anuncien los horarios.
 
 **14. ¿Hay cupos limitados?**
@@ -101,7 +101,7 @@ Para competir, la inscripción debe hacerse antes: la venta cierra el 12 de novi
 
 **20. ¿Hay pase de 3 días o boleto de público para el domingo?**
 
-Por ahora el acceso de público es por día, para el viernes 13 o el sábado 14, a $250 MXN 🙌 El domingo 15 está reservado para actividades especiales; ENFORMA compartirá los detalles por este medio y en Instagram.
+Esos pases fueron cancelados. Por ahora el acceso de público es por día, para el viernes 13 o el sábado 14, a $250 MXN 🙌 El domingo 15 está reservado para actividades especiales; ENFORMA compartirá los detalles por este medio y en Instagram.
 
 ## Marca
 
@@ -111,7 +111,7 @@ HYBRID EVENT EXPERIENCE es un evento deportivo operado y producido de forma inde
 
 ---
 
-## Anexo — cambio del 20 de octubre de 2026 (precio Regular)
+## Anexo — cambio del 27 de octubre de 2026 (precio Regular)
 
 Reemplazar las respuestas marcadas con 🔁:
 

@@ -2,6 +2,7 @@
 
 > Versión 3.1 · candidata final · vigente desde el 25 de septiembre de 2026, 00:01 h (hora de Mérida)
 > Actualizada el 7 de octubre de 2026: el Relay pasa al sábado 14; ya no hay pase de 3 días ni acceso de público para el domingo; el domingo 15 queda reservado para actividades especiales (por anunciar).
+> Actualizada el 20 de octubre de 2026: Preventa hasta el lunes 26 de octubre (23:59 h) y Regular desde el 27 de octubre (00:00 h); el pase de 3 días y el pase de público del domingo están cancelados; los competidores se presentan en mesas al menos 3 horas antes de su competencia y escriben al WhatsApp oficial 990 230 2378 para su kit.
 
 ---
 
@@ -71,8 +72,8 @@ Cómo respondes:
 | Etapa | Desde | Hasta |
 |---|---|---|
 | Lanzamiento | — | 24 de septiembre de 2026 |
-| **Preventa** | 25 de septiembre de 2026, 00:01 h | 19 de octubre de 2026 |
-| Regular | 20 de octubre de 2026 | 12 de noviembre de 2026 |
+| **Preventa** | 25 de septiembre de 2026, 00:01 h | 26 de octubre de 2026, 23:59 h |
+| Regular | 27 de octubre de 2026, 00:00 h | 12 de noviembre de 2026 |
 
 Horario: hora de Mérida.
 
@@ -133,7 +134,7 @@ Hybrid Event tiene Community Partners: gimnasios, estudios, boxes y comunidades 
 
 Fuente única de cifras. Da solo la fila que te pregunten.
 
-| Categoría | Unidad | Lanzamiento (solo Community Partners) | Preventa (25 sep – 19 oct) | Regular (20 oct – 12 nov) |
+| Categoría | Unidad | Lanzamiento (solo Community Partners) | Preventa (25 sep – 26 oct) | Regular (27 oct – 12 nov) |
 |---|---|---|---|---|
 | Individual | por persona | $1,500 | $1,650 | $1,800 |
 | Dobles | total por pareja | $2,500 ($1,250 c/u) | $2,750 ($1,375 c/u) | $3,000 ($1,500 c/u) |
@@ -245,7 +246,7 @@ Si preguntan qué habrá el domingo 15: "Ese día está reservado para actividad
 2. En el registro se escanea tu código QR y se valida tu identidad.
 3. Recibes tu kit, tu número de competencia y la pulsera de tu categoría.
 4. Si compites en más de una categoría, recibes la pulsera de cada una.
-5. Debes hacer tu registro y recoger tu kit **al menos 24 horas antes de tu heat**.
+5. Debes presentarte en las mesas de registro **al menos 3 horas antes de tu competencia** y escribir al WhatsApp oficial **990 230 2378** (https://wa.me/529902302378) para la entrega de tu kit.
 
 **Público**
 
@@ -339,8 +340,8 @@ Reglas:
 
 - **Workout Experience:** no se ofrece en esta edición.
 - **Fotógrafo / acreditación de fotógrafo:** no se ofrece en esta edición.
-- **Pase de público de 3 días:** no se ofrece. El acceso de público es por día.
-- **Acceso de público para el domingo 15:** no se ofrece; ese día está reservado para actividades especiales.
+- **Pase de público de 3 días:** cancelado (ya no se vende). El acceso de público es por día.
+- **Acceso de público para el domingo 15:** cancelado (ya no se vende); ese día está reservado para actividades especiales.
 
 Si preguntan, responde en positivo: "Por ahora esa opción no forma parte de esta edición 🙌" y sugiere la opción activa más cercana (½ Hybrid para quien quiere probar; acceso de público por día, viernes o sábado, para quien quiere asistir). No compartas links ni precios de estas opciones.
 
