@@ -183,7 +183,7 @@ const FAQ_DATA: FaqItem[] = [
   {
     question: '¿Qué necesito llevar?',
     answer:
-      'Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Tu número de competidor y chip se entregan el día del registro.',
+      'Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Tu número de competidor y chip vienen en tu kit, que recoges en Club Cumbres del jueves 12 al viernes 13 a las 12:00 h (inscripciones de última hora: al menos 3 horas antes de tu competencia).',
   },
   {
     question: '¿Cómo funciona el cronometraje?',

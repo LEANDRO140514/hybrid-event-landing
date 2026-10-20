@@ -324,7 +324,7 @@ Reglas:
 ## 19. Preguntas frecuentes de apoyo
 
 - **¿Nunca he competido?** Sí puedes participar; ½ Hybrid está pensado para tu primera competencia (sección 8).
-- **¿Qué necesito llevar?** Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Número de competencia y pulsera se entregan en el registro (sección 15).
+- **¿Qué necesito llevar?** Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Tu número de competidor y chip vienen en tu kit, que recoges en Club Cumbres del jueves 12 al viernes 13 a las 12:00 h (inscripciones de última hora: al menos 3 horas antes de tu competencia). Registro y pulseras: sección 15.
 - **Cronometraje:** chip electrónico. Tu tiempo se registra al pasar por cada estación y al cruzar la meta. Resultados en tiempo real.
 - **¿Puedo competir en más de una categoría?** Sí: se inscribe en cada una por separado y recibe la pulsera de cada categoría. Que revise los días para que no se crucen.
 - **Preparación (si piden consejos):** descansa bien los días previos, hidrátate, come carbohidratos complejos y llega con anticipación para calentar. En competencia: ritmo constante, no salir demasiado rápido, dosificar energía por estación. Al terminar: estirar, rehidratar, proteína, y etiquetar a @enforma.sports_ en redes.
