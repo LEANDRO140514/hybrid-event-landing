@@ -8,8 +8,8 @@ export type EtapaComercial = 'lanzamiento' | 'preventa' | 'regular'
  *
  * America/Mérida is fixed at UTC−6 (no DST). Windows are half-open [start, end).
  *   LAUNCH   2026-08-11 → 2026-09-25  (through 24 sep inclusive)
- *   PRESALE  2026-09-25 → 2026-10-20  (25 sep – 19 oct inclusive)
- *   REGULAR  2026-10-20 → 2026-11-13  (20 oct – 12 nov inclusive)
+ *   PRESALE  2026-09-25 → 2026-10-27  (25 sep – 26 oct inclusive; extended from 19 oct)
+ *   REGULAR  2026-10-27 → 2026-11-13  (27 oct – 12 nov inclusive)
  */
 
 const MERIDA_OFFSET_MS = -6 * 60 * 60 * 1000
@@ -25,10 +25,10 @@ const STAGE_WINDOWS = {
   },
   preventa: {
     startMs: meridaWallToUtcMs(2026, 9, 25, 0, 0, 0),
-    endMs: meridaWallToUtcMs(2026, 10, 20, 0, 0, 0),
+    endMs: meridaWallToUtcMs(2026, 10, 27, 0, 0, 0),
   },
   regular: {
-    startMs: meridaWallToUtcMs(2026, 10, 20, 0, 0, 0),
+    startMs: meridaWallToUtcMs(2026, 10, 27, 0, 0, 0),
     endMs: meridaWallToUtcMs(2026, 11, 13, 0, 0, 0),
   },
 } as const
@@ -39,8 +39,8 @@ export const FECHA_CIERRE_VENTAS = '2026-11-13'
 /** Display range per stage, inclusive, in America/Mérida — mirrors STAGE_WINDOWS. */
 export const ETAPA_RANGO_LABEL: Record<EtapaComercial, string> = {
   lanzamiento: 'Hasta 24 sep',
-  preventa: '25 sep – 19 oct',
-  regular: '20 oct – 12 nov',
+  preventa: 'hasta el 26 de octubre',
+  regular: '27 oct – 12 nov',
 }
 
 /**
