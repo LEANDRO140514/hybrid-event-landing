@@ -946,29 +946,33 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
         >
           {producto.integrantes} {producto.integrantes === 1 ? 'integrante' : 'integrantes'}
         </Typography>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 900,
-            fontSize: { xs: '1.1rem', sm: '1.3rem' },
-            fontFamily: "'Space Grotesk', sans-serif",
-            color: accentColor,
-            letterSpacing: '0.02em',
-          }}
-        >
-          {formatPrecio(precioVigente)}
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'rgba(255,255,255,0.65)',
-            fontSize: '0.75rem',
-            mb: producto.incluyeChip ? 0.5 : 1.5,
-            fontFamily: "'Space Grotesk', sans-serif",
-          }}
-        >
-          {unidadConPrecioVigente(producto, precioVigente)}
-        </Typography>
+        {!isClosed && (
+          <>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 900,
+                fontSize: { xs: '1.1rem', sm: '1.3rem' },
+                fontFamily: "'Space Grotesk', sans-serif",
+                color: accentColor,
+                letterSpacing: '0.02em',
+              }}
+            >
+              {formatPrecio(precioVigente)}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'rgba(255,255,255,0.65)',
+                fontSize: '0.75rem',
+                mb: producto.incluyeChip ? 0.5 : 1.5,
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
+              {unidadConPrecioVigente(producto, precioVigente)}
+            </Typography>
+          </>
+        )}
         {producto.incluyeChip && (
           <Typography
             variant="caption"
@@ -1469,6 +1473,7 @@ function Navbar() {
     { label: 'EXPERIENCE', href: '#experience' },
     { label: 'FORMATOS', href: '#formatos' },
     { label: 'PRECIOS', href: '#precios' },
+    { label: 'CALENDARIO', href: '#calendario' },
     { label: 'COMPITE', href: '#compite' },
     { label: 'PREMIOS', href: '#premios' },
     ...(SIMULACRO_PRO_ACTIVE ? [{ label: 'PRO', href: '#simulacro-pro' }] : []),
@@ -3855,6 +3860,9 @@ export default function LandingPage() {
 
           {COMPITE_GROUPS.map((group) => {
             const precioVigente = getPrecioMostrado(group.productos[0])
+            const grupoCerrado =
+              SALES_CONFIG.status === 'closed' ||
+              (SALES_CONFIG.status === 'open' && !isVentaAbierta(group.productos[0].code))
             return (
             <Box key={group.key} id={group.id} sx={{ mb: { xs: 5, md: 6 }, scrollMarginTop: '80px' }}>
               <Typography
@@ -3870,7 +3878,7 @@ export default function LandingPage() {
                   fontFamily: "'Space Grotesk', sans-serif",
                 }}
               >
-                {`${DIA_FECHA[group.dia]} · ${SESION_LABEL[group.sesion] ?? group.sesion} · ${group.tipo.toUpperCase()} · ${formatPrecio(precioVigente)} ${unidadConPrecioVigente(group.productos[0], precioVigente)}`}
+                {`${DIA_FECHA[group.dia]} · ${SESION_LABEL[group.sesion] ?? group.sesion} · ${group.tipo.toUpperCase()}${grupoCerrado ? '' : ` · ${formatPrecio(precioVigente)} ${unidadConPrecioVigente(group.productos[0], precioVigente)}`}`}
               </Typography>
               {FORMATO_DESCRIPCIONES[group.tipo] && (
                 <Typography
