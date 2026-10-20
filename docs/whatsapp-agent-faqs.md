@@ -23,7 +23,7 @@ Tu boleto con código QR te llega por correo ⚡ Estamos en Preventa hasta el 26
 
 **3. ¿Cómo pago?**
 
-Llenas tus datos en https://hybrid-experience.enforma.mx y pagas con Mercado Pago 🙌 En categorías de competencia tienes opción de 3 meses sin intereses. Tu pago se confirma al momento y tu boleto con código QR te llega por correo.
+Llenas tus datos en https://hybrid-experience.enforma.mx y pagas con Mercado Pago 🙌 En categorías de competencia tienes opción de 3 meses sin intereses. Desde el 13 de noviembre solo se acepta pago con tarjeta. Tu pago se confirma al momento y tu boleto con código QR te llega por correo.
 
 **4. Ya pagué, ¿cómo confirmo mi registro?**
 
@@ -43,7 +43,7 @@ Te ayudamos a ubicarlo 🙌 Revisa también spam o promociones. Si no aparece, e
 
 **8. 🔁 ¿Cuándo sube el precio?**
 
-Estamos en precio de Preventa hasta el 26 de octubre. Del 27 de octubre al 12 de noviembre aplica el precio Regular, así que te conviene asegurar tu lugar antes ⚡
+Estamos en precio de Preventa hasta el 26 de octubre. Del 27 de octubre al 13 de noviembre a las 11:00 aplica el precio Regular, así que te conviene asegurar tu lugar antes ⚡
 
 **9. ¿Hay reembolsos si no puedo ir?**
 
@@ -97,7 +97,7 @@ Tu inscripción de competencia incluye 🙌 kit oficial, chip de cronometraje, s
 
 **19. ¿Habrá venta de boletos en los días de competencia?**
 
-Para competir, la inscripción debe hacerse antes: la venta cierra el 12 de noviembre. Los accesos de público sí se venden durante el evento, sujetos a disponibilidad 🙌 Hay acceso por día para el viernes y el sábado.
+Para competir, la inscripción debe hacerse antes: la venta en línea cierra el 13 de noviembre a las 11:00. Los accesos de público sí se venden durante el evento, sujetos a disponibilidad 🙌 Hay acceso por día para el viernes y el sábado.
 
 **20. ¿Hay pase de 3 días o boleto de público para el domingo?**
 
@@ -116,10 +116,10 @@ HYBRID EVENT EXPERIENCE es un evento deportivo operado y producido de forma inde
 Reemplazar las respuestas marcadas con 🔁:
 
 **1. ¿Ya puedo inscribirme?**
-¡Sí! 🙌 Las inscripciones para Hybrid Event están abiertas en https://hybrid-experience.enforma.mx. Estamos en precio Regular, vigente hasta el 12 de noviembre. ¿Qué te interesa: Individual, Dobles, Relay, ½ Hybrid o público? Te paso el precio exacto.
+¡Sí! 🙌 Las inscripciones para Hybrid Event están abiertas en https://hybrid-experience.enforma.mx. Estamos en precio Regular, vigente hasta el 13 de noviembre a las 11:00. ¿Qué te interesa: Individual, Dobles, Relay, ½ Hybrid o público? Te paso el precio exacto.
 
 **2. ¿Cómo puedo reservar mi lugar?**
-Misma respuesta, cambiando la última línea por: "Estamos en precio Regular hasta el 12 de noviembre. ¿Qué categoría te interesa?"
+Misma respuesta, cambiando la última línea por: "Estamos en precio Regular hasta el 13 de noviembre a las 11:00. ¿Qué categoría te interesa?"
 
 **8. ¿Cuándo sube el precio?**
-Estamos en precio Regular, vigente hasta el 12 de noviembre, cuando cierra la venta de competencia ⚡ Los cupos son limitados, así que te conviene asegurar tu lugar pronto.
+Estamos en precio Regular, vigente hasta el 13 de noviembre a las 11:00, cuando cierra la venta en línea de competencia ⚡ Los cupos son limitados, así que te conviene asegurar tu lugar pronto.
