@@ -9,7 +9,10 @@ export type EtapaComercial = 'lanzamiento' | 'preventa' | 'regular'
  * America/Mérida is fixed at UTC−6 (no DST). Windows are half-open [start, end).
  *   LAUNCH   2026-08-11 → 2026-09-25  (through 24 sep inclusive)
  *   PRESALE  2026-09-25 → 2026-10-27  (25 sep – 26 oct inclusive; extended from 19 oct)
- *   REGULAR  2026-10-27 → 2026-11-13  (27 oct – 12 nov inclusive)
+ *   REGULAR  2026-10-27 → 2026-11-13 11:00  (27 oct – 13 nov 11:00)
+ *
+ * Online sales for competitors close at 13 nov 11:00 (backend SALES_CLOSED_AT_MS).
+ * From 13 nov 00:00 every product is card-only (backend CARDS_ONLY_FROM).
  */
 
 const MERIDA_OFFSET_MS = -6 * 60 * 60 * 1000
@@ -29,18 +32,26 @@ const STAGE_WINDOWS = {
   },
   regular: {
     startMs: meridaWallToUtcMs(2026, 10, 27, 0, 0, 0),
-    endMs: meridaWallToUtcMs(2026, 11, 13, 0, 0, 0),
+    endMs: meridaWallToUtcMs(2026, 11, 13, 11, 0, 0),
   },
 } as const
 
-/** Exclusive end of REGULAR: 13 nov 2026 00:00 America/Mérida. */
+/** Exclusive end of REGULAR: 13 nov 2026 11:00 America/Mérida. */
 export const FECHA_CIERRE_VENTAS = '2026-11-13'
+
+/** Mirrors backend CARDS_ONLY_FROM: 13 nov 2026 00:00 America/Mérida. */
+const SOLO_TARJETA_DESDE_MS = meridaWallToUtcMs(2026, 11, 13, 0, 0, 0)
+
+/** From 13 nov 00:00 every product is paid by card only (no cash). */
+export function esSoloTarjeta(now: Date = new Date()): boolean {
+  return now.getTime() >= SOLO_TARJETA_DESDE_MS
+}
 
 /** Display range per stage, inclusive, in America/Mérida — mirrors STAGE_WINDOWS. */
 export const ETAPA_RANGO_LABEL: Record<EtapaComercial, string> = {
   lanzamiento: 'Hasta 24 sep',
   preventa: 'hasta el 26 de octubre',
-  regular: '27 oct – 12 nov',
+  regular: '27 oct – 13 nov, 11:00',
 }
 
 /**
