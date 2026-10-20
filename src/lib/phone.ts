@@ -5,6 +5,7 @@ export const TELEFONO_ERROR =
 /**
  * Checkout phone, aligned with the backend. Spaces, hyphens and parentheses are ignored.
  * - 10 digits, 52 + 10 digits, or +52 + 10 digits -> '+52XXXXXXXXXX'
+ * - old mobile format '+52 1 XXXXXXXXXX' or '521XXXXXXXXXX' (the 1 is dropped) -> '+52XXXXXXXXXX'
  * - '+' with another country code and 8 to 15 digits -> kept as E.164
  * - '' when empty (the field is optional); null when invalid.
  */
@@ -14,6 +15,8 @@ export function normalizePhoneMx(raw: string): string | null {
   if (/^\d{10}$/.test(compact)) return `+52${compact}`
   if (/^52\d{10}$/.test(compact)) return `+${compact}`
   if (/^\+52\d{10}$/.test(compact)) return compact
+  const oldMobile = compact.match(/^\+?521(\d{10})$/)
+  if (oldMobile) return `+52${oldMobile[1]}`
   if (!compact.startsWith('+52') && /^\+[1-9]\d{7,14}$/.test(compact)) return compact
   return null
 }

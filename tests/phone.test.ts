@@ -19,6 +19,14 @@ describe('checkout phone (MX + international E.164)', () => {
     assert.equal(normalizePhoneMx('52 981 120 4320'), '+529811204320')
   })
 
+  it('accepts the old mobile format with the extra 1 and drops it', () => {
+    assert.equal(normalizePhoneMx('+52 1 981 120 4320'), '+529811204320')
+    assert.equal(normalizePhoneMx('+521 981 120 4320'), '+529811204320')
+    assert.equal(normalizePhoneMx('5219811204320'), '+529811204320')
+    assert.equal(normalizePhoneMx('52 1 981-120-4320'), '+529811204320')
+    assert.equal(normalizePhoneMx('+52 1 (981) 120 4320'), '+529811204320')
+  })
+
   it('keeps international numbers as E.164', () => {
     assert.equal(normalizePhoneMx('+1 305 555 0123'), '+13055550123')
     assert.equal(normalizePhoneMx('+34 612 345 678'), '+34612345678')
