@@ -1,4 +1,4 @@
-export const TELEFONO_PLACEHOLDER = '10 dígitos, ej. 9811234567'
+export const TELEFONO_PLACEHOLDER = '10 dígitos'
 export const TELEFONO_ERROR =
   'Escribe 10 dígitos (ej. 9811234567), +52 con 10 dígitos, o un número internacional con + y de 8 a 15 dígitos.'
 

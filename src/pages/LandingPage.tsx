@@ -2062,6 +2062,36 @@ function FilaPrecioTabla({ fila }: { fila: FilaTablaPrecio }) {
   )
 }
 
+function EntregaKitsAviso({ mb }: { mb: number | { xs: number; md: number } }) {
+  return (
+    <Typography
+      variant="body1"
+      sx={{
+        textAlign: 'center',
+        color: '#E6F2B1',
+        mb,
+        maxWidth: 640,
+        mx: 'auto',
+        fontFamily: "'Space Grotesk', sans-serif",
+      }}
+    >
+      Entrega de kits en Club Cumbres: jueves 12 y viernes 13 de noviembre, hasta las 12:00 h (horario por
+      confirmar). Si te inscribes de última hora (viernes 13), recoge tu kit al menos 3 horas antes de tu
+      competencia y escríbenos al{' '}
+      <Box
+        component="a"
+        href={WHATSAPP_OFICIAL_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        sx={{ color: '#E6F2B1', fontWeight: 700, textDecoration: 'underline' }}
+      >
+        WhatsApp oficial {WHATSAPP_OFICIAL_LABEL}
+      </Box>
+      .
+    </Typography>
+  )
+}
+
 const CALENDARIO_FILAS: { etiqueta: string; detalle: React.ReactNode }[] = [
   { etiqueta: 'Preventa', detalle: 'Hasta el 26 de octubre.' },
   {
@@ -2070,22 +2100,8 @@ const CALENDARIO_FILAS: { etiqueta: string; detalle: React.ReactNode }[] = [
   },
   { etiqueta: 'Competencias', detalle: '13 y 14 de noviembre, Club Cumbres, Mérida.' },
   {
-    etiqueta: 'Entrega de kit',
-    detalle: (
-      <>
-        Preséntate en las mesas al menos 3 horas antes de tu competencia y escribe al WhatsApp oficial{' '}
-        <Box
-          component="a"
-          href={WHATSAPP_OFICIAL_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{ color: '#E6F2B1', fontWeight: 700 }}
-        >
-          {WHATSAPP_OFICIAL_LABEL}
-        </Box>
-        .
-      </>
-    ),
+    etiqueta: 'Entrega de kits',
+    detalle: 'Jue 12 – vie 13 nov, 12:00 h, en Club Cumbres (horario por confirmar).',
   },
 ]
 
@@ -2148,6 +2164,28 @@ function CalendarioVenta() {
             </Box>
           ))}
         </Box>
+        <Typography
+          sx={{
+            mt: 2.5,
+            color: 'rgba(255,255,255,0.8)',
+            fontSize: { xs: '0.88rem', sm: '0.95rem' },
+            lineHeight: 1.6,
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}
+        >
+          Inscripciones de última hora (viernes 13, hasta el cierre de venta en línea a las 11:00): recoge tu kit
+          al menos 3 horas antes de tu competencia y escribe al WhatsApp oficial{' '}
+          <Box
+            component="a"
+            href={WHATSAPP_OFICIAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ color: '#E6F2B1', fontWeight: 700 }}
+          >
+            {WHATSAPP_OFICIAL_LABEL}
+          </Box>
+          .
+        </Typography>
       </Container>
     </Box>
   )
@@ -3129,29 +3167,7 @@ export default function LandingPage() {
             Para quien nunca ha competido — y para quien quiere hacerlo de verdad, en volumen
             accesible.
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              textAlign: 'center',
-              color: '#E6F2B1',
-              mb: { xs: 5, md: 7 },
-              maxWidth: 640,
-              mx: 'auto',
-              fontFamily: "'Space Grotesk', sans-serif",
-            }}
-          >
-            Competidores: preséntate en mesas al menos 3 horas antes de tu competencia y escríbenos al{' '}
-            <Box
-              component="a"
-              href="https://wa.me/529902302378"
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{ color: '#E6F2B1', fontWeight: 700, textDecoration: 'underline' }}
-            >
-              WhatsApp oficial 990 230 2378
-            </Box>
-            {' '}para la entrega de tu kit.
-          </Typography>
+          <EntregaKitsAviso mb={{ xs: 5, md: 7 }} />
 
           {/* ½ Hybrid */}
           <Box>
@@ -3834,29 +3850,7 @@ export default function LandingPage() {
           >
             Individual, Dobles o Relay. Encuentra tu categoría y asegura tu lugar en HYBRID EXPERIENCE.
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              textAlign: 'center',
-              color: '#E6F2B1',
-              mb: 6,
-              maxWidth: 640,
-              mx: 'auto',
-              fontFamily: "'Space Grotesk', sans-serif",
-            }}
-          >
-            Competidores: preséntate en mesas al menos 3 horas antes de tu competencia y escríbenos al{' '}
-            <Box
-              component="a"
-              href="https://wa.me/529902302378"
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{ color: '#E6F2B1', fontWeight: 700, textDecoration: 'underline' }}
-            >
-              WhatsApp oficial 990 230 2378
-            </Box>
-            {' '}para la entrega de tu kit.
-          </Typography>
+          <EntregaKitsAviso mb={6} />
 
           {COMPITE_GROUPS.map((group) => {
             const precioVigente = getPrecioMostrado(group.productos[0])
