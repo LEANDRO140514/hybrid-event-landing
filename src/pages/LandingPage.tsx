@@ -183,7 +183,7 @@ const FAQ_DATA: FaqItem[] = [
   {
     question: '¿Qué necesito llevar?',
     answer:
-      'Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Tu número de competidor y chip vienen en tu kit, que recoges en Club Cumbres del jueves 12 al viernes 13 a las 12:00 h (inscripciones de última hora: al menos 3 horas antes de tu competencia).',
+      'Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Tu número de competidor y chip vienen en tu kit, que recoges en Club Cumbres desde el jueves 12 a las 5:00 pm (17:00 h) y hasta el viernes 13 a las 12:00 h (inscripciones de última hora: al menos 3 horas antes de tu competencia).',
   },
   {
     question: '¿Cómo funciona el cronometraje?',
@@ -2075,9 +2075,9 @@ function EntregaKitsAviso({ mb }: { mb: number | { xs: number; md: number } }) {
         fontFamily: "'Space Grotesk', sans-serif",
       }}
     >
-      Entrega de kits en Club Cumbres: jueves 12 y viernes 13 de noviembre, hasta las 12:00 h (horario por
-      confirmar). Si te inscribes de última hora (viernes 13), recoge tu kit al menos 3 horas antes de tu
-      competencia y escríbenos al{' '}
+      Entrega de kits en Club Cumbres: jueves 12 de noviembre a partir de las 5:00 pm (17:00 h) y hasta el
+      viernes 13 a las 12:00 h. Si te inscribes de última hora (viernes 13), recoge tu kit al menos 3 horas
+      antes de tu competencia y escríbenos al{' '}
       <Box
         component="a"
         href={WHATSAPP_OFICIAL_URL}
@@ -2101,7 +2101,7 @@ const CALENDARIO_FILAS: { etiqueta: string; detalle: React.ReactNode }[] = [
   { etiqueta: 'Competencias', detalle: '13 y 14 de noviembre, Club Cumbres, Mérida.' },
   {
     etiqueta: 'Entrega de kits',
-    detalle: 'Jue 12 – vie 13 nov, 12:00 h, en Club Cumbres (horario por confirmar).',
+    detalle: 'Jue 12 nov desde las 5:00 pm (17:00 h) – vie 13 nov, 12:00 h, en Club Cumbres.',
   },
 ]
 
