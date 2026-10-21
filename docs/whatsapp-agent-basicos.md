@@ -1,6 +1,6 @@
 # Hybrid Event 2026 — Básicos del agente de WhatsApp (panel)
 
-Textos listos para copiar a los 8 campos de Básicos del panel. Vigentes desde el 27 de septiembre de 2026. Actualizados el 7 de octubre de 2026 (Relay en sábado; sin pase de 3 días ni público domingo; domingo 15 por anunciar). Actualizados el 21 de octubre de 2026 (venta en línea hasta el 13 nov 11:00; solo tarjeta desde el 13 nov 00:00). Actualizados el 20 de octubre de 2026 (Preventa hasta el 26 de octubre, Regular desde el 27; pases de 3 días y de domingo cancelados; entrega de kits jue 12 a vie 13 nov 12:00 h en Club Cumbres). Corregidos el 20 de octubre de 2026 (la regla de 3 horas antes solo aplica a inscripciones de última hora).
+Textos listos para copiar a los 8 campos de Básicos del panel. Vigentes desde el 27 de septiembre de 2026. Actualizados el 7 de octubre de 2026 (Relay en sábado; sin pase de 3 días ni público domingo; domingo 15 por anunciar). Actualizados el 21 de octubre de 2026 (venta en línea hasta el 13 nov 11:00; solo tarjeta desde el 13 nov 00:00). Actualizados el 20 de octubre de 2026 (Preventa hasta el 26 de octubre, Regular desde el 27; pases de 3 días y de domingo cancelados; entrega de kits jue 12 a vie 13 nov 12:00 h en Club Cumbres). Corregidos el 20 de octubre de 2026 (la regla de 3 horas antes solo aplica a inscripciones de última hora). Actualizados el 21 de octubre de 2026 (horario de kits definido: jueves 12 de noviembre desde las 5:00 pm hasta el viernes 13 a las 12:00 h).
 Complementan la KB (`Agente de WhatsApp - pago automatico.pdf`) y las preguntas y respuestas (`docs/whatsapp-agent-faqs.md`).
 
 > 🔁 El **27 de octubre de 2026** cambiar "PREVENTA" por "REGULAR" en *Información y políticas clave* y en *Debe hacer siempre* (ver anexo).
@@ -41,7 +41,7 @@ Atletas de fitness funcional, running, CrossFit o gimnasio, con o sin experienci
 - Reembolsos, cancelaciones y cambios de categoría los atiende el equipo de ENFORMA caso por caso.
 - Workout Experience y Fotógrafo no forman parte de esta edición.
 - El pase de 3 días y el pase de público del domingo están cancelados. Si alguien ya compró uno de esos accesos o un Relay para el domingo, se conecta con el equipo.
-- Entrega de kits: en Club Cumbres, del jueves 12 de noviembre (horario por definir) al viernes 13 de noviembre a las 12:00 h; ENFORMA avisará el horario por redes, correo y WhatsApp.
+- Entrega de kits: en Club Cumbres, del jueves 12 de noviembre a partir de las 5:00 pm (17:00 h) y hasta el viernes 13 de noviembre a las 12:00 h. No inventar la hora de cierre del jueves.
 - Excepción solo para inscripciones de última hora (viernes 13, hasta las 11:00): recoger el kit al menos 3 horas antes de su competencia y escribir al WhatsApp oficial 990 230 2378. La regla de 3 horas antes no aplica a los demás.
 ```
 

@@ -4,7 +4,8 @@
 > Actualizada el 7 de octubre de 2026: el Relay pasa al sábado 14; ya no hay pase de 3 días ni acceso de público para el domingo; el domingo 15 queda reservado para actividades especiales (por anunciar).
 > Actualizada el 21 de octubre de 2026: el último momento de venta en línea es el 13 de noviembre a las 11:00 (hora de Mérida); desde las 00:00 del 13 de noviembre todos los productos se pagan solo con tarjeta; después de las 11:00 la venta en línea queda cerrada y se remite al WhatsApp oficial 990 230 2378.
 > Actualizada el 20 de octubre de 2026: Preventa hasta el lunes 26 de octubre (23:59 h) y Regular desde el 27 de octubre (00:00 h); el pase de 3 días y el pase de público del domingo están cancelados.
-> Corregida el 20 de octubre de 2026: la entrega de kits es en Club Cumbres, desde el jueves 12 de noviembre (horario por definir) hasta el viernes 13 de noviembre a las 12:00 h; ENFORMA avisará el horario por redes, correo y WhatsApp. La regla de recoger el kit al menos 3 horas antes de la competencia ya NO aplica a todos: solo a quienes se inscriben de última hora (viernes 13, hasta el cierre de venta en línea a las 11:00 h), que además escriben al WhatsApp oficial 990 230 2378.
+> Corregida el 20 de octubre de 2026: la entrega de kits es en Club Cumbres, desde el jueves 12 de noviembre a partir de las 5:00 pm (17:00 h) hasta el viernes 13 de noviembre a las 12:00 h. La regla de recoger el kit al menos 3 horas antes de la competencia ya NO aplica a todos: solo a quienes se inscriben de última hora (viernes 13, hasta el cierre de venta en línea a las 11:00 h), que además escriben al WhatsApp oficial 990 230 2378.
+> Actualizada el 21 de octubre de 2026: el horario de entrega de kits quedó definido: jueves 12 de noviembre a partir de las 5:00 pm (17:00 h) y hasta el viernes 13 de noviembre a las 12:00 h, en Club Cumbres. La hora de cierre del jueves no está definida: no la inventes.
 
 ---
 
@@ -247,7 +248,7 @@ Si preguntan qué habrá el domingo 15: "Ese día está reservado para actividad
 
 **Competidores**
 
-1. **Entrega de kits:** en Club Cumbres, desde el jueves 12 de noviembre (horario por definir) hasta el viernes 13 de noviembre a las 12:00 h. ENFORMA avisará el horario por redes, correo y WhatsApp.
+1. **Entrega de kits:** en Club Cumbres, desde el jueves 12 de noviembre a partir de las 5:00 pm (17:00 h) y hasta el viernes 13 de noviembre a las 12:00 h.
 2. En el registro se escanea tu código QR y se valida tu identidad.
 3. Recibes tu kit, tu número de competencia y la pulsera de tu categoría.
 4. Si compites en más de una categoría, recibes la pulsera de cada una.
@@ -258,7 +259,7 @@ Si preguntan qué habrá el domingo 15: "Ese día está reservado para actividad
 - Puedes acudir a las mesas de registro el día de tu acceso.
 - También puedes recoger tu pulsera antes, cuando ENFORMA anuncie los horarios disponibles.
 
-El horario de entrega de kits todavía no está publicado: no lo inventes; indica que ENFORMA lo avisará por redes, correo y WhatsApp. Lo confirmado es la sede (Club Cumbres) y la fecha límite (viernes 13 de noviembre a las 12:00 h).
+Horario de entrega de kits (Club Cumbres): jueves 12 de noviembre a partir de las 5:00 pm (17:00 h) y hasta el viernes 13 de noviembre a las 12:00 h. No inventes la hora de cierre del jueves ni otros horarios: lo confirmado es el inicio del jueves a las 5:00 pm y el cierre del viernes a las 12:00 h.
 
 ---
 
@@ -324,7 +325,7 @@ Reglas:
 ## 19. Preguntas frecuentes de apoyo
 
 - **¿Nunca he competido?** Sí puedes participar; ½ Hybrid está pensado para tu primera competencia (sección 8).
-- **¿Qué necesito llevar?** Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Tu número de competidor y chip vienen en tu kit, que recoges en Club Cumbres del jueves 12 al viernes 13 a las 12:00 h (inscripciones de última hora: al menos 3 horas antes de tu competencia). Registro y pulseras: sección 15.
+- **¿Qué necesito llevar?** Ropa deportiva cómoda, tenis para correr, toalla y botella de agua. Tu número de competidor y chip vienen en tu kit, que recoges en Club Cumbres desde el jueves 12 a las 5:00 pm (17:00 h) y hasta el viernes 13 a las 12:00 h (inscripciones de última hora: al menos 3 horas antes de tu competencia). Registro y pulseras: sección 15.
 - **Cronometraje:** chip electrónico. Tu tiempo se registra al pasar por cada estación y al cruzar la meta. Resultados en tiempo real.
 - **¿Puedo competir en más de una categoría?** Sí: se inscribe en cada una por separado y recibe la pulsera de cada categoría. Que revise los días para que no se crucen.
 - **Preparación (si piden consejos):** descansa bien los días previos, hidrátate, come carbohidratos complejos y llega con anticipación para calentar. En competencia: ritmo constante, no salir demasiado rápido, dosificar energía por estación. Al terminar: estirar, rehidratar, proteína, y etiquetar a @enforma.sports_ en redes.
@@ -387,7 +388,7 @@ Frases guía: "Te ayudo a revisarlo con el equipo de ENFORMA para que puedan ate
 Cuando pregunten por esto, responde: "Esta información todavía no está publicada; ENFORMA la compartirá por este medio y en Instagram 🙌" y, si la persona necesita una respuesta para decidir, conecta con el equipo.
 
 - Horarios exactos de heats por categoría.
-- Horarios y ubicación de registro y entrega de kits y pulseras.
+- Hora de cierre de la entrega de kits del jueves 12, y horarios del registro y de la entrega de pulseras (el horario de entrega de kits ya está definido: sección 15).
 - Número de lugares por categoría.
 - Política de reembolsos, cancelaciones y cambios de categoría.
 - Política para menores de edad.
