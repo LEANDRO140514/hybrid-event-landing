@@ -39,6 +39,27 @@ describe('checkout phone (MX + international E.164)', () => {
     assert.equal(normalizePhoneMx('   '), '')
   })
 
+  it('rejects Mexican numbers that start with 0 or 1, with or without 52/+52', () => {
+    for (const bad of [
+      '+52 1 981 120 432',
+      '1234567890',
+      '0123456789',
+      '52 1234567890',
+      '+52 1234567890',
+      '+52 0123456789',
+      '+52 1 123 456 7890',
+      '521 123 456 7890',
+    ]) {
+      assert.equal(normalizePhoneMx(bad), null, bad)
+    }
+  })
+
+  it('still accepts the old mobile format with a valid number after the 1', () => {
+    assert.equal(normalizePhoneMx('+52 1 981 120 4320'), '+529811204320')
+    assert.equal(normalizePhoneMx('5219811204320'), '+529811204320')
+    assert.equal(normalizePhoneMx('+52 1 222 123 4567'), '+522221234567')
+  })
+
   it('rejects anything else', () => {
     for (const bad of [
       '12345',
