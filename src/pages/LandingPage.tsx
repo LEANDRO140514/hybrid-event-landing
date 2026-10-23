@@ -42,6 +42,7 @@ import {
   getPrecioMostrado,
 } from '../data/catalogo'
 import type { Producto } from '../data/catalogo'
+import { anchorIdForProducto, buildCatalogoGrupos } from '../lib/catalogoLista'
 import { eventConfig } from '../config/eventConfig'
 import { SALES_CONFIG } from '../config/salesConfig'
 import { Link } from '@tanstack/react-router'
@@ -868,7 +869,9 @@ function ProductCard({ producto, accentColor = '#E6F2B1', openLabel = 'Inscribir
 
   return (
     <Card
+      id={anchorIdForProducto(producto.code)}
       sx={{
+        scrollMarginTop: '80px',
         position: 'relative',
         height: '100%',
         display: 'flex',
@@ -1295,6 +1298,11 @@ function groupProductos(productos: Producto[]): ProductoGroup[] {
 const COMPITE_GROUPS = groupProductos(porBloque('COMPITE'))
 const HALF_HYBRID_PRODUCTS = CATALOGO.filter((p) => p.tipo === '½ Hybrid Individual' || p.tipo === '½ Hybrid Dobles')
 const PUBLICO_PRODUCTS = CATALOGO.filter((p) => p.tipo === 'Público')
+const CATALOGO_GRUPOS = buildCatalogoGrupos({
+  compite: porBloque('COMPITE'),
+  halfHybrid: HALF_HYBRID_PRODUCTS,
+  publico: PUBLICO_PRODUCTS,
+})
 
 function SectionHeading({ label, color = '#E6F2B1' }: { label: string; color?: string }) {
   return (
@@ -1627,6 +1635,129 @@ function OrganizerStrip() {
       >
         Organizado por ENFORMA Sports Society · Mérida, Yucatán · 13, 14 y 15 de noviembre de 2026
       </Typography>
+    </Box>
+  )
+}
+
+// ── Catálogo de categorías (una columna, cada fila lleva a su tarjeta) ──
+const CATALOGO_COLOR: Record<string, string> = { compite: '#E6F2B1', half_hybrid: '#E6F2B1', asiste: '#E9C7DF' }
+
+function CatalogoCategorias() {
+  return (
+    <Box
+      id="catalogo"
+      component="section"
+      sx={{ py: { xs: 6, md: 8 }, bgcolor: 'background.default', scrollMarginTop: '80px' }}
+    >
+      <Container maxWidth="sm">
+        <Typography
+          variant="h2"
+          component="h2"
+          sx={{
+            textAlign: 'center',
+            mb: 1,
+            fontWeight: 900,
+            fontSize: { xs: '1.6rem', sm: '2.1rem' },
+            textTransform: 'uppercase',
+            letterSpacing: '0.02em',
+            fontFamily: "'Space Grotesk', sans-serif",
+            color: '#E6F2B1',
+          }}
+        >
+          Elige tu categoría
+        </Typography>
+        <Typography
+          component="p"
+          sx={{
+            textAlign: 'center',
+            mb: { xs: 4, md: 5 },
+            color: 'text.secondary',
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontSize: { xs: '0.9rem', sm: '1rem' },
+            lineHeight: 1.6,
+          }}
+        >
+          Toca tu categoría y te llevamos directo a su inscripción.
+        </Typography>
+        {CATALOGO_GRUPOS.map((grupo) => {
+          const color = CATALOGO_COLOR[grupo.key]
+          return (
+            <Box key={grupo.key} sx={{ mb: { xs: 4, md: 5 } }}>
+              <Typography
+                component="h3"
+                sx={{
+                  color,
+                  fontWeight: 900,
+                  letterSpacing: '0.15em',
+                  textTransform: 'uppercase',
+                  fontSize: '0.8rem',
+                  pb: 1,
+                  borderBottom: `2px solid ${color}`,
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                {grupo.titulo}
+              </Typography>
+              {grupo.filas.map(({ producto, anchorId }) => {
+                const abierta = SALES_CONFIG.status === 'open' && isVentaAbierta(producto.code)
+                const precio = getPrecioMostrado(producto)
+                const estado = SALES_CONFIG.status === 'coming_soon' ? SALES_CONFIG.openingLabel : 'Cerrado'
+                return (
+                  <Box
+                    key={producto.code}
+                    component="a"
+                    href={`#${anchorId}`}
+                    onClick={() => trackSelectExperience({ experience: grupo.experience, cta_location: 'catalogo' })}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 2,
+                      minHeight: 60,
+                      py: 1.25,
+                      textDecoration: 'none',
+                      color: 'text.primary',
+                      borderBottom: '1px solid rgba(230,242,177,0.15)',
+                      WebkitTapHighlightColor: 'transparent',
+                      '@media (hover: hover) and (pointer: fine)': {
+                        '&:hover': { bgcolor: `${color}0F` },
+                      },
+                      '&:active': { bgcolor: `${color}1F` },
+                      '&:focus-visible': { outline: `3px solid ${color}`, outlineOffset: -3 },
+                    }}
+                  >
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography
+                        sx={{ fontWeight: 800, fontSize: { xs: '0.95rem', sm: '1rem' }, lineHeight: 1.25, fontFamily: "'Space Grotesk', sans-serif" }}
+                      >
+                        {producto.nombre}
+                      </Typography>
+                      <Typography
+                        sx={{ color: 'text.secondary', fontSize: '0.7rem', letterSpacing: '0.08em', fontFamily: "'JetBrains Mono', monospace" }}
+                      >
+                        {`${DIA_FECHA[producto.dia] ?? producto.dia} · ${SESION_LABEL[producto.sesion] ?? producto.sesion}`}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexShrink: 0 }}>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography sx={{ color, fontWeight: 900, fontSize: { xs: '1rem', sm: '1.1rem' }, fontFamily: "'Space Grotesk', sans-serif" }}>
+                          {abierta ? formatPrecio(precio) : estado}
+                        </Typography>
+                        {abierta && (
+                          <Typography sx={{ color: 'text.secondary', fontSize: '0.68rem', fontFamily: "'Space Grotesk', sans-serif" }}>
+                            {unidadConPrecioVigente(producto, precio)}
+                          </Typography>
+                        )}
+                      </Box>
+                      <ArrowRight size={18} color={color} />
+                    </Box>
+                  </Box>
+                )
+              })}
+            </Box>
+          )
+        })}
+      </Container>
     </Box>
   )
 }
@@ -2991,6 +3122,7 @@ export default function LandingPage() {
         </Stack>
       </Box>
 
+      <CatalogoCategorias />
       <EligeTuExperiencia />
       <OrganizerStrip />
 
@@ -4921,7 +5053,7 @@ export default function LandingPage() {
       {/* Floating CTA - Elige tu experiencia (desktop: badge horizontal en esquina inferior derecha) */}
       <Box
         component="a"
-        href="#elige-tu-experiencia"
+        href="#catalogo"
         sx={{
           position: 'fixed',
           bottom: 16,
@@ -4991,7 +5123,7 @@ export default function LandingPage() {
       {/* Floating CTA - Elige tu experiencia (mobile: barra sticky inferior) */}
       <Box
         component="a"
-        href="#elige-tu-experiencia"
+        href="#catalogo"
         sx={{
           position: 'fixed',
           left: 12,
